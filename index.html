@@ -11,7 +11,7 @@
 :root {
   --bg:#0a0a0a; --surface:#111; --surface2:#161616; --border:#1e1e1e;
   --accent:#c8f135; --accent2:#35f1c8; --red:#f13560; --green:#35f135;
-  --text:#e8e8e8; --muted:#555;
+  --text:#e8e8e8; --muted:#999;
   --font-display:'Syne',sans-serif; --font-mono:'DM Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -37,6 +37,10 @@ nav{border-bottom:1px solid var(--border);padding:18px 0;}
 .tab{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:14px 20px;background:transparent;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px;white-space:nowrap;}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .tab:hover:not(.active){color:var(--text);}
+  #tab-consolidacao{color:var(--accent);}
+  #tab-consolidacao.active{color:var(--accent);border-bottom-color:var(--accent);}
+  #tab-historico{color:#ffffff;}
+  #tab-historico.active{color:#ffffff;border-bottom-color:#ffffff;}
 .panel{display:none;padding:24px 0 60px;}
 .panel.active{display:block;animation:fadeUp .3s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -130,21 +134,21 @@ td{padding:12px 14px;white-space:nowrap;}
 <nav>
   <div class="nav-inner">
     <div class="logo">CARTEIRA<span>.</span>monitor</div>
-    <div class="nav-right">
-      <span class="group-badge" id="group-name">—</span>
-      <span class="role-badge" id="role-badge">—</span>
-      <span class="dot" id="live-dot"></span>
-      <span class="clock" id="clock">--:--:--</span>
-      <button class="btn-sm" onclick="doLogout()">Sair</button>
-    </div>
+      <div class="nav-right">
+        <span class="group-badge" id="group-name">—</span>
+        <span class="role-badge" id="role-badge">—</span>
+        <button class="btn-sm" onclick="switchTab('alertas', this)">Alertas</button>
+        <button class="btn-sm" id="nav-admin" onclick="switchTab('admin', this)" style="display:none">Admin</button>
+        <span class="dot" id="live-dot"></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn-sm" onclick="doLogout()">Sair</button>
+      </div>
   </div>
 </nav>
 
 <div class="tabs" id="tabs-bar">
   <button class="tab active" id="tab-consolidacao" onclick="switchToConsolidacao(this)">Consolidado</button>
   <button class="tab" id="tab-historico" onclick="switchTab('historico',this)">Histórico</button>
-  <button class="tab" id="tab-alertas" onclick="switchTab('alertas',this)">Alertas</button>
-  <button class="tab" id="tab-admin" onclick="switchTab('admin',this)" style="display:none">Admin</button>
 </div>
 
 <!-- CONSOLIDADO -->
@@ -263,6 +267,7 @@ async function boot(){
   const rb=document.getElementById('role-badge')
   rb.textContent=role;rb.className='role-badge '+role
   if (role==='admin') document.getElementById('tab-admin').style.display='block'
+  document.getElementById('nav-admin').style.display='block'
   else document.getElementById('alert-admin-wrap').style.display='none'
   loadApiKeys()
   await loadTodayPortfolios()
