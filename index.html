@@ -492,8 +492,8 @@ async function fetchBrapi(tickers){
   if (!valid.length) return
 
   // Busca em lotes de 20 para evitar URL muito longa
-  for (let i=0;i<valid.length;i+=20){
-    const batch=valid.slice(i,i+20)
+for (let i=0;i<valid.length;i+=10){
+  const batch=valid.slice(i,i+10)
     try {
       const r=await fetch(`https://brapi.dev/api/quote/${batch.join(',')}${param}`)
       const d=await r.json()
