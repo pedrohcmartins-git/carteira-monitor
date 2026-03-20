@@ -396,7 +396,11 @@ async function handleFile(file){
     rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1})
   } else {
     const txt=await file.text()
-    rows=txt.split('\n').map(l=>l.split(/[,;\t]/))
+    rows=txt.split('\n').map(l=>{
+      // Detecta separador: se tem ; usa ; senão usa ,
+      const sep=l.includes(';')?';':','
+      return l.split(sep)
+    })
   }
   const byPort={}
   for (const row of rows){
