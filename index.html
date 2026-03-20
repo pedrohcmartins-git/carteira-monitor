@@ -482,36 +482,27 @@ async function fetchBrapi(tickers){
   const token=localStorage.getItem('brapi_token')||BRAPI_TOKEN
   const param=token?`?token=${token}`:''
 
-  // Filtra só tickers válidos (sem underscore, sem ponto, max 6 chars alfanuméricos)
   const valid=tickers.filter(t=>/^[A-Z0-9]{3,6}$/.test(t))
   const invalid=tickers.filter(t=>!/^[A-Z0-9]{3,6}$/.test(t))
-
-  // Tickers inválidos marcados como erro para usar prevClose
   invalid.forEach(t=>{if(!quotes[t]) quotes[t]={error:true,msg:'Ticker especial'}})
 
-  if (!valid.length) return
-
-  // Busca em lotes de 20 para evitar URL muito longa
-for (let i=0;i<valid.length;i+=10){
-  const batch=valid.slice(i,i+10)
+  for (const ticker of valid){
     try {
-      const r=await fetch(`https://brapi.dev/api/quote/${batch.join(',')}${param}`)
+      const r=await fetch(`https://brapi.dev/api/quote/${ticker}${param}`)
       const d=await r.json()
-      d.results?.forEach(q=>{
-        if (q.regularMarketPrice){
-          const chg=q.regularMarketChange||0
-          const pct=q.regularMarketChangePercent||0
-          // Se brapi retornar 0 mas tiver prevClose, calcula manualmente
-          quotes[q.symbol]={
-            price:q.regularMarketPrice,
-            change:chg,
-            changePct:pct,
-            prevClose:q.regularMarketPreviousClose||null,
-            currency:'BRL'
-          }
+      const q=d.results?.[0]
+      if (q?.regularMarketPrice){
+        quotes[ticker]={
+          price:q.regularMarketPrice,
+          change:q.regularMarketChange||0,
+          changePct:q.regularMarketChangePercent||0,
+          currency:'BRL'
         }
-      })
-    } catch(e){batch.forEach(t=>{if(!quotes[t])quotes[t]={error:true}})}
+      } else {
+        quotes[ticker]={error:true,msg:'Não encontrado'}
+      }
+    } catch { quotes[ticker]={error:true,msg:'Erro'} }
+    await new Promise(r=>setTimeout(r,200))
   }
 }
 
