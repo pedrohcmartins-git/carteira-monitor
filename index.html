@@ -477,6 +477,9 @@ async function handleFile(file){
         delete portfolios[port.portfolio_name]
       }
       toast(`${portsFaltando.length} carteira(s) removida(s)`,'ok')
+      buildPortfolioTabs(Object.keys(portfolios))
+      buildPortfolioPanels(Object.keys(portfolios))
+      updateChartSelector(Object.keys(portfolios))
     } else {
       toast(`${portsFaltando.length} carteira(s) mantida(s)`,'ok')
     }
