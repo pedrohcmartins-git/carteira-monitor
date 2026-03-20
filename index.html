@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carteira Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg:#0a0a0a; --surface:#111; --surface2:#161616; --border:#1e1e1e;
+  --accent:#c8f135; --accent2:#35f1c8; --red:#f13560; --green:#35f135;
+  --text:#e8e8e8; --muted:#555;
+  --font-display:'Syne',sans-serif; --font-mono:'DM Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-mono);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(200,241,53,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(200,241,53,.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:20px 0;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.logo{font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:-.5px;}
+.logo span{color:var(--accent);}
+.nav-right{display:flex;align-items:center;gap:16px;}
+.group-badge{font-size:11px;padding:4px 10px;border:1px solid var(--border);color:var(--muted);letter-spacing:.05em;}
+.role-badge{font-size:9px;padding:3px 8px;letter-spacing:.08em;text-transform:uppercase;}
+.role-badge.admin{background:rgba(200,241,53,.1);color:var(--accent);border:1px solid rgba(200,241,53,.2);}
+.role-badge.viewer{background:rgba(85,85,85,.15);color:var(--muted);border:1px solid var(--border);}
+.btn-sm{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.btn-sm:hover{color:var(--text);border-color:var(--text);}
+.clock{font-size:11px;color:var(--muted);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:5px;vertical-align:middle;}
+.dot.live{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-top:0;}
+.tab{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:14px 20px;background:transparent;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover:not(.active){color:var(--text);}
+
+/* PANELS */
+.panel{display:none;padding:28px 0 60px;}
+.panel.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* SUMMARY CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:28px;}
+.card{background:var(--surface);padding:20px 22px;position:relative;overflow:hidden;}
+.card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .5s ease;}
+.card.ready::after{transform:scaleX(1);}
+.card-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.card-val{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1;}
+.card-sub{font-size:11px;color:var(--muted);margin-top:6px;}
+.pos{color:var(--green);} .neg{color:var(--red);}
+
+/* UPLOAD ZONE */
+.upload-zone{border:1.5px dashed var(--border);padding:40px 32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative;margin-bottom:24px;}
+.upload-zone:hover,.upload-zone.over{border-color:var(--accent);background:rgba(200,241,53,.025);}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-zone h3{font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:6px;}
+.upload-zone p{font-size:11px;color:var(--muted);}
+
+/* TABLE */
+.tbl-wrap{border:1px solid var(--border);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead tr{background:var(--surface);border-bottom:1px solid var(--border);}
+th{padding:11px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400;white-space:nowrap;}
+th.r,td.r{text-align:right;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--surface2);}
+td{padding:13px 14px;white-space:nowrap;}
+.badge{font-size:9px;padding:2px 6px;border-radius:2px;text-transform:uppercase;font-weight:500;margin-right:6px;}
+.badge.br{background:rgba(200,241,53,.1);color:var(--accent);border:1px solid rgba(200,241,53,.2);}
+.badge.us{background:rgba(53,241,200,.1);color:var(--accent2);border:1px solid rgba(53,241,200,.2);}
+.tk{font-family:var(--font-display);font-weight:700;font-size:13px;}
+.bar-wrap{min-width:90px;}
+.bar{height:3px;background:var(--border);border-radius:2px;margin-top:5px;}
+.bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.err-lbl{font-size:10px;color:var(--red);}
+
+/* CHART */
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.chart-title{font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+.chart-box{background:var(--surface);border:1px solid var(--border);padding:24px;position:relative;}
+.range-btns{display:flex;gap:4px;}
+.range-btn{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;padding:5px 10px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.range-btn.active,.range-btn:hover{border-color:var(--accent);color:var(--accent);}
+.empty-chart{display:flex;align-items:center;justify-content:center;height:200px;color:var(--muted);font-size:12px;}
+
+/* ALERTS */
+.alert-form{background:var(--surface);border:1px solid var(--border);padding:24px;margin-bottom:24px;}
+.form-title{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-field label{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.form-field input,.form-field select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:10px 12px;outline:none;transition:border-color .2s;}
+.form-field input:focus,.form-field select:focus{border-color:var(--accent);}
+.form-field select option{background:var(--surface);}
+.btn-add{margin-top:16px;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:10px 20px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-weight:500;transition:background .15s;}
+.btn-add:hover{background:#d4f54a;}
+.alert-item{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border:1px solid var(--border);background:var(--surface);margin-bottom:8px;gap:12px;flex-wrap:wrap;}
+.alert-info{font-size:12px;}
+.alert-info strong{color:var(--text);}
+.alert-info span{color:var(--muted);margin-left:8px;}
+.toggle-active{width:32px;height:18px;border-radius:9px;background:var(--border);border:none;cursor:pointer;position:relative;transition:background .2s;}
+.toggle-active.on{background:var(--green);}
+.toggle-active::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;}
+.toggle-active.on::after{transform:translateX(14px);}
+.btn-del{font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;letter-spacing:.05em;padding:4px 8px;}
+
+/* ADMIN */
+.admin-section{background:var(--surface);border:1px solid var(--border);padding:24px;margin-bottom:20px;}
+.section-title{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;}
+.member-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;}
+.member-row:last-child{border-bottom:none;}
+.member-email{font-size:12px;}
+.invite-row{display:flex;gap:8px;margin-top:4px;}
+.invite-row input{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:9px 12px;outline:none;}
+.invite-row input:focus{border-color:var(--accent);}
+.invite-row select{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:9px 10px;outline:none;}
+.btn-invite{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:9px 16px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;white-space:nowrap;}
+
+/* CONTROLS */
+.controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+.section-lbl{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.btn-refresh{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-weight:500;transition:background .15s;display:flex;align-items:center;gap:6px;}
+.btn-refresh:hover{background:#d4f54a;}
+.btn-refresh:disabled{opacity:.5;cursor:not-allowed;}
+.last-upd{font-size:10px;color:var(--muted);text-align:right;margin-top:10px;}
+
+/* SPINNER */
+.spin{display:inline-block;width:11px;height:11px;border:1.5px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:sp .7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;font-size:11px;z-index:999;opacity:0;transform:translateY(6px);transition:all .25s;border:1px solid var(--border);background:var(--surface2);max-width:300px;}
+#toast.show{opacity:1;transform:translateY(0);}
+#toast.ok{border-color:var(--green);color:var(--green);}
+#toast.err{border-color:var(--red);color:var(--red);}
+
+/* MISC */
+.no-permission{padding:48px 24px;text-align:center;color:var(--muted);font-size:13px;}
+@media(max-width:600px){.cards{grid-template-columns:1fr 1fr;}.form-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">CARTEIRA<span>.</span>monitor</div>
+    <div class="nav-right">
+      <span class="group-badge" id="group-name">—</span>
+      <span class="role-badge" id="role-badge">—</span>
+      <span class="dot" id="live-dot"></span>
+      <span class="clock" id="clock">--:--:--</span>
+      <button class="btn-sm" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+</nav>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('dashboard',this)">Dashboard</button>
+  <button class="tab" onclick="switchTab('historico',this)">Histórico</button>
+  <button class="tab" onclick="switchTab('alertas',this)">Alertas</button>
+  <button class="tab" id="tab-admin" onclick="switchTab('admin',this)" style="display:none">Admin</button>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="panel active" id="panel-dashboard">
+
+  <!-- Upload (só admin) -->
+  <div id="upload-wrap" style="display:none;margin-bottom:0;">
+    <div class="upload-zone" id="drop-zone">
+      <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.txt"/>
+      <h3>📂 Enviar carteira de hoje</h3>
+      <p>CSV · XLSX · TXT — colunas: TICKER, QUANTIDADE</p>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="cards">
+    <div class="card" id="c-total"><div class="card-lbl">Valor Total (BRL)</div><div class="card-val" id="v-total">—</div><div class="card-sub" id="v-total-sub">aguardando</div></div>
+    <div class="card" id="c-var"><div class="card-lbl">Variação do Dia</div><div class="card-val" id="v-var">—</div><div class="card-sub" id="v-var-sub">R$ —</div></div>
+    <div class="card" id="c-ativos"><div class="card-lbl">Ativos</div><div class="card-val" id="v-ativos">—</div><div class="card-sub" id="v-ativos-sub">— B3 · — EUA</div></div>
+    <div class="card" id="c-usd"><div class="card-lbl">USD/BRL</div><div class="card-val" id="v-usd">—</div><div class="card-sub">ao vivo</div></div>
+  </div>
+
+  <!-- Table -->
+  <div class="controls">
+    <span class="section-lbl">Posições</span>
+    <button class="btn-refresh" id="btn-refresh" onclick="refreshAll()">
+      <span id="refresh-icon">↻</span> Atualizar
+    </button>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>Ativo</th><th class="r">Qtd</th><th class="r">Preço</th>
+        <th class="r">Var. Dia</th><th class="r">Posição (BRL)</th><th class="r">Peso</th>
+      </tr></thead>
+      <tbody id="tbl-body"><tr><td colspan="6" style="padding:24px 14px;color:var(--muted);font-size:12px;">Carregando carteira...</td></tr></tbody>
+    </table>
+  </div>
+  <div class="last-upd" id="last-upd"></div>
+</div>
+
+<!-- ═══ HISTÓRICO ═══ -->
+<div class="panel" id="panel-historico">
+  <div class="chart-header">
+    <span class="chart-title">Performance do dia</span>
+    <div class="range-btns">
+      <button class="range-btn active" onclick="loadChart('hoje',this)">Hoje</button>
+      <button class="range-btn" onclick="loadChart('7d',this)">7 dias</button>
+      <button class="range-btn" onclick="loadChart('30d',this)">30 dias</button>
+    </div>
+  </div>
+  <div class="chart-box">
+    <canvas id="chart-canvas" height="280"></canvas>
+    <div class="empty-chart" id="empty-chart" style="display:none;">Nenhum dado de histórico ainda.</div>
+  </div>
+</div>
+
+<!-- ═══ ALERTAS ═══ -->
+<div class="panel" id="panel-alertas">
+  <div id="alert-admin-wrap">
+    <div class="alert-form">
+      <div class="form-title">Novo alerta</div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Tipo</label>
+          <select id="al-type">
+            <option value="email">E-mail</option>
+            <option value="whatsapp">WhatsApp</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Destino</label>
+          <input type="text" id="al-dest" placeholder="email@fundo.com ou +55119..."/>
+        </div>
+        <div class="form-field">
+          <label>Condição</label>
+          <select id="al-trigger">
+            <option value="change_pct">Variação % no dia</option>
+            <option value="value_below">Valor total abaixo de (BRL)</option>
+            <option value="value_above">Valor total acima de (BRL)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Limite</label>
+          <input type="number" id="al-threshold" placeholder="Ex: -3 para alertar em -3%"/>
+        </div>
+      </div>
+      <button class="btn-add" onclick="addAlert()">+ Adicionar alerta</button>
+    </div>
+  </div>
+  <div id="alerts-list"></div>
+  <div id="no-alerts" style="color:var(--muted);font-size:12px;display:none;">Nenhum alerta configurado.</div>
+</div>
+
+<!-- ═══ ADMIN ═══ -->
+<div class="panel" id="panel-admin">
+  <div class="admin-section">
+    <div class="section-title">Membros do grupo</div>
+    <div id="members-list"><span style="color:var(--muted);font-size:12px;">Carregando...</span></div>
+  </div>
+  <div class="admin-section">
+    <div class="section-title">Convidar membro</div>
+    <div class="invite-row">
+      <input type="email" id="invite-email" placeholder="email@exemplo.com"/>
+      <select id="invite-role">
+        <option value="viewer">Viewer</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button class="btn-invite" onclick="inviteUser()">Convidar</button>
+    </div>
+    <p style="font-size:10px;color:var(--muted);margin-top:8px;">O usuário receberá um e-mail para definir sua senha.</p>
+  </div>
+  <div class="admin-section">
+    <div class="section-title">Chaves de API</div>
+    <div class="form-grid" style="margin-bottom:12px;">
+      <div class="form-field"><label>brapi.dev (B3)</label><input type="text" id="cfg-brapi" placeholder="Token brapi"/></div>
+      <div class="form-field"><label>Finnhub (EUA)</label><input type="text" id="cfg-finnhub" placeholder="Token finnhub"/></div>
+    </div>
+    <button class="btn-add" onclick="saveApiKeys()">Salvar chaves</button>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+<div id="toast"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { SUPABASE_URL, SUPABASE_ANON_KEY, BRAPI_TOKEN, FINNHUB_TOKEN } from './config.js'
+
+// ─── Supabase ──────────────────────────────────────────────
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// ─── State ─────────────────────────────────────────────────
+let user = null, groupId = null, groupName = null, role = null
+let portfolio = [], quotes = {}, usdBrl = null
+let chartInstance = null, refreshTimer = null
+
+// ─── Boot ──────────────────────────────────────────────────
+async function boot() {
+  const { data: { session } } = await sb.auth.getSession()
+  if (!session) { window.location.href = './login.html'; return }
+  user = session.user
+
+  // Load group membership
+  const { data: mem } = await sb.from('group_members')
+    .select('group_id, role, groups(name)')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!mem) {
+    document.getElementById('tbl-body').innerHTML =
+      '<tr><td colspan="6" style="padding:24px 14px;color:var(--muted);">Você não pertence a nenhum grupo. Contate o administrador.</td></tr>'
+    return
+  }
+
+  groupId   = mem.group_id
+  groupName = mem.groups.name
+  role      = mem.role
+
+  // UI setup
+  document.getElementById('group-name').textContent = groupName
+  const rb = document.getElementById('role-badge')
+  rb.textContent = role; rb.className = 'role-badge ' + role
+
+  if (role === 'admin') {
+    document.getElementById('upload-wrap').style.display = 'block'
+    document.getElementById('tab-admin').style.display = 'block'
+    loadMembers()
+  } else {
+    document.getElementById('alert-admin-wrap').style.display = 'none'
+  }
+
+  loadApiKeys()
+  await loadTodayPortfolio()
+  loadAlerts()
+
+  // Auto-refresh 5min
+  if (refreshTimer) clearInterval(refreshTimer)
+  refreshTimer = setInterval(refreshAll, 5 * 60 * 1000)
+}
+
+// ─── Clock ─────────────────────────────────────────────────
+setInterval(() => {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('pt-BR', { hour12: false })
+}, 1000)
+
+// ─── Tabs ──────────────────────────────────────────────────
+window.switchTab = function(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  el.classList.add('active')
+  document.getElementById('panel-' + name).classList.add('active')
+  if (name === 'historico') loadChart('hoje', document.querySelector('.range-btn.active'))
+  if (name === 'admin') loadMembers()
+}
+
+// ─── Load today's portfolio from DB ────────────────────────
+async function loadTodayPortfolio() {
+  const today = new Date().toISOString().slice(0, 10)
+  const { data: port } = await sb.from('portfolios')
+    .select('id, date, label')
+    .eq('group_id', groupId)
+    .eq('date', today)
+    .single()
+
+  if (!port) {
+    document.getElementById('tbl-body').innerHTML =
+      `<tr><td colspan="6" style="padding:24px 14px;color:var(--muted);font-size:12px;">${
+        role === 'admin'
+          ? 'Nenhuma carteira enviada hoje. Use o campo acima para fazer o upload.'
+          : 'Aguardando o administrador enviar a carteira de hoje.'
+      }</td></tr>`
+    return
+  }
+
+  const { data: positions } = await sb.from('positions')
+    .select('ticker, quantity, market')
+    .eq('portfolio_id', port.id)
+
+  portfolio = positions.map(p => ({ ticker: p.ticker, qty: p.quantity, market: p.market }))
+  renderSkeleton()
+  await refreshAll()
+}
+
+// ─── File Upload ────────────────────────────────────────────
+const dropZone = document.getElementById('drop-zone')
+const fileInput = document.getElementById('file-input')
+
+dropZone?.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over') })
+dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('over'))
+dropZone?.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('over'); handleFile(e.dataTransfer.files[0]) })
+fileInput?.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]) })
+
+async function handleFile(file) {
+  if (!file) return
+  const ext = file.name.split('.').pop().toLowerCase()
+  let rows
+  if (['xlsx','xls'].includes(ext)) {
+    const buf = await file.arrayBuffer()
+    const wb = XLSX.read(buf, { type: 'array' })
+    rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 })
+  } else {
+    const txt = await file.text()
+    rows = txt.split('\n').map(l => l.split(/[,;\t]/))
+  }
+
+  const items = []
+  for (const row of rows) {
+    if (!row || row.length < 2) continue
+    const ticker = String(row[0]).trim().toUpperCase().replace(/[^A-Z0-9]/g,'')
+    const qty    = parseFloat(String(row[1]).replace(',','.'))
+    if (!ticker || ticker === 'TICKER' || ticker === 'ATIVO' || isNaN(qty) || qty <= 0) continue
+    items.push({ ticker, qty, market: /[0-9]/.test(ticker) ? 'BR' : 'US' })
+  }
+
+  if (!items.length) { toast('Nenhum ativo encontrado no arquivo.', 'err'); return }
+
+  // Save to DB
+  const today = new Date().toISOString().slice(0, 10)
+
+  // Upsert portfolio
+  const { data: port, error: portErr } = await sb.from('portfolios')
+    .upsert({ group_id: groupId, uploaded_by: user.id, date: today, label: `Carteira ${formatDate(today)}` },
+             { onConflict: 'group_id,date' })
+    .select().single()
+
+  if (portErr) { toast('Erro ao salvar carteira: ' + portErr.message, 'err'); return }
+
+  // Delete old positions for today, insert new
+  await sb.from('positions').delete().eq('portfolio_id', port.id)
+  await sb.from('positions').insert(items.map(i => ({
+    portfolio_id: port.id, ticker: i.ticker, quantity: i.qty, market: i.market
+  })))
+
+  portfolio = items
+  toast(`${items.length} ativos carregados`, 'ok')
+  renderSkeleton()
+  await refreshAll()
+}
+
+// ─── Fetch quotes ──────────────────────────────────────────
+async function fetchUsdBrl() {
+  try {
+    const r = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL')
+    const d = await r.json()
+    usdBrl = parseFloat(d.USDBRL.bid)
+    document.getElementById('v-usd').textContent = usdBrl.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})
+  } catch { usdBrl = 5.8 }
+}
+
+async function fetchBrapi(tickers) {
+  if (!tickers.length) return
+  const token = localStorage.getItem('brapi_token') || BRAPI_TOKEN
+  const param = token ? `?token=${token}` : ''
+  try {
+    const r = await fetch(`https://brapi.dev/api/quote/${tickers.join(',')}${param}`)
+    const d = await r.json()
+    d.results?.forEach(q => {
+      if (q.regularMarketPrice) quotes[q.symbol] = {
+        price: q.regularMarketPrice, change: q.regularMarketChange||0,
+        changePct: q.regularMarketChangePercent||0, currency:'BRL'
+      }
+    })
+  } catch(e) { tickers.forEach(t => { quotes[t] = { error:true } }) }
+}
+
+async function fetchFinnhub(tickers) {
+  if (!tickers.length) return
+  const token = localStorage.getItem('finnhub_token') || FINNHUB_TOKEN
+  if (!token) { tickers.forEach(t => { quotes[t] = { error:true, msg:'Sem token Finnhub' } }); return }
+  for (const t of tickers) {
+    try {
+      const r = await fetch(`https://finnhub.io/api/v1/quote?symbol=${t}&token=${token}`)
+      const d = await r.json()
+      if (d.c > 0) quotes[t] = { price:d.c, change:d.d||0, changePct:d.dp||0, currency:'USD' }
+      else quotes[t] = { error:true, msg:'Não encontrado' }
+    } catch { quotes[t] = { error:true, msg:'Erro de rede' } }
+    await new Promise(r => setTimeout(r, 120))
+  }
+}
+
+window.refreshAll = async function() {
+  if (!portfolio.length) return
+  const btn = document.getElementById('btn-refresh')
+  btn.disabled = true
+  document.getElementById('refresh-icon').innerHTML = '<span class="spin"></span>'
+  document.getElementById('live-dot').className = 'dot'
+
+  const br = portfolio.filter(p => p.market==='BR').map(p => p.ticker)
+  const us = portfolio.filter(p => p.market==='US').map(p => p.ticker)
+  await Promise.all([fetchUsdBrl(), fetchBrapi(br), fetchFinnhub(us)])
+
+  renderTable()
+  await saveSnapshot()
+  checkAlerts()
+
+  btn.disabled = false
+  document.getElementById('refresh-icon').textContent = '↻'
+  document.getElementById('live-dot').className = 'dot live'
+  document.getElementById('last-upd').textContent =
+    'Última atualização: ' + new Date().toLocaleTimeString('pt-BR')
+}
+
+// ─── Render table + cards ──────────────────────────────────
+function renderSkeleton() {
+  const body = document.getElementById('tbl-body')
+  body.innerHTML = portfolio.map(p => `
+    <tr>
+      <td><span class="badge ${p.market.toLowerCase()}">${p.market}</span><span class="tk">${p.ticker}</span></td>
+      <td class="r">${p.qty.toLocaleString('pt-BR')}</td>
+      <td class="r"><span class="spin"></span></td>
+      <td class="r">—</td><td class="r">—</td><td class="r">—</td>
+    </tr>`).join('')
+}
+
+function renderTable() {
+  let totalBrl=0, totalChg=0, totalPrev=0
+  const rows = portfolio.map(p => {
+    const q = quotes[p.ticker]
+    if (!q || q.error) return { ...p, valueBrl:0, q }
+    const mult = q.currency==='USD' ? (usdBrl||5.8) : 1
+    const priceBrl = q.price * mult
+    const chgBrl   = q.change * mult * p.qty
+    const valBrl   = priceBrl * p.qty
+    totalBrl += valBrl; totalChg += chgBrl; totalPrev += valBrl - chgBrl
+    return { ...p, priceBrl, valBrl, q }
+  })
+
+  // Cards
+  document.getElementById('v-ativos').textContent = portfolio.length
+  document.getElementById('v-ativos-sub').textContent =
+    `${portfolio.filter(p=>p.market==='BR').length} B3 · ${portfolio.filter(p=>p.market==='US').length} EUA`
+
+  if (totalBrl > 0) {
+    const pct = totalPrev > 0 ? ((totalBrl-totalPrev)/totalPrev)*100 : 0
+    document.getElementById('v-total').textContent = fmtBrl(totalBrl)
+    document.getElementById('v-total-sub').textContent = `${portfolio.length} ativos`
+    const vv = document.getElementById('v-var')
+    vv.textContent = `${pct>=0?'+':''}${pct.toFixed(2)}%`
+    vv.className = 'card-val ' + (pct>=0?'pos':'neg')
+    document.getElementById('v-var-sub').textContent = `${totalChg>=0?'+':''}${fmtBrl(totalChg)}`
+    document.querySelectorAll('.card').forEach(c => c.classList.add('ready'))
+  }
+
+  // Table rows
+  document.getElementById('tbl-body').innerHTML = rows.map(row => {
+    const { ticker, qty, market, priceBrl, valBrl, q } = row
+    const w = totalBrl > 0 ? (valBrl/totalBrl)*100 : 0
+    const isPos = q && !q.error && q.changePct >= 0
+    const barColor = !q||q.error ? 'var(--muted)' : isPos ? 'var(--green)' : 'var(--red)'
+    let priceCell='—', varCell='—', valCell='—', weightCell='—'
+    if (q && !q.error) {
+      priceCell = q.currency==='BRL'
+        ? `R$ ${q.price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+        : `$ ${q.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+      const s = q.changePct>=0?'+':''; const cls = q.changePct>=0?'pos':'neg'
+      varCell = `<span class="${cls}">${s}${q.changePct.toFixed(2)}%</span>`
+      valCell = fmtBrl(valBrl)
+      weightCell = `<div class="bar-wrap"><span>${w.toFixed(1)}%</span><div class="bar"><div class="bar-fill" style="width:${Math.min(w*2,100)}%;background:${barColor}"></div></div></div>`
+    } else if (q?.error) {
+      priceCell = `<span class="err-lbl">${q.msg||'erro'}</span>`
+    }
+    return `<tr>
+      <td><span class="badge ${market.toLowerCase()}">${market}</span><span class="tk">${ticker}</span></td>
+      <td class="r">${qty.toLocaleString('pt-BR')}</td>
+      <td class="r">${priceCell}</td>
+      <td class="r">${varCell}</td>
+      <td class="r">${valCell}</td>
+      <td class="r">${weightCell}</td>
+    </tr>`
+  }).join('')
+}
+
+// ─── Save snapshot for chart ───────────────────────────────
+async function saveSnapshot() {
+  if (!portfolio.length) return
+  const today = new Date().toISOString().slice(0,10)
+  const { data: port } = await sb.from('portfolios')
+    .select('id').eq('group_id', groupId).eq('date', today).single()
+  if (!port) return
+
+  let totalBrl=0, totalPrev=0
+  portfolio.forEach(p => {
+    const q = quotes[p.ticker]; if (!q||q.error) return
+    const mult = q.currency==='USD'?(usdBrl||5.8):1
+    const val  = q.price * mult * p.qty
+    const chg  = q.change * mult * p.qty
+    totalBrl += val; totalPrev += val - chg
+  })
+  const pct = totalPrev > 0 ? ((totalBrl-totalPrev)/totalPrev)*100 : 0
+
+  await sb.from('quote_snapshots').insert({
+    portfolio_id: port.id,
+    total_brl: totalBrl,
+    day_change_pct: pct,
+    usd_brl: usdBrl,
+    snapshot_data: quotes
+  })
+}
+
+// ─── Chart ─────────────────────────────────────────────────
+window.loadChart = async function(range, btn) {
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+
+  const today = new Date().toISOString().slice(0,10)
+  let since = new Date()
+  if (range==='7d') since.setDate(since.getDate()-7)
+  else if (range==='30d') since.setDate(since.getDate()-30)
+  else since = new Date(today + 'T00:00:00')
+
+  // Get portfolio IDs for this group
+  const { data: ports } = await sb.from('portfolios')
+    .select('id').eq('group_id', groupId)
+    .gte('date', since.toISOString().slice(0,10))
+
+  if (!ports?.length) {
+    showEmptyChart(); return
+  }
+
+  const portIds = ports.map(p => p.id)
+  const { data: snaps } = await sb.from('quote_snapshots')
+    .select('captured_at, total_brl, day_change_pct')
+    .in('portfolio_id', portIds)
+    .gte('captured_at', since.toISOString())
+    .order('captured_at', { ascending: true })
+
+  if (!snaps?.length) { showEmptyChart(); return }
+
+  document.getElementById('empty-chart').style.display = 'none'
+  document.getElementById('chart-canvas').style.display = 'block'
+
+  const labels = snaps.map(s => {
+    const d = new Date(s.captured_at)
+    return range==='hoje'
+      ? d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
+      : d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
+  })
+  const values = snaps.map(s => parseFloat(s.total_brl||0).toFixed(2))
+  const pcts   = snaps.map(s => parseFloat(s.day_change_pct||0).toFixed(2))
+
+  if (chartInstance) chartInstance.destroy()
+  chartInstance = new Chart(document.getElementById('chart-canvas'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Valor Total (BRL)',
+        data: values,
+        borderColor: '#c8f135',
+        backgroundColor: 'rgba(200,241,53,.06)',
+        borderWidth: 1.5,
+        pointRadius: 2,
+        pointHoverRadius: 4,
+        fill: true,
+        tension: 0.3,
+        yAxisID: 'y'
+      },{
+        label: 'Var. Dia (%)',
+        data: pcts,
+        borderColor: '#35f1c8',
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        pointRadius: 2,
+        borderDash: [4,3],
+        tension: 0.3,
+        yAxisID: 'y2'
+      }]
+    },
+    options: {
+      responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{labels:{color:'#666',font:{family:'DM Mono',size:11}}},
+        tooltip:{
+          backgroundColor:'#111',
+          borderColor:'#1e1e1e',borderWidth:1,
+          titleColor:'#888',bodyColor:'#e8e8e8',
+          titleFont:{family:'DM Mono',size:10},
+          bodyFont:{family:'DM Mono',size:12},
+          callbacks:{
+            label: ctx => ctx.datasetIndex===0
+              ? ` R$ ${parseFloat(ctx.raw).toLocaleString('pt-BR',{minimumFractionDigits:2})}`
+              : ` ${parseFloat(ctx.raw)>=0?'+':''}${ctx.raw}%`
+          }
+        }
+      },
+      scales:{
+        x:{ticks:{color:'#444',font:{family:'DM Mono',size:10}},grid:{color:'#1a1a1a'}},
+        y:{ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>'R$ '+parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})},grid:{color:'#1a1a1a'},position:'left'},
+        y2:{ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>v+'%'},grid:{display:false},position:'right'}
+      }
+    }
+  })
+}
+
+function showEmptyChart() {
+  document.getElementById('empty-chart').style.display='flex'
+  document.getElementById('chart-canvas').style.display='none'
+}
+
+// ─── Alerts ────────────────────────────────────────────────
+async function loadAlerts() {
+  const { data } = await sb.from('alerts').select('*').eq('group_id', groupId)
+  renderAlerts(data||[])
+}
+
+function renderAlerts(list) {
+  const el = document.getElementById('alerts-list')
+  document.getElementById('no-alerts').style.display = list.length ? 'none' : 'block'
+  el.innerHTML = list.map(a => {
+    const trigLabel = {
+      change_pct:  `Variação ≤ ${a.threshold}%`,
+      value_below: `Valor < R$ ${fmtNum(a.threshold)}`,
+      value_above: `Valor > R$ ${fmtNum(a.threshold)}`
+    }[a.trigger_type] || ''
+    return `<div class="alert-item">
+      <div class="alert-info">
+        <strong>${a.type.toUpperCase()}</strong> → ${a.destination}
+        <span>${trigLabel}</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        ${role==='admin'?`<button class="toggle-active ${a.active?'on':''}" onclick="toggleAlert('${a.id}',${!a.active})" title="${a.active?'Desativar':'Ativar'}"></button>
+        <button class="btn-del" onclick="deleteAlert('${a.id}')">remover</button>`:''}
+      </div>
+    </div>`
+  }).join('')
+}
+
+window.addAlert = async function() {
+  const type      = document.getElementById('al-type').value
+  const dest      = document.getElementById('al-dest').value.trim()
+  const trigger   = document.getElementById('al-trigger').value
+  const threshold = parseFloat(document.getElementById('al-threshold').value)
+  if (!dest || isNaN(threshold)) { toast('Preencha todos os campos.','err'); return }
+
+  const { error } = await sb.from('alerts').insert({
+    group_id:groupId, created_by:user.id, type, destination:dest,
+    trigger_type:trigger, threshold, active:true
+  })
+  if (error) { toast('Erro: '+error.message,'err'); return }
+  toast('Alerta criado!','ok')
+  document.getElementById('al-dest').value=''
+  document.getElementById('al-threshold').value=''
+  loadAlerts()
+}
+
+window.toggleAlert = async function(id, active) {
+  await sb.from('alerts').update({ active }).eq('id', id)
+  loadAlerts()
+}
+
+window.deleteAlert = async function(id) {
+  await sb.from('alerts').delete().eq('id', id)
+  loadAlerts()
+}
+
+function checkAlerts() {
+  // Local check — in production, use Supabase Edge Functions for server-side delivery
+  if (!portfolio.length) return
+  let totalBrl=0, totalPrev=0
+  portfolio.forEach(p => {
+    const q = quotes[p.ticker]; if (!q||q.error) return
+    const mult = q.currency==='USD'?(usdBrl||5.8):1
+    totalBrl += q.price*mult*p.qty; totalPrev += (q.price-q.change)*mult*p.qty
+  })
+  const pct = totalPrev>0?((totalBrl-totalPrev)/totalPrev)*100:0
+  // Alerts are stored in DB; server-side delivery via Edge Functions (see admin/setup docs)
+  console.log(`[alerts] totalBrl=${totalBrl.toFixed(0)} changePct=${pct.toFixed(2)}`)
+}
+
+// ─── Admin: Members ────────────────────────────────────────
+async function loadMembers() {
+  const { data } = await sb.from('group_members')
+    .select('id, role, user_id')
+    .eq('group_id', groupId)
+
+  if (!data?.length) { document.getElementById('members-list').innerHTML='<span style="color:var(--muted);font-size:12px;">Nenhum membro.</span>'; return }
+
+  document.getElementById('members-list').innerHTML = data.map(m => `
+    <div class="member-row">
+      <span class="member-email">${m.user_id.substring(0,8)}… <span style="color:var(--muted)">(${m.role})</span></span>
+      ${m.user_id!==user.id?`<button class="btn-del" onclick="removeMember('${m.id}')">remover</button>`:'<span style="font-size:10px;color:var(--muted);">você</span>'}
+    </div>`).join('')
+}
+
+window.removeMember = async function(id) {
+  if (!confirm('Remover este membro?')) return
+  await sb.from('group_members').delete().eq('id',id)
+  loadMembers(); toast('Membro removido','ok')
+}
+
+window.inviteUser = async function() {
+  const email = document.getElementById('invite-email').value.trim()
+  const role_ = document.getElementById('invite-role').value
+  if (!email) { toast('Informe o e-mail','err'); return }
+
+  // Create auth user via Supabase Admin (needs service role key in Edge Function)
+  // For now, uses signUp — user sets own password via email confirmation
+  const { data, error } = await sb.auth.admin.inviteUserByEmail
+    ? await sb.auth.admin.inviteUserByEmail(email)
+    : { data:null, error:{ message:'Use o painel Supabase → Authentication → Invite user' } }
+
+  if (error) {
+    // Fallback: show manual instruction
+    toast('Convide manualmente via Supabase → Authentication → Invite user', 'err')
+    return
+  }
+  if (data?.user) {
+    await sb.from('group_members').insert({ group_id:groupId, user_id:data.user.id, role:role_ })
+    toast(`Convite enviado para ${email}`, 'ok')
+  }
+  document.getElementById('invite-email').value=''
+}
+
+// ─── API Keys (stored in localStorage per user) ────────────
+function loadApiKeys() {
+  document.getElementById('cfg-brapi').value   = localStorage.getItem('brapi_token')  ||''
+  document.getElementById('cfg-finnhub').value = localStorage.getItem('finnhub_token')||''
+}
+
+window.saveApiKeys = function() {
+  localStorage.setItem('brapi_token',   document.getElementById('cfg-brapi').value.trim())
+  localStorage.setItem('finnhub_token', document.getElementById('cfg-finnhub').value.trim())
+  toast('Chaves salvas!','ok')
+}
+
+// ─── Auth ──────────────────────────────────────────────────
+window.doLogout = async function() {
+  await sb.auth.signOut()
+  window.location.href = './login.html'
+}
+
+// ─── Helpers ───────────────────────────────────────────────
+function fmtBrl(v) { return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) }
+function fmtNum(v) { return parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2}) }
+function formatDate(d) { const [y,m,day]=d.split('-'); return `${day}/${m}/${y}` }
+
+window.toast = function(msg, type='ok') {
+  const t=document.getElementById('toast')
+  t.textContent=msg; t.className='show '+type
+  setTimeout(()=>t.className='',3200)
+}
+
+// ─── Start ─────────────────────────────────────────────────
+boot()
+</script>
+</body>
+</html>
