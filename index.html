@@ -422,7 +422,7 @@ async function handleFile(file) {
     if (!row || row.length < 2) continue
     const ticker = String(row[0]).trim().toUpperCase().replace(/[^A-Z0-9]/g,'')
     const qty    = parseFloat(String(row[1]).replace(',','.'))
-    if (!ticker || ticker === 'TICKER' || ticker === 'ATIVO' || isNaN(qty) || qty <= 0) continue
+    if (!ticker || ticker === 'TICKER' || ticker === 'ATIVO' || isNaN(qty) || qty === 0) continue
     items.push({ ticker, qty, market: /[0-9]/.test(ticker) ? 'BR' : 'US' })
   }
 
