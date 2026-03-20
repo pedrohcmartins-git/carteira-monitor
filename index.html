@@ -173,7 +173,6 @@ td{padding:12px 14px;white-space:nowrap;}
   </div>
 </div>
 
-<!-- PORTFOLIO PANELS injected here -->
 <div id="portfolio-panels"></div>
 
 <!-- HISTÓRICO -->
@@ -397,11 +396,11 @@ async function handleFile(file){
   } else {
     const txt=await file.text()
     rows=txt.split('\n').map(l=>{
-      // Detecta separador: se tem ; usa ; senão usa ,
       const sep=l.includes(';')?';':','
       return l.split(sep)
     })
   }
+
   const byPort={}
   for (const row of rows){
     if (!row||row.length<3) continue
@@ -415,12 +414,40 @@ async function handleFile(file){
     if (!byPort[portName]) byPort[portName]=[]
     byPort[portName].push({ticker,qty,market:/[0-9]/.test(ticker)?'BR':'US',prevClose,book,sector})
   }
+
   if (!Object.keys(byPort).length){toast('Nenhum ativo encontrado.','err');return}
+
   const today=new Date().toISOString().slice(0,10)
+
+  // Verifica carteiras do dia que não vieram no novo arquivo
+  const {data:portsHoje}=await sb.from('portfolios')
+    .select('id,portfolio_name').eq('group_id',groupId).eq('date',today)
+
+  const portsFaltando=(portsHoje||[]).filter(p=>!byPort[p.portfolio_name])
+
+  if (portsFaltando.length>0){
+    const nomes=portsFaltando.map(p=>p.portfolio_name).join('\n• ')
+    const apagar=confirm(
+      `As seguintes carteiras já existem hoje mas não estão no novo arquivo:\n\n• ${nomes}\n\nDeseja APAGAR essas carteiras?\n\nOK = Apagar\nCancelar = Manter`
+    )
+    if (apagar){
+      for (const port of portsFaltando){
+        await sb.from('positions').delete().eq('portfolio_id',port.id)
+        await sb.from('portfolios').delete().eq('id',port.id)
+        delete portfolios[port.portfolio_name]
+      }
+      toast(`${portsFaltando.length} carteira(s) removida(s)`,'ok')
+    } else {
+      toast(`${portsFaltando.length} carteira(s) mantida(s)`,'ok')
+    }
+  }
+
+  // Salva carteiras do novo arquivo
   let totalItems=0
   for (const [portName,items] of Object.entries(byPort)){
     const {data:port,error:portErr}=await sb.from('portfolios')
-      .upsert({group_id:groupId,uploaded_by:user.id,date:today,portfolio_name:portName,label:`${portName} ${formatDate(today)}`},
+      .upsert({group_id:groupId,uploaded_by:user.id,date:today,portfolio_name:portName,
+               label:`${portName} ${formatDate(today)}`},
               {onConflict:'group_id,portfolio_name,date'}).select().single()
     if (portErr){toast('Erro em '+portName+': '+portErr.message,'err');continue}
     await sb.from('positions').delete().eq('portfolio_id',port.id)
@@ -433,6 +460,7 @@ async function handleFile(file){
     sortStates[portName]={col:'valueBrl',asc:false}
     totalItems+=items.length
   }
+
   toast(`${totalItems} ativos em ${Object.keys(byPort).length} carteiras`,'ok')
   buildPortfolioTabs(Object.keys(portfolios))
   buildPortfolioPanels(Object.keys(portfolios))
@@ -481,11 +509,9 @@ async function fetchBrapi(tickers){
   if (!tickers.length) return
   const token=localStorage.getItem('brapi_token')||BRAPI_TOKEN
   const param=token?`?token=${token}`:''
-
   const valid=tickers.filter(t=>/^[A-Z0-9]{3,6}$/.test(t))
   const invalid=tickers.filter(t=>!/^[A-Z0-9]{3,6}$/.test(t))
   invalid.forEach(t=>{if(!quotes[t]) quotes[t]={error:true,msg:'Ticker especial'}})
-
   for (const ticker of valid){
     try {
       const r=await fetch(`https://brapi.dev/api/quote/${ticker}${param}`)
@@ -501,7 +527,7 @@ async function fetchBrapi(tickers){
       } else {
         quotes[ticker]={error:true,msg:'Não encontrado'}
       }
-    } catch { quotes[ticker]={error:true,msg:'Erro'} }
+    } catch {quotes[ticker]={error:true,msg:'Erro'}}
     await new Promise(r=>setTimeout(r,200))
   }
 }
@@ -543,9 +569,13 @@ function computeRows(name){
     const mult=(q&&!q.error&&q.currency==='USD')?(usdBrl||5.8):1
     let price=0,changePct=0,changeAbsBrl=0
     if (q&&!q.error){price=q.price*mult;changePct=q.changePct;changeAbsBrl=q.change*mult*p.qty}
-    else if (p.prevClose!=null){price=p.prevClose*(p.market==='US'?(usdBrl||5.8):1);changePct=0;changeAbsBrl=0}
+    else if (p.prevClose!=null&&p.prevClose>0){
+      price=p.prevClose*(p.market==='US'?(usdBrl||5.8):1)
+      changePct=0;changeAbsBrl=0
+    }
     const valueBrl=price*p.qty
-    return {...p,price,changePct,changeAbsBrl,valueBrl,hasQuote:!!(q&&!q.error)||p.prevClose!=null}
+    return {...p,price,changePct,changeAbsBrl,valueBrl,
+      hasQuote:!!(q&&!q.error),hasPrevClose:p.prevClose!=null&&p.prevClose>0}
   })
 }
 
@@ -575,8 +605,7 @@ function renderPortfolio(name){
   const sorted=[...rows].sort((a,b)=>{
     if (ss.col==='weightAbs'){
       const g=gross||1
-      const av=Math.abs(a.valueBrl)/g,bv=Math.abs(b.valueBrl)/g
-      return ss.asc?av-bv:bv-av
+      return ss.asc?Math.abs(a.valueBrl)/g-Math.abs(b.valueBrl)/g:Math.abs(b.valueBrl)/g-Math.abs(a.valueBrl)/g
     }
     if (['ticker','book','sector'].includes(ss.col)){
       const av=String(a[ss.col]||''),bv=String(b[ss.col]||'')
@@ -587,19 +616,19 @@ function renderPortfolio(name){
   })
 
   document.getElementById('tbl-'+sid).innerHTML=sorted.map(row=>{
-    const {ticker,qty,market,book,sector,price,changePct,valueBrl,hasQuote}=row
+    const {ticker,qty,market,book,sector,price,changePct,valueBrl,hasQuote,hasPrevClose}=row
     const weight=gross>0?(valueBrl/gross)*100:0
     const weightAbs=Math.abs(weight)
     const isPos=changePct>=0
     const q=quotes[ticker]
     let priceCell,varCell
-    if (q&&!q.error){
+    if (hasQuote){
       const pf=q.currency==='BRL'
         ?`R$ ${q.price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
         :`$ ${q.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`
       priceCell=pf
       varCell=`<span class="${isPos?'pos':'neg'}">${isPos?'+':''}${changePct.toFixed(2)}%</span>`
-    } else if (hasQuote){
+    } else if (hasPrevClose){
       priceCell=`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-size:9px;color:var(--muted)">prev</span>`
       varCell=`<span style="color:var(--muted)">0.00%</span>`
     } else {
@@ -677,7 +706,8 @@ function renderConsolidation(){
 }
 
 window.consolSort=function(col){
-  consolSortCol=col;consolSortAsc=consolSortCol===col?!consolSortAsc:false
+  consolSortAsc=consolSortCol===col?!consolSortAsc:false
+  consolSortCol=col
   document.querySelectorAll('[id^="csort-"]').forEach(el=>el.textContent='')
   const el=document.getElementById('csort-'+col)
   if (el) el.textContent=consolSortAsc?' ↑':' ↓'
@@ -694,7 +724,7 @@ async function saveSnapshots(){
     const {gross,net,varPct,varBrl}=computeSummary(rows)
     await sb.from('quote_snapshots').insert({
       portfolio_id:port.id,total_brl:gross,day_change_pct:varPct,
-      usd_brl:usdBrl,snapshot_data:{quotes,net,gross,varBrl}
+      usd_brl:usdBrl,snapshot_data:{net,gross,varBrl}
     })
   }
 }
@@ -757,7 +787,9 @@ window.loadChart=async function(){
       plugins:{legend:{labels:{color:'#666',font:{family:'DM Mono',size:11}}},
         tooltip:{backgroundColor:'#111',borderColor:'#1e1e1e',borderWidth:1,titleColor:'#888',bodyColor:'#e8e8e8',
           titleFont:{family:'DM Mono',size:10},bodyFont:{family:'DM Mono',size:12},
-          callbacks:{label:ctx=>ctx.datasetIndex===0?` R$ ${parseFloat(ctx.raw).toLocaleString('pt-BR',{minimumFractionDigits:2})}`:` ${parseFloat(ctx.raw)>=0?'+':''}${ctx.raw}%`}}},
+          callbacks:{label:ctx=>ctx.datasetIndex===0
+            ?` R$ ${parseFloat(ctx.raw).toLocaleString('pt-BR',{minimumFractionDigits:2})}`
+            :` ${parseFloat(ctx.raw)>=0?'+':''}${ctx.raw}%`}}},
       scales:{
         x:{ticks:{color:'#444',font:{family:'DM Mono',size:10}},grid:{color:'#1a1a1a'}},
         y:{ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>'R$ '+parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})},grid:{color:'#1a1a1a'},position:'left'},
