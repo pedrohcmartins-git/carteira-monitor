@@ -481,16 +481,38 @@ async function fetchBrapi(tickers){
   if (!tickers.length) return
   const token=localStorage.getItem('brapi_token')||BRAPI_TOKEN
   const param=token?`?token=${token}`:''
-  try {
-    const r=await fetch(`https://brapi.dev/api/quote/${tickers.join(',')}${param}`)
-    const d=await r.json()
-    d.results?.forEach(q=>{
-      if (q.regularMarketPrice) quotes[q.symbol]={
-        price:q.regularMarketPrice,change:q.regularMarketChange||0,
-        changePct:q.regularMarketChangePercent||0,currency:'BRL'
-      }
-    })
-  } catch(e){tickers.forEach(t=>{if(!quotes[t])quotes[t]={error:true}})}
+
+  // Filtra só tickers válidos (sem underscore, sem ponto, max 6 chars alfanuméricos)
+  const valid=tickers.filter(t=>/^[A-Z0-9]{3,6}$/.test(t))
+  const invalid=tickers.filter(t=>!/^[A-Z0-9]{3,6}$/.test(t))
+
+  // Tickers inválidos marcados como erro para usar prevClose
+  invalid.forEach(t=>{if(!quotes[t]) quotes[t]={error:true,msg:'Ticker especial'}})
+
+  if (!valid.length) return
+
+  // Busca em lotes de 20 para evitar URL muito longa
+  for (let i=0;i<valid.length;i+=20){
+    const batch=valid.slice(i,i+20)
+    try {
+      const r=await fetch(`https://brapi.dev/api/quote/${batch.join(',')}${param}`)
+      const d=await r.json()
+      d.results?.forEach(q=>{
+        if (q.regularMarketPrice){
+          const chg=q.regularMarketChange||0
+          const pct=q.regularMarketChangePercent||0
+          // Se brapi retornar 0 mas tiver prevClose, calcula manualmente
+          quotes[q.symbol]={
+            price:q.regularMarketPrice,
+            change:chg,
+            changePct:pct,
+            prevClose:q.regularMarketPreviousClose||null,
+            currency:'BRL'
+          }
+        }
+      })
+    } catch(e){batch.forEach(t=>{if(!quotes[t])quotes[t]={error:true}})}
+  }
 }
 
 async function fetchFinnhub(tickers){
