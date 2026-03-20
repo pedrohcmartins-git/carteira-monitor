@@ -269,7 +269,7 @@ async function boot(){
   await loadTodayPortfolios()
   loadAlerts()
   if (refreshTimer) clearInterval(refreshTimer)
-  refreshTimer=setInterval(refreshAll,5*60*1000)
+  refreshTimer=setInterval(refreshAll,10*60*1000)
 }
 
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('pt-BR',{hour12:false})},1000)
