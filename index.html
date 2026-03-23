@@ -78,8 +78,9 @@ tbody tr:hover{background:var(--surface2);}
 tbody tr.total-row{background:var(--surface2);border-top:1px solid var(--border);}
 td{padding:12px 14px;white-space:nowrap;}
 .badge{font-size:9px;padding:2px 6px;border-radius:2px;text-transform:uppercase;font-weight:500;margin-right:6px;}
-.badge.br{background:rgba(200,241,53,.1);color:var(--accent);border:1px solid rgba(200,241,53,.2);}
-.badge.us{background:rgba(53,241,200,.1);color:var(--accent2);border:1px solid rgba(53,241,200,.2);}
+.badge.br,.badge.brl{background:rgba(200,241,53,.1);color:var(--accent);border:1px solid rgba(200,241,53,.2);}
+.badge.us,.badge.usd{background:rgba(53,241,200,.1);color:var(--accent2);border:1px solid rgba(53,241,200,.2);}
+.badge.ignore{background:rgba(153,153,153,.1);color:var(--muted);border:1px solid var(--border);}
 .tk{font-family:var(--font-display);font-weight:700;font-size:13px;}
 .bar-wrap{min-width:80px;}
 .bar{height:3px;background:var(--border);border-radius:2px;margin-top:5px;}
@@ -128,6 +129,24 @@ td{padding:12px 14px;white-space:nowrap;}
 .invite-row input:focus{border-color:var(--accent);}
 .invite-row select{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:9px 10px;outline:none;}
 .btn-invite{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:9px 16px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;}
+/* Ticker map table */
+.tmap-table{width:100%;border-collapse:collapse;font-size:12px;}
+.tmap-table th{padding:9px 12px;text-align:left;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400;border-bottom:1px solid var(--border);}
+.tmap-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tmap-table tr:last-child td{border-bottom:none;}
+.tmap-table tr:hover td{background:var(--surface2);}
+.tmap-input{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:5px 8px;outline:none;width:100%;transition:border-color .2s;}
+.tmap-input:focus{border-color:var(--accent);}
+.tmap-select{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:5px 8px;outline:none;transition:border-color .2s;}
+.tmap-select:focus{border-color:var(--accent);}
+.status-badge{font-size:9px;padding:2px 8px;border-radius:2px;text-transform:uppercase;font-weight:500;}
+.status-auto{background:rgba(200,241,53,.1);color:var(--accent);border:1px solid rgba(200,241,53,.2);}
+.status-ignore{background:rgba(153,153,153,.1);color:var(--muted);border:1px solid var(--border);}
+.status-manual{background:rgba(53,241,200,.1);color:var(--accent2);border:1px solid rgba(53,241,200,.2);}
+.status-brapi{background:rgba(200,241,53,.1);color:var(--accent);border:1px solid rgba(200,241,53,.2);}
+.status-finnhub{background:rgba(53,241,200,.1);color:var(--accent2);border:1px solid rgba(53,241,200,.2);}
+.btn-save-map{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;}
+.btn-reset-map{font-family:var(--font-mono);font-size:10px;color:var(--muted);background:none;border:1px solid var(--border);padding:5px 10px;cursor:pointer;}
 .spin{display:inline-block;width:11px;height:11px;border:1.5px solid rgba(0,0,0,.3);border-top-color:currentColor;border-radius:50%;animation:sp .7s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg)}}
 #toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;font-size:11px;z-index:999;opacity:0;transform:translateY(6px);transition:all .25s;border:1px solid var(--border);background:var(--surface2);max-width:320px;}
@@ -222,25 +241,40 @@ td{padding:12px 14px;white-space:nowrap;}
 
 <!-- ADMIN -->
 <div class="panel" id="panel-admin">
-  <!-- Preferências do usuário -->
+  <!-- Preferências -->
   <div class="admin-section">
     <div class="form-title">Minhas preferências</div>
     <div class="pref-row">
-      <div>
-        <div class="pref-label">Variação de ativos estrangeiros</div>
-        <div class="pref-sub">Como exibir a variação de ativos em moeda estrangeira</div>
-      </div>
+      <div><div class="pref-label">Variação de ativos estrangeiros</div><div class="pref-sub">Como exibir a variação de ativos em moeda estrangeira</div></div>
       <div class="currency-toggle">
         <button class="currency-opt active" id="curr-original" onclick="setCurrencyMode('original')">Moeda original</button>
         <button class="currency-opt" id="curr-brl" onclick="setCurrencyMode('brl')">Tudo em BRL</button>
       </div>
     </div>
     <div class="pref-row">
-      <div>
-        <div class="pref-label">Atualização automática</div>
-        <div class="pref-sub">Atualizar cotações automaticamente a cada 10 minutos</div>
-      </div>
+      <div><div class="pref-label">Atualização automática</div><div class="pref-sub">Atualizar cotações automaticamente a cada 10 minutos</div></div>
       <button class="toggle-active" id="toggle-autorefresh" onclick="toggleAutoRefresh()"></button>
+    </div>
+  </div>
+
+  <!-- Mapeamento de Ativos -->
+  <div class="admin-section">
+    <div class="form-title">Mapeamento de ativos</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:16px;">Define como cada ativo é buscado. Admins podem editar — todos podem visualizar.</p>
+    <div style="overflow-x:auto;">
+      <table class="tmap-table" id="tmap-table">
+        <thead><tr>
+          <th>Ticker</th>
+          <th>Moeda</th>
+          <th>Fonte</th>
+          <th>Ticker na fonte</th>
+          <th>Status</th>
+          <th style="text-align:right">Ação</th>
+        </tr></thead>
+        <tbody id="tmap-body">
+          <tr><td colspan="6" style="color:var(--muted);padding:20px 12px;">Carregando...</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -252,7 +286,7 @@ td{padding:12px 14px;white-space:nowrap;}
       <div class="form-field"><label>Finnhub (EUA)</label><input type="text" id="cfg-finnhub" placeholder="Token finnhub"/></div>
     </div>
     <button class="btn-add" onclick="saveApiKeys()">Salvar chaves</button>
-    <p style="font-size:10px;color:var(--muted);margin-top:8px;">Chaves salvas aqui ficam disponíveis para todos os membros do grupo em qualquer dispositivo.</p>
+    <p style="font-size:10px;color:var(--muted);margin-top:8px;">Chaves salvas aqui ficam disponíveis para todos os membros em qualquer dispositivo.</p>
   </div>
 
   <!-- Membros -->
@@ -282,10 +316,10 @@ const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
 // ─── State ─────────────────────────────────────────────────
 let user=null,groupId=null,groupName=null,role=null
 let portfolios={},quotes={},usdBrl=null,usdVarPct=0,ibovPct=null
+let tickerMap={} // {ticker: {source, source_ticker, id}}
 let sortStates={},consolSortCol='gross',consolSortAsc=false
 let chartInstance=null
-let currencyMode='original'
-let autoRefresh=false
+let currencyMode='original',autoRefresh=false
 let lastRefresh=null,cooldownTimer=null,autoRefreshTimer=null,isRefreshing=false
 const COOLDOWN_MS=5*60*1000
 const AUTO_REFRESH_MS=10*60*1000
@@ -324,6 +358,7 @@ async function boot(){
   }
 
   await loadPreferences()
+  await loadTickerMap()
   await loadTodayPortfolios()
   loadAlerts()
 }
@@ -337,11 +372,8 @@ async function loadPreferences(){
       .select('currency_mode,auto_refresh').eq('user_id',user.id).single()
     currencyMode=data?.currency_mode||'original'
     autoRefresh=data?.auto_refresh||false
-  } catch {
-    currencyMode='original';autoRefresh=false
-  }
-  updateCurrencyUI()
-  updateAutoRefreshUI()
+  } catch {currencyMode='original';autoRefresh=false}
+  updateCurrencyUI();updateAutoRefreshUI()
   if (autoRefresh) startAutoRefreshTimer()
 }
 
@@ -353,46 +385,151 @@ async function savePreferences(){
 }
 
 window.setCurrencyMode=async function(mode){
-  currencyMode=mode
-  updateCurrencyUI()
-  await savePreferences()
+  currencyMode=mode;updateCurrencyUI();await savePreferences()
   Object.keys(portfolios).forEach(name=>renderPortfolio(name))
   renderConsolidation()
 }
 
 window.toggleAutoRefresh=async function(){
-  autoRefresh=!autoRefresh
-  updateAutoRefreshUI()
-  await savePreferences()
-  if (autoRefresh){
-    startAutoRefreshTimer()
-    toast('Atualização automática ativada','ok')
-  } else {
-    stopAutoRefreshTimer()
-    toast('Atualização automática desativada','ok')
-  }
+  autoRefresh=!autoRefresh;updateAutoRefreshUI();await savePreferences()
+  if (autoRefresh){startAutoRefreshTimer();toast('Atualização automática ativada','ok')}
+  else {stopAutoRefreshTimer();toast('Atualização automática desativada','ok')}
 }
 
 function updateCurrencyUI(){
   document.getElementById('curr-original').classList.toggle('active',currencyMode==='original')
   document.getElementById('curr-brl').classList.toggle('active',currencyMode==='brl')
 }
-
 function updateAutoRefreshUI(){
-  const btn=document.getElementById('toggle-autorefresh')
-  btn.classList.toggle('on',autoRefresh)
+  document.getElementById('toggle-autorefresh').classList.toggle('on',autoRefresh)
 }
-
 function startAutoRefreshTimer(){
   stopAutoRefreshTimer()
-  autoRefreshTimer=setInterval(()=>{
-    if (!isRefreshing&&getRemainingCooldown()<=0) refreshAll()
-  },AUTO_REFRESH_MS)
+  autoRefreshTimer=setInterval(()=>{if(!isRefreshing&&getRemainingCooldown()<=0)refreshAll()},AUTO_REFRESH_MS)
+}
+function stopAutoRefreshTimer(){if(autoRefreshTimer)clearInterval(autoRefreshTimer);autoRefreshTimer=null}
+
+// ─── Ticker Map ────────────────────────────────────────────
+async function loadTickerMap(){
+  const {data}=await sb.from('ticker_map').select('*').eq('group_id',groupId)
+  tickerMap={}
+  ;(data||[]).forEach(r=>{tickerMap[r.ticker]={id:r.id,source:r.source,sourceTicker:r.source_ticker}})
 }
 
-function stopAutoRefreshTimer(){
-  if (autoRefreshTimer) clearInterval(autoRefreshTimer)
-  autoRefreshTimer=null
+// Get effective source config for a ticker
+function getTickerConfig(ticker,currency){
+  const cfg=tickerMap[ticker]
+  if (cfg) return {source:cfg.source,sourceTicker:cfg.sourceTicker||ticker}
+  // Auto-detect
+  return {source:currency==='USD'?'finnhub':'brapi',sourceTicker:ticker}
+}
+
+async function saveTickerMapRow(ticker,source,sourceTicker){
+  const existing=tickerMap[ticker]
+  if (existing){
+    await sb.from('ticker_map').update({source,source_ticker:sourceTicker||null,updated_at:new Date().toISOString()}).eq('id',existing.id)
+  } else {
+    await sb.from('ticker_map').insert({group_id:groupId,ticker,source,source_ticker:sourceTicker||null})
+  }
+  await loadTickerMap()
+}
+
+async function resetTickerMapRow(ticker){
+  const existing=tickerMap[ticker]
+  if (existing) await sb.from('ticker_map').delete().eq('id',existing.id)
+  await loadTickerMap()
+  renderTickerMap()
+  toast(`${ticker} voltou para automático`,'ok')
+}
+
+function renderTickerMap(){
+  // Collect all unique tickers across all portfolios
+  const allTickers=[...new Set(Object.values(portfolios).flat().map(p=>({ticker:p.ticker,currency:p.currency}))
+    .filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i))]
+    .sort((a,b)=>a.ticker.localeCompare(b.ticker))
+
+  if (!allTickers.length){
+    document.getElementById('tmap-body').innerHTML=
+      '<tr><td colspan="6" style="color:var(--muted);padding:20px 12px;">Nenhum ativo carregado ainda.</td></tr>'
+    return
+  }
+
+  document.getElementById('tmap-body').innerHTML=allTickers.map(({ticker,currency})=>{
+    const cfg=tickerMap[ticker]
+    const source=cfg?.source||'auto'
+    const sourceTicker=cfg?.sourceTicker||''
+    const isAdmin=role==='admin'
+
+    const statusBadge={
+      auto:`<span class="status-badge status-auto">auto</span>`,
+      brapi:`<span class="status-badge status-brapi">brapi</span>`,
+      finnhub:`<span class="status-badge status-finnhub">finnhub</span>`,
+      ignore:`<span class="status-badge status-ignore">ignorado</span>`,
+      manual:`<span class="status-badge status-manual">manual</span>`,
+    }[source]||`<span class="status-badge status-auto">auto</span>`
+
+    const currBadge=currency==='USD'
+      ?`<span class="badge usd">USD</span>`
+      :`<span class="badge brl">BRL</span>`
+
+    if (!isAdmin){
+      // Read-only view
+      const effectiveCfg=getTickerConfig(ticker,currency)
+      return `<tr>
+        <td><span class="tk">${ticker}</span></td>
+        <td>${currBadge}</td>
+        <td style="color:var(--muted);font-size:11px;">${effectiveCfg.source}</td>
+        <td style="color:var(--muted);font-size:11px;">${effectiveCfg.sourceTicker}</td>
+        <td>${statusBadge}</td>
+        <td></td>
+      </tr>`
+    }
+
+    // Admin editable row
+    return `<tr id="tmap-row-${safeid(ticker)}">
+      <td><span class="tk">${ticker}</span></td>
+      <td>${currBadge}</td>
+      <td>
+        <select class="tmap-select" id="tmap-src-${safeid(ticker)}" onchange="onTickerSourceChange('${ticker}')">
+          <option value="auto" ${source==='auto'?'selected':''}>Auto</option>
+          <option value="brapi" ${source==='brapi'?'selected':''}>brapi.dev</option>
+          <option value="finnhub" ${source==='finnhub'?'selected':''}>Finnhub</option>
+          <option value="ignore" ${source==='ignore'?'selected':''}>Ignorar</option>
+          <option value="manual" ${source==='manual'?'selected':''}>Manual (prevClose)</option>
+        </select>
+      </td>
+      <td>
+        <input class="tmap-input" id="tmap-sticker-${safeid(ticker)}"
+          value="${sourceTicker}"
+          placeholder="${ticker}"
+          style="width:100px"
+          ${source==='ignore'||source==='manual'||source==='auto'?'disabled':''} />
+      </td>
+      <td>${statusBadge}</td>
+      <td style="text-align:right">
+        <button class="btn-save-map" onclick="saveTickerRow('${ticker}')">Salvar</button>
+        ${cfg?`<button class="btn-reset-map" style="margin-left:4px" onclick="resetTickerMapRow('${ticker}')">Reset</button>`:''}
+      </td>
+    </tr>`
+  }).join('')
+}
+
+window.onTickerSourceChange=function(ticker){
+  const src=document.getElementById('tmap-src-'+safeid(ticker))?.value
+  const inp=document.getElementById('tmap-sticker-'+safeid(ticker))
+  if (!inp) return
+  inp.disabled=(src==='auto'||src==='ignore'||src==='manual')
+  if (src==='auto'||src==='ignore'||src==='manual') inp.value=''
+}
+
+window.saveTickerRow=async function(ticker){
+  const src=document.getElementById('tmap-src-'+safeid(ticker))?.value||'auto'
+  const sticker=document.getElementById('tmap-sticker-'+safeid(ticker))?.value.trim().toUpperCase()||''
+  await saveTickerMapRow(ticker,src,sticker||ticker)
+  renderTickerMap()
+  // Clear cached quote so it gets re-fetched
+  delete quotes[ticker]
+  toast(`${ticker} → ${src} salvo`,'ok')
 }
 
 // ─── Tabs ──────────────────────────────────────────────────
@@ -404,7 +541,7 @@ window.switchTab=function(name,el){
   deactivateAll();el.classList.add('active')
   document.getElementById('panel-'+name).classList.add('active')
   if (name==='historico') loadChart()
-  if (name==='admin') loadMembers()
+  if (name==='admin'){loadMembers();renderTickerMap()}
 }
 window.switchToConsolidacao=function(el){
   deactivateAll();el.classList.add('active')
@@ -413,7 +550,7 @@ window.switchToConsolidacao=function(el){
 window.navTo=function(name){
   deactivateAll()
   document.getElementById('panel-'+name).classList.add('active')
-  if (name==='admin') loadMembers()
+  if (name==='admin'){loadMembers();renderTickerMap()}
 }
 function switchToPortfolio(name,el){
   deactivateAll();el.classList.add('active')
@@ -437,9 +574,8 @@ async function loadTodayPortfolios(){
     const {data:pos}=await sb.from('positions')
       .select('ticker,quantity,market,currency,prev_close,book,sector').eq('portfolio_id',port.id)
     portfolios[port.portfolio_name]=(pos||[]).map(p=>({
-      ticker:p.ticker,qty:p.quantity,
-      market:p.market,
-      currency:p.currency||p.market, // 'BRL' or 'USD'
+      ticker:p.ticker,qty:p.quantity,market:p.market,
+      currency:p.currency||p.market,
       prevClose:p.prev_close,book:p.book||'—',sector:p.sector||'—'
     }))
     sortStates[port.portfolio_name]={col:'valueBrl',asc:false}
@@ -456,46 +592,30 @@ async function loadCachedQuotes(){
   const {data:cached}=await sb.from('quote_cache')
     .select('ticker,price,change,change_pct,currency,usd_brl,usd_var_pct,ibov_pct,updated_at')
     .eq('group_id',groupId)
-
   if (cached&&cached.length){
     cached.forEach(q=>{
-      quotes[q.ticker]={
-        price:q.price||0,change:q.change||0,
-        changePct:q.change_pct||0,currency:q.currency||'BRL',error:false
-      }
+      quotes[q.ticker]={price:q.price||0,change:q.change||0,changePct:q.change_pct||0,currency:q.currency||'BRL',error:false}
     })
     const first=cached[0]
     if (first.usd_brl) usdBrl=first.usd_brl
     if (first.usd_var_pct!=null) usdVarPct=first.usd_var_pct
     if (first.ibov_pct!=null) ibovPct=first.ibov_pct
-
     Object.keys(portfolios).forEach(name=>renderPortfolio(name))
-    renderConsolidation()
-    updateMarketCards()
-
+    renderConsolidation();updateMarketCards()
     const age=Date.now()-new Date(first.updated_at).getTime()
-    if (age>10*60*1000){
-      refreshAll()
-    } else {
-      lastRefresh=new Date(first.updated_at).getTime()
-      startCooldownTimer()
-      document.getElementById('live-dot').className='dot live'
-    }
+    if (age>10*60*1000){refreshAll()}
+    else {lastRefresh=new Date(first.updated_at).getTime();startCooldownTimer();document.getElementById('live-dot').className='dot live'}
   } else {
     refreshAll()
   }
 }
 
 async function saveCachedQuotes(){
-  const rows=Object.entries(quotes)
-    .filter(([,q])=>!q.error)
-    .map(([ticker,q])=>({
-      group_id:groupId,ticker,
-      price:q.price,change:q.change,change_pct:q.changePct,
-      currency:q.currency,
-      usd_brl:usdBrl,usd_var_pct:usdVarPct,ibov_pct:ibovPct,
-      updated_at:new Date().toISOString(),updated_by:user.id
-    }))
+  const rows=Object.entries(quotes).filter(([,q])=>!q.error).map(([ticker,q])=>({
+    group_id:groupId,ticker,price:q.price,change:q.change,change_pct:q.changePct,
+    currency:q.currency,usd_brl:usdBrl,usd_var_pct:usdVarPct,ibov_pct:ibovPct,
+    updated_at:new Date().toISOString(),updated_by:user.id
+  }))
   if (!rows.length) return
   for (let i=0;i<rows.length;i+=50){
     await sb.from('quote_cache').upsert(rows.slice(i,i+50),{onConflict:'group_id,ticker'})
@@ -514,30 +634,24 @@ function formatCooldown(ms){
 function startCooldownTimer(){
   if (cooldownTimer) clearInterval(cooldownTimer)
   updateRefreshButtons()
-  cooldownTimer=setInterval(()=>{
-    updateRefreshButtons()
-    if (getRemainingCooldown()<=0) clearInterval(cooldownTimer)
-  },1000)
+  cooldownTimer=setInterval(()=>{updateRefreshButtons();if(getRemainingCooldown()<=0)clearInterval(cooldownTimer)},1000)
 }
 function updateRefreshButtons(){
-  const remaining=getRemainingCooldown()
-  const inCooldown=remaining>0
+  const remaining=getRemainingCooldown(),inCooldown=remaining>0
   const label=isRefreshing
     ?`<span class="spin"></span> Atualizando...`
     :inCooldown?`↻ Atualizar (${formatCooldown(remaining)})`:`↻ Atualizar`
   document.querySelectorAll('.btn-refresh').forEach(btn=>{
     btn.disabled=isRefreshing||inCooldown
     const lbl=btn.querySelector('span[id^="refresh-label"]')
-    if (lbl) lbl.innerHTML=label
-    else btn.innerHTML=label
+    if (lbl) lbl.innerHTML=label else btn.innerHTML=label
   })
 }
 
 // ─── Build UI ──────────────────────────────────────────────
 function buildPortfolioTabs(names){
   document.querySelectorAll('.tab.port-tab').forEach(t=>t.remove())
-  const bar=document.getElementById('tabs-bar')
-  const histTab=document.getElementById('tab-historico')
+  const bar=document.getElementById('tabs-bar'),histTab=document.getElementById('tab-historico')
   names.forEach(name=>{
     const btn=document.createElement('button')
     btn.className='tab port-tab';btn.textContent=name
@@ -564,9 +678,7 @@ function buildPortfolioPanels(names){
       </div>
       <div class="controls">
         <span class="section-lbl">${name}</span>
-        <button class="btn-refresh" id="btn-refresh-${safeid(name)}" onclick="refreshAll()">
-          <span>↻ Atualizar</span>
-        </button>
+        <button class="btn-refresh" id="btn-refresh-${safeid(name)}" onclick="refreshAll()"><span>↻ Atualizar</span></button>
       </div>
       <div class="tbl-wrap"><table>
         <thead><tr>
@@ -613,26 +725,22 @@ async function handleFile(file){
     const txt=await file.text()
     rows=txt.split('\n').map(l=>{const sep=l.includes(';')?';':',';return l.split(sep)})
   }
-
   const byPort={}
   for (const row of rows){
     if (!row||row.length<4) continue
     const portName=String(row[0]).trim()
     const ticker=String(row[1]).trim().toUpperCase().replace(/[^A-Z0-9^]/g,'')
-    // New format: CARTEIRA, TICKER, MOEDA, QUANTIDADE, PRECO_ANTERIOR, BOOK, SETOR
     const currencyRaw=String(row[2]||'').trim().toUpperCase()
     const qty=parseFloat(String(row[3]).replace(',','.'))
     if (!portName||portName==='CARTEIRA'||!ticker||ticker==='TICKER'||isNaN(qty)||qty===0) continue
     const prevClose=row[4]?parseFloat(String(row[4]).replace(',','.'))||null:null
     const book=row[5]?String(row[5]).trim()||null:null
     const sector=row[6]?String(row[6]).trim()||null:null
-    // Determine currency and market
     const currency=(['USD','BRL'].includes(currencyRaw))?currencyRaw:(/[0-9]/.test(ticker)?'BRL':'USD')
     const market=currency==='BRL'?'BR':'US'
     if (!byPort[portName]) byPort[portName]=[]
     byPort[portName].push({ticker,qty,market,currency,prevClose,book,sector})
   }
-
   if (!Object.keys(byPort).length){toast('Nenhum ativo encontrado.','err');return}
 
   const today=new Date().toISOString().slice(0,10)
@@ -667,8 +775,7 @@ async function handleFile(file){
     if (portErr){toast('Erro em '+portName+': '+portErr.message,'err');continue}
     await sb.from('positions').delete().eq('portfolio_id',port.id)
     const {error:insErr}=await sb.from('positions').insert(items.map(i=>({
-      portfolio_id:port.id,ticker:i.ticker,quantity:i.qty,
-      market:i.market,currency:i.currency,
+      portfolio_id:port.id,ticker:i.ticker,quantity:i.qty,market:i.market,currency:i.currency,
       prev_close:i.prevClose,book:i.book,sector:i.sector
     })))
     if (insErr){toast('Erro ao salvar '+portName+': '+insErr.message,'err');continue}
@@ -676,7 +783,6 @@ async function handleFile(file){
     sortStates[portName]={col:'valueBrl',asc:false}
     totalItems+=items.length
   }
-
   toast(`${totalItems} ativos em ${Object.keys(byPort).length} carteiras`,'ok')
   buildPortfolioTabs(Object.keys(portfolios))
   buildPortfolioPanels(Object.keys(portfolios))
@@ -690,8 +796,7 @@ async function fetchUsdBrl(){
   try {
     const r=await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL')
     const d=await r.json()
-    usdBrl=parseFloat(d.USDBRL.bid)
-    usdVarPct=parseFloat(d.USDBRL.pctChange)||0
+    usdBrl=parseFloat(d.USDBRL.bid);usdVarPct=parseFloat(d.USDBRL.pctChange)||0
   } catch {usdBrl=usdBrl||5.8;usdVarPct=usdVarPct||0}
 }
 
@@ -709,12 +814,23 @@ async function fetchBrapi(tickers){
   if (!tickers.length) return
   const token=window._brapiToken
   const param=token?`?token=${token}`:''
-  const valid=tickers.filter(t=>/^[A-Z0-9]{3,6}$/.test(t))
-  const invalid=tickers.filter(t=>!/^[A-Z0-9]{3,6}$/.test(t))
-  invalid.forEach(t=>{if(!quotes[t]) quotes[t]={error:true,msg:'Ticker especial'}})
-  for (const ticker of valid){
+  for (const ticker of tickers){
+    const cfg=getTickerConfig(ticker,'BRL')
+    if (cfg.source==='ignore'||cfg.source==='manual'){
+      quotes[ticker]={error:true,msg:cfg.source==='ignore'?'ignorado':'manual'}
+      continue
+    }
+    if (cfg.source==='finnhub'){
+      // Will be handled by fetchFinnhub
+      continue
+    }
+    const fetchTicker=cfg.sourceTicker||ticker
+    if (!/^[A-Z0-9]{3,6}$/.test(fetchTicker)){
+      quotes[ticker]={error:true,msg:'Ticker especial'}
+      continue
+    }
     try {
-      const r=await fetch(`https://brapi.dev/api/quote/${ticker}${param}`)
+      const r=await fetch(`https://brapi.dev/api/quote/${fetchTicker}${param}`)
       const d=await r.json()
       const q=d.results?.[0]
       if (q?.regularMarketPrice){
@@ -730,43 +846,57 @@ async function fetchBrapi(tickers){
 async function fetchFinnhub(tickers){
   if (!tickers.length) return
   const token=window._finnhubToken
-  if (!token){tickers.forEach(t=>{quotes[t]={error:true,msg:'Sem token'}});return}
-  for (const t of tickers){
+  if (!token){tickers.forEach(t=>{if(!quotes[t])quotes[t]={error:true,msg:'Sem token'}});return}
+  for (const ticker of tickers){
+    const cfg=getTickerConfig(ticker,'USD')
+    if (cfg.source==='ignore'||cfg.source==='manual'){
+      quotes[ticker]={error:true,msg:cfg.source==='ignore'?'ignorado':'manual'}
+      continue
+    }
+    if (cfg.source==='brapi'){
+      // Will be fetched via brapi
+      continue
+    }
+    const fetchTicker=cfg.sourceTicker||ticker
     try {
-      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${t}&token=${token}`)
+      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${fetchTicker}&token=${token}`)
       const d=await r.json()
-      if (d.c>0) quotes[t]={price:d.c,change:d.d||0,changePct:d.dp||0,currency:'USD'}
-      else quotes[t]={error:true,msg:'Não encontrado'}
-    } catch {quotes[t]={error:true,msg:'Erro'}}
+      if (d.c>0) quotes[ticker]={price:d.c,change:d.d||0,changePct:d.dp||0,currency:'USD'}
+      else quotes[ticker]={error:true,msg:'Não encontrado'}
+    } catch {quotes[ticker]={error:true,msg:'Erro'}}
     await new Promise(r=>setTimeout(r,120))
   }
 }
 
-// ─── Refresh (background) ──────────────────────────────────
+// ─── Refresh ──────────────────────────────────────────────
 window.refreshAll=async function(){
   if (isRefreshing) return
-  if (getRemainingCooldown()>0&&lastRefresh){
-    toast(`Aguarde ${formatCooldown(getRemainingCooldown())} para atualizar`,'err');return
-  }
+  if (getRemainingCooldown()>0&&lastRefresh){toast(`Aguarde ${formatCooldown(getRemainingCooldown())} para atualizar`,'err');return}
   isRefreshing=true
   document.getElementById('live-dot').className='dot updating'
   updateRefreshButtons()
 
-  // Collect unique tickers by currency — only one call per ticker across all portfolios
   const all=Object.values(portfolios).flat()
   const brlTickers=[...new Set(all.filter(p=>p.currency==='BRL').map(p=>p.ticker))]
   const usdTickers=[...new Set(all.filter(p=>p.currency==='USD').map(p=>p.ticker))]
 
-  await Promise.all([fetchUsdBrl(),fetchIbov(),fetchBrapi(brlTickers),fetchFinnhub(usdTickers)])
-  await saveCachedQuotes()
+  // Also handle cross-source tickers (brapi for USD, finnhub for BRL)
+  const brapiExtra=usdTickers.filter(t=>{const cfg=getTickerConfig(t,'USD');return cfg.source==='brapi'})
+  const finnhubExtra=brlTickers.filter(t=>{const cfg=getTickerConfig(t,'BRL');return cfg.source==='finnhub'})
 
+  await Promise.all([
+    fetchUsdBrl(),
+    fetchIbov(),
+    fetchBrapi([...brlTickers,...brapiExtra]),
+    fetchFinnhub([...usdTickers,...finnhubExtra])
+  ])
+
+  await saveCachedQuotes()
   Object.keys(portfolios).forEach(name=>renderPortfolio(name))
-  renderConsolidation()
-  updateMarketCards()
+  renderConsolidation();updateMarketCards()
   await saveSnapshots()
 
-  lastRefresh=Date.now()
-  isRefreshing=false
+  lastRefresh=Date.now();isRefreshing=false
   document.getElementById('live-dot').className='dot live'
   startCooldownTimer()
 }
@@ -779,7 +909,6 @@ function updateMarketCards(){
     const uel=document.getElementById('v-usd-pct-'+sid)
     const uvl=document.getElementById('v-usd-val-'+sid)
     const iel=document.getElementById('v-ibov-pct-'+sid)
-    const ivl=document.getElementById('v-ibov-val-'+sid)
     if (uel){uel.textContent=sign+usdVarPct.toFixed(2)+'%';uel.className='mkt-pct '+cls}
     if (uvl&&usdBrl) uvl.textContent=usdBrl.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})
     if (iel&&ibovPct!=null){iel.textContent=ibovSign+ibovPct.toFixed(2)+'%';iel.className='mkt-pct '+ibovCls}
@@ -793,7 +922,22 @@ function computeRowVar(p){
   const usdNow=usdBrl||5.8
   const usdYest=usdNow/(1+(usdVarPct/100)||1)
 
-  // No quote available
+  // Ignored or manual — use prevClose, no variation
+  if (q&&q.msg==='ignorado'){
+    if (p.prevClose!=null&&p.prevClose>0){
+      const price=p.prevClose*(isUSD?usdNow:1)
+      return {price,valueBrl:price*p.qty,varBrl:0,varPct:0,varDisplayPct:'0.00',hasQuote:false,hasPrevClose:true,isIgnored:true}
+    }
+    return {price:0,valueBrl:0,varBrl:0,varPct:0,varDisplayPct:'—',hasQuote:false,hasPrevClose:false,isIgnored:true}
+  }
+  if (q&&q.msg==='manual'){
+    if (p.prevClose!=null&&p.prevClose>0){
+      const price=p.prevClose*(isUSD?usdNow:1)
+      return {price,valueBrl:price*p.qty,varBrl:0,varPct:0,varDisplayPct:'0.00',hasQuote:false,hasPrevClose:true,isManual:true}
+    }
+    return {price:0,valueBrl:0,varBrl:0,varPct:0,varDisplayPct:'—',hasQuote:false,hasPrevClose:false}
+  }
+
   if (!q||q.error){
     if (p.prevClose!=null&&p.prevClose>0){
       const price=p.prevClose*(isUSD?usdNow:1)
@@ -803,14 +947,11 @@ function computeRowVar(p){
   }
 
   if (!isUSD){
-    // BRL asset
     const price=q.price
     const varBrl=q.change*p.qty
-    return {price,valueBrl:price*p.qty,varBrl,varPct:q.changePct,
-      varDisplayPct:q.changePct.toFixed(2),hasQuote:true,hasPrevClose:false}
+    return {price,valueBrl:price*p.qty,varBrl,varPct:q.changePct,varDisplayPct:q.changePct.toFixed(2),hasQuote:true,hasPrevClose:false}
   }
 
-  // USD asset
   const priceBrl=q.price*usdNow
   const valueBrl=priceBrl*p.qty
   const priceYestUsd=q.price-q.change
@@ -818,17 +959,13 @@ function computeRowVar(p){
 
   if (currencyMode==='brl'){
     const varPctBrl=((1+q.changePct/100)*(1+usdVarPct/100)-1)*100
-    return {price:priceBrl,valueBrl,varBrl,varPct:varPctBrl,
-      varDisplayPct:varPctBrl.toFixed(2),hasQuote:true,hasPrevClose:false,isUSD:true}
+    return {price:priceBrl,valueBrl,varBrl,varPct:varPctBrl,varDisplayPct:varPctBrl.toFixed(2),hasQuote:true,hasPrevClose:false,isUSD:true}
   } else {
-    return {price:priceBrl,valueBrl,varBrl,varPct:q.changePct,
-      varDisplayPct:q.changePct.toFixed(2),hasQuote:true,hasPrevClose:false,isUSD:true}
+    return {price:priceBrl,valueBrl,varBrl,varPct:q.changePct,varDisplayPct:q.changePct.toFixed(2),hasQuote:true,hasPrevClose:false,isUSD:true}
   }
 }
 
-function computeRows(name){
-  return (portfolios[name]||[]).map(p=>({...p,...computeRowVar(p)}))
-}
+function computeRows(name){return (portfolios[name]||[]).map(p=>({...p,...computeRowVar(p)}))}
 
 function computeSummary(rows){
   let gross=0,net=0,totalVarBrl=0
@@ -841,7 +978,6 @@ function renderPortfolio(name){
   const sid=safeid(name)
   const rows=computeRows(name)
   const {gross,net,varPct,varBrl}=computeSummary(rows)
-
   document.getElementById('v-gross-'+sid).textContent=fmtBrl(gross)
   const ne=document.getElementById('v-net-'+sid)
   ne.textContent='Net: '+fmtBrl(net);ne.className='card-sub '+(net>=0?'':'neg')
@@ -862,24 +998,26 @@ function renderPortfolio(name){
   })
 
   document.getElementById('tbl-'+sid).innerHTML=sorted.map(row=>{
-    const {ticker,qty,currency,book,sector,price,valueBrl,varPct,varDisplayPct,hasQuote,hasPrevClose,isUSD}=row
+    const {ticker,qty,currency,book,sector,price,valueBrl,varPct,varDisplayPct,hasQuote,hasPrevClose,isIgnored,isManual,isUSD}=row
     const weight=gross>0?(valueBrl/gross)*100:0
     const weightAbs=Math.abs(weight)
     const isPos=varPct>=0
     const q=quotes[ticker]
     let priceCell,varCell
 
-    if (hasQuote){
+    if (isIgnored){
+      priceCell=price>0?`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-size:9px;color:var(--muted)">prev</span>`:`<span class="err-lbl">sem preço</span>`
+      varCell=`<span style="color:var(--muted)">ignorado</span>`
+    } else if (hasQuote){
       const pf=currency==='USD'
         ?currencyMode==='brl'
           ?`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
           :`$ ${q.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`
         :`R$ ${q.price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
       priceCell=pf
-      const sym=currency==='USD'&&currencyMode==='original'?'$ ':'R$ '
       varCell=`<span class="${isPos?'pos':'neg'}">${isPos?'+':''}${varDisplayPct}%</span>`
     } else if (hasPrevClose){
-      priceCell=`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-size:9px;color:var(--muted)">prev</span>`
+      priceCell=`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-size:9px;color:var(--muted)">${isManual?'manual':'prev'}</span>`
       varCell=`<span style="color:var(--muted)">0.00%</span>`
     } else {
       priceCell=`<span class="err-lbl">sem cotação</span>`
@@ -888,7 +1026,7 @@ function renderPortfolio(name){
 
     const barW=Math.min(weightAbs*1.5,100)
     const barColor=qty<0?'var(--red)':(isPos?'var(--green)':'var(--red)')
-    const mktBadge=currency==='USD'?'us':'br'
+    const mktBadge=currency==='USD'?'usd':'brl'
     return `<tr>
       <td><span class="badge ${mktBadge}">${currency}</span><span class="tk">${ticker}</span></td>
       <td style="font-size:11px;color:var(--muted)">${book||'—'}</td>
