@@ -407,7 +407,7 @@ async function loadCachedQuotes(){
     .eq('group_id',groupId)
   if (cached&&cached.length){
     cached.forEach(q=>{
-      quotes[q.ticker]={price:q.price,change:q.change,changePct:q.change_pct,currency:q.currency,error:false}
+      quotes[q.ticker]={price:q.price||0,change:q.change||0,changePct:q.change_pct||0,currency:q.currency||'BRL',error:false}
     })
     // Get shared market data from first row
     const first=cached[0]
