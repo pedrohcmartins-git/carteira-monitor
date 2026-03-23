@@ -607,6 +607,8 @@ async function handleFile(file){
         await sb.from('portfolios').delete().eq('id',port.id)
         delete portfolios[port.portfolio_name]
       }
+      // Limpa o cache de cotações ao apagar carteiras
+      await sb.from('quote_cache').delete().eq('group_id',groupId)
       toast(`${portsFaltando.length} carteira(s) removida(s)`,'ok')
       buildPortfolioTabs(Object.keys(portfolios))
       buildPortfolioPanels(Object.keys(portfolios))
