@@ -970,7 +970,9 @@ function computeRows(name){return (portfolios[name]||[]).map(p=>({...p,...comput
 function computeSummary(rows){
   let gross=0,net=0,totalVarBrl=0
   rows.forEach(r=>{gross+=Math.abs(r.valueBrl);net+=r.valueBrl;totalVarBrl+=r.varBrl})
-  return {gross,net,varPct:gross>0?(totalVarBrl/gross)*100:0,varBrl:totalVarBrl}
+  const grossOntem=gross-totalVarBrl
+  const denom=grossOntem>0?grossOntem:gross
+  return {gross,net,varPct:denom>0?(totalVarBrl/denom)*100:0,varBrl:totalVarBrl}
 }
 
 // ─── Render portfolio ──────────────────────────────────────
