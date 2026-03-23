@@ -527,7 +527,8 @@ window.saveTickerRow=async function(ticker){
   const sticker=document.getElementById('tmap-sticker-'+safeid(ticker))?.value.trim().toUpperCase()||''
   await saveTickerMapRow(ticker,src,sticker||ticker)
   renderTickerMap()
-  // Clear cached quote so it gets re-fetched
+  // Limpa do cache do banco também
+  await sb.from('quote_cache').delete().eq('group_id',groupId).eq('ticker',ticker)
   delete quotes[ticker]
   toast(`${ticker} → ${src} salvo`,'ok')
 }
