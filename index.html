@@ -62,7 +62,7 @@ nav{border-bottom:1px solid var(--border);padding:18px 0;}
 .pos{color:var(--green);} .neg{color:var(--red);}
 .controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;}
 .section-lbl{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
-.btn-refresh{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-weight:500;transition:all .15s;display:flex;align-items:center;gap:6px;min-width:140px;justify-content:center;}
+.btn-refresh{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-weight:500;transition:all .15s;display:flex;align-items:center;gap:6px;min-width:160px;justify-content:center;}
 .btn-refresh:hover:not(:disabled){background:#d4f54a;}
 .btn-refresh:disabled{opacity:.6;cursor:not-allowed;background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
 .tbl-wrap{border:1px solid var(--border);overflow-x:auto;}
@@ -114,6 +114,13 @@ td{padding:12px 14px;white-space:nowrap;}
 .toggle-active.on::after{transform:translateX(14px);}
 .btn-del{font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:4px 8px;}
 .admin-section{background:var(--surface);border:1px solid var(--border);padding:22px;margin-bottom:18px;}
+.pref-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px;}
+.pref-row:last-child{border-bottom:none;}
+.pref-label{font-size:12px;color:var(--text);}
+.pref-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.currency-toggle{display:flex;gap:0;border:1px solid var(--border);overflow:hidden;}
+.currency-opt{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;padding:7px 14px;background:transparent;color:var(--muted);border:none;cursor:pointer;transition:all .15s;}
+.currency-opt.active{background:var(--accent);color:var(--bg);}
 .member-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);gap:12px;}
 .member-row:last-child{border-bottom:none;}
 .invite-row{display:flex;gap:8px;margin-top:4px;}
@@ -121,10 +128,6 @@ td{padding:12px 14px;white-space:nowrap;}
 .invite-row input:focus{border-color:var(--accent);}
 .invite-row select{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:9px 10px;outline:none;}
 .btn-invite{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:9px 16px;background:var(--accent);color:var(--bg);border:none;cursor:pointer;}
-/* Currency toggle */
-.currency-toggle{display:flex;gap:0;border:1px solid var(--border);overflow:hidden;}
-.currency-opt{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;padding:7px 14px;background:transparent;color:var(--muted);border:none;cursor:pointer;transition:all .15s;}
-.currency-opt.active{background:var(--accent);color:var(--bg);}
 .spin{display:inline-block;width:11px;height:11px;border:1.5px solid rgba(0,0,0,.3);border-top-color:currentColor;border-radius:50%;animation:sp .7s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg)}}
 #toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;font-size:11px;z-index:999;opacity:0;transform:translateY(6px);transition:all .25s;border:1px solid var(--border);background:var(--surface2);max-width:320px;}
@@ -219,16 +222,29 @@ td{padding:12px 14px;white-space:nowrap;}
 
 <!-- ADMIN -->
 <div class="panel" id="panel-admin">
+  <!-- Preferências do usuário -->
   <div class="admin-section">
-    <div class="form-title">Preferências</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-      <span style="font-size:12px;color:var(--text)">Variação de ativos estrangeiros</span>
+    <div class="form-title">Minhas preferências</div>
+    <div class="pref-row">
+      <div>
+        <div class="pref-label">Variação de ativos estrangeiros</div>
+        <div class="pref-sub">Como exibir a variação de ativos em moeda estrangeira</div>
+      </div>
       <div class="currency-toggle">
         <button class="currency-opt active" id="curr-original" onclick="setCurrencyMode('original')">Moeda original</button>
         <button class="currency-opt" id="curr-brl" onclick="setCurrencyMode('brl')">Tudo em BRL</button>
       </div>
     </div>
+    <div class="pref-row">
+      <div>
+        <div class="pref-label">Atualização automática</div>
+        <div class="pref-sub">Atualizar cotações automaticamente a cada 10 minutos</div>
+      </div>
+      <button class="toggle-active" id="toggle-autorefresh" onclick="toggleAutoRefresh()"></button>
+    </div>
   </div>
+
+  <!-- Chaves de API (só admin) -->
   <div class="admin-section" id="admin-api-section" style="display:none">
     <div class="form-title">Chaves de API do grupo</div>
     <div class="form-grid" style="margin-bottom:12px;">
@@ -238,6 +254,8 @@ td{padding:12px 14px;white-space:nowrap;}
     <button class="btn-add" onclick="saveApiKeys()">Salvar chaves</button>
     <p style="font-size:10px;color:var(--muted);margin-top:8px;">Chaves salvas aqui ficam disponíveis para todos os membros do grupo em qualquer dispositivo.</p>
   </div>
+
+  <!-- Membros -->
   <div class="admin-section">
     <div class="form-title">Membros do grupo</div>
     <div id="members-list"><span style="color:var(--muted);font-size:12px;">Carregando...</span></div>
@@ -266,9 +284,11 @@ let user=null,groupId=null,groupName=null,role=null
 let portfolios={},quotes={},usdBrl=null,usdVarPct=0,ibovPct=null
 let sortStates={},consolSortCol='gross',consolSortAsc=false
 let chartInstance=null
-let currencyMode='original' // 'original' | 'brl'
-let lastRefresh=null,cooldownTimer=null,isRefreshing=false
-const COOLDOWN_MS=5*60*1000 // 5 minutes
+let currencyMode='original'
+let autoRefresh=false
+let lastRefresh=null,cooldownTimer=null,autoRefreshTimer=null,isRefreshing=false
+const COOLDOWN_MS=5*60*1000
+const AUTO_REFRESH_MS=10*60*1000
 
 function safeid(s){return s.replace(/[^a-zA-Z0-9]/g,'_')}
 
@@ -287,8 +307,6 @@ async function boot(){
     return
   }
   groupId=mem.group_id;groupName=mem.groups.name;role=mem.role
-
-  // Store group API keys in memory
   window._brapiToken=mem.groups.brapi_token||''
   window._finnhubToken=mem.groups.finnhub_token||''
 
@@ -305,43 +323,76 @@ async function boot(){
     document.getElementById('alert-admin-wrap').style.display='none'
   }
 
-  // Load user preferences
   await loadPreferences()
   await loadTodayPortfolios()
   loadAlerts()
-
-  // Auto-refresh every 10 min (only if enough time passed)
-  setInterval(()=>{
-    if (!isRefreshing && lastRefresh && Date.now()-lastRefresh>=COOLDOWN_MS){
-      refreshAll()
-    }
-  },60*1000)
 }
 
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('pt-BR',{hour12:false})},1000)
 
 // ─── Preferences ──────────────────────────────────────────
 async function loadPreferences(){
-  const {data}=await sb.from('user_preferences').select('currency_mode').eq('user_id',user.id).single()
-  currencyMode=data?.currency_mode||'original'
+  try {
+    const {data}=await sb.from('user_preferences')
+      .select('currency_mode,auto_refresh').eq('user_id',user.id).single()
+    currencyMode=data?.currency_mode||'original'
+    autoRefresh=data?.auto_refresh||false
+  } catch {
+    currencyMode='original';autoRefresh=false
+  }
   updateCurrencyUI()
+  updateAutoRefreshUI()
+  if (autoRefresh) startAutoRefreshTimer()
 }
 
-async function savePreference(key,val){
-  await sb.from('user_preferences').upsert({user_id:user.id,[key]:val},{onConflict:'user_id'})
+async function savePreferences(){
+  await sb.from('user_preferences').upsert(
+    {user_id:user.id,currency_mode:currencyMode,auto_refresh:autoRefresh},
+    {onConflict:'user_id'}
+  )
 }
 
 window.setCurrencyMode=async function(mode){
   currencyMode=mode
   updateCurrencyUI()
-  await savePreference('currency_mode',mode)
+  await savePreferences()
   Object.keys(portfolios).forEach(name=>renderPortfolio(name))
   renderConsolidation()
+}
+
+window.toggleAutoRefresh=async function(){
+  autoRefresh=!autoRefresh
+  updateAutoRefreshUI()
+  await savePreferences()
+  if (autoRefresh){
+    startAutoRefreshTimer()
+    toast('Atualização automática ativada','ok')
+  } else {
+    stopAutoRefreshTimer()
+    toast('Atualização automática desativada','ok')
+  }
 }
 
 function updateCurrencyUI(){
   document.getElementById('curr-original').classList.toggle('active',currencyMode==='original')
   document.getElementById('curr-brl').classList.toggle('active',currencyMode==='brl')
+}
+
+function updateAutoRefreshUI(){
+  const btn=document.getElementById('toggle-autorefresh')
+  btn.classList.toggle('on',autoRefresh)
+}
+
+function startAutoRefreshTimer(){
+  stopAutoRefreshTimer()
+  autoRefreshTimer=setInterval(()=>{
+    if (!isRefreshing&&getRemainingCooldown()<=0) refreshAll()
+  },AUTO_REFRESH_MS)
+}
+
+function stopAutoRefreshTimer(){
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer)
+  autoRefreshTimer=null
 }
 
 // ─── Tabs ──────────────────────────────────────────────────
@@ -384,9 +435,11 @@ async function loadTodayPortfolios(){
   }
   for (const port of ports){
     const {data:pos}=await sb.from('positions')
-      .select('ticker,quantity,market,prev_close,book,sector').eq('portfolio_id',port.id)
+      .select('ticker,quantity,market,currency,prev_close,book,sector').eq('portfolio_id',port.id)
     portfolios[port.portfolio_name]=(pos||[]).map(p=>({
-      ticker:p.ticker,qty:p.quantity,market:p.market,
+      ticker:p.ticker,qty:p.quantity,
+      market:p.market,
+      currency:p.currency||p.market, // 'BRL' or 'USD'
       prevClose:p.prev_close,book:p.book||'—',sector:p.sector||'—'
     }))
     sortStates[port.portfolio_name]={col:'valueBrl',asc:false}
@@ -395,8 +448,6 @@ async function loadTodayPortfolios(){
   buildPortfolioPanels(Object.keys(portfolios))
   updateChartSelector(Object.keys(portfolios))
   if (role==='admin') buildUploadZone()
-
-  // Load cached quotes first, then refresh if stale
   await loadCachedQuotes()
 }
 
@@ -405,22 +456,23 @@ async function loadCachedQuotes(){
   const {data:cached}=await sb.from('quote_cache')
     .select('ticker,price,change,change_pct,currency,usd_brl,usd_var_pct,ibov_pct,updated_at')
     .eq('group_id',groupId)
+
   if (cached&&cached.length){
     cached.forEach(q=>{
-      quotes[q.ticker]={price:q.price||0,change:q.change||0,changePct:q.change_pct||0,currency:q.currency||'BRL',error:false}
+      quotes[q.ticker]={
+        price:q.price||0,change:q.change||0,
+        changePct:q.change_pct||0,currency:q.currency||'BRL',error:false
+      }
     })
-    // Get shared market data from first row
     const first=cached[0]
     if (first.usd_brl) usdBrl=first.usd_brl
     if (first.usd_var_pct!=null) usdVarPct=first.usd_var_pct
     if (first.ibov_pct!=null) ibovPct=first.ibov_pct
 
-    // Render with cached data immediately
     Object.keys(portfolios).forEach(name=>renderPortfolio(name))
     renderConsolidation()
     updateMarketCards()
 
-    // Check if cache is stale (> 10 min)
     const age=Date.now()-new Date(first.updated_at).getTime()
     if (age>10*60*1000){
       refreshAll()
@@ -430,72 +482,54 @@ async function loadCachedQuotes(){
       document.getElementById('live-dot').className='dot live'
     }
   } else {
-    // No cache — refresh immediately
     refreshAll()
   }
 }
 
 async function saveCachedQuotes(){
-  const rows=Object.entries(quotes).map(([ticker,q])=>({
-    group_id:groupId,ticker,
-    price:q.price||null,change:q.change||null,change_pct:q.changePct||null,
-    currency:q.currency||null,
-    usd_brl:usdBrl,usd_var_pct:usdVarPct,ibov_pct:ibovPct,
-    updated_at:new Date().toISOString(),
-    updated_by:user.id
-  }))
+  const rows=Object.entries(quotes)
+    .filter(([,q])=>!q.error)
+    .map(([ticker,q])=>({
+      group_id:groupId,ticker,
+      price:q.price,change:q.change,change_pct:q.changePct,
+      currency:q.currency,
+      usd_brl:usdBrl,usd_var_pct:usdVarPct,ibov_pct:ibovPct,
+      updated_at:new Date().toISOString(),updated_by:user.id
+    }))
   if (!rows.length) return
-  // Upsert in batches of 50
   for (let i=0;i<rows.length;i+=50){
     await sb.from('quote_cache').upsert(rows.slice(i,i+50),{onConflict:'group_id,ticker'})
   }
 }
 
-// ─── Cooldown timer ────────────────────────────────────────
+// ─── Cooldown ──────────────────────────────────────────────
+function getRemainingCooldown(){
+  if (!lastRefresh) return 0
+  return Math.max(0,COOLDOWN_MS-(Date.now()-lastRefresh))
+}
+function formatCooldown(ms){
+  const s=Math.ceil(ms/1000),m=Math.floor(s/60),sec=s%60
+  return `${m}:${sec.toString().padStart(2,'0')}`
+}
 function startCooldownTimer(){
   if (cooldownTimer) clearInterval(cooldownTimer)
   updateRefreshButtons()
   cooldownTimer=setInterval(()=>{
     updateRefreshButtons()
-    const remaining=getRemainingCooldown()
-    if (remaining<=0) clearInterval(cooldownTimer)
+    if (getRemainingCooldown()<=0) clearInterval(cooldownTimer)
   },1000)
 }
-
-function getRemainingCooldown(){
-  if (!lastRefresh) return 0
-  return Math.max(0,COOLDOWN_MS-(Date.now()-lastRefresh))
-}
-
-function formatCooldown(ms){
-  const s=Math.ceil(ms/1000)
-  const m=Math.floor(s/60),sec=s%60
-  return `${m}:${sec.toString().padStart(2,'0')}`
-}
-
 function updateRefreshButtons(){
   const remaining=getRemainingCooldown()
   const inCooldown=remaining>0
   const label=isRefreshing
     ?`<span class="spin"></span> Atualizando...`
-    :inCooldown
-      ?`↻ Atualizar (${formatCooldown(remaining)})`
-      :`↻ Atualizar`
-
+    :inCooldown?`↻ Atualizar (${formatCooldown(remaining)})`:`↻ Atualizar`
   document.querySelectorAll('.btn-refresh').forEach(btn=>{
     btn.disabled=isRefreshing||inCooldown
-    const lbl=btn.querySelector('[id^="refresh-label"]')||btn
-    if (btn.id==='btn-refresh-consol'){
-      document.getElementById('refresh-label-consol').innerHTML=label
-    }
-  })
-  // Update per-portfolio buttons
-  Object.keys(portfolios).forEach(name=>{
-    const btn=document.getElementById('btn-refresh-'+safeid(name))
-    if (btn){
-      btn.disabled=isRefreshing||inCooldown
-      btn.innerHTML=label
-    }
+    const lbl=btn.querySelector('span[id^="refresh-label"]')
+    if (lbl) lbl.innerHTML=label
+    else btn.innerHTML=label
   })
 }
 
@@ -506,8 +540,7 @@ function buildPortfolioTabs(names){
   const histTab=document.getElementById('tab-historico')
   names.forEach(name=>{
     const btn=document.createElement('button')
-    btn.className='tab port-tab'
-    btn.textContent=name
+    btn.className='tab port-tab';btn.textContent=name
     btn.onclick=function(){switchToPortfolio(name,this)}
     bar.insertBefore(btn,histTab)
   })
@@ -531,7 +564,9 @@ function buildPortfolioPanels(names){
       </div>
       <div class="controls">
         <span class="section-lbl">${name}</span>
-        <button class="btn-refresh" id="btn-refresh-${safeid(name)}" onclick="refreshAll()">↻ Atualizar</button>
+        <button class="btn-refresh" id="btn-refresh-${safeid(name)}" onclick="refreshAll()">
+          <span>↻ Atualizar</span>
+        </button>
       </div>
       <div class="tbl-wrap"><table>
         <thead><tr>
@@ -557,7 +592,7 @@ function buildUploadZone(){
   zone.className='upload-zone';zone.id='drop-zone'
   zone.innerHTML=`<input type="file" id="file-input" accept=".csv,.xlsx,.xls,.txt"/>
     <h3>📂 Enviar carteira de hoje</h3>
-    <p>CSV · XLSX · TXT — colunas: CARTEIRA, TICKER, QUANTIDADE, PRECO_ANTERIOR, BOOK, SETOR</p>`
+    <p>CSV · XLSX · TXT — colunas: CARTEIRA, TICKER, MOEDA, QUANTIDADE, PRECO_ANTERIOR, BOOK, SETOR</p>`
   panel.appendChild(zone)
   zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('over')})
   zone.addEventListener('dragleave',()=>zone.classList.remove('over'))
@@ -565,7 +600,7 @@ function buildUploadZone(){
   document.getElementById('file-input').addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0])})
 }
 
-// ─── File upload ───────────────────────────────────────────
+// ─── File Upload ───────────────────────────────────────────
 async function handleFile(file){
   if (!file) return
   const ext=file.name.split('.').pop().toLowerCase()
@@ -578,19 +613,26 @@ async function handleFile(file){
     const txt=await file.text()
     rows=txt.split('\n').map(l=>{const sep=l.includes(';')?';':',';return l.split(sep)})
   }
+
   const byPort={}
   for (const row of rows){
-    if (!row||row.length<3) continue
+    if (!row||row.length<4) continue
     const portName=String(row[0]).trim()
     const ticker=String(row[1]).trim().toUpperCase().replace(/[^A-Z0-9^]/g,'')
-    const qty=parseFloat(String(row[2]).replace(',','.'))
+    // New format: CARTEIRA, TICKER, MOEDA, QUANTIDADE, PRECO_ANTERIOR, BOOK, SETOR
+    const currencyRaw=String(row[2]||'').trim().toUpperCase()
+    const qty=parseFloat(String(row[3]).replace(',','.'))
     if (!portName||portName==='CARTEIRA'||!ticker||ticker==='TICKER'||isNaN(qty)||qty===0) continue
-    const prevClose=row[3]?parseFloat(String(row[3]).replace(',','.'))||null:null
-    const book=row[4]?String(row[4]).trim()||null:null
-    const sector=row[5]?String(row[5]).trim()||null:null
+    const prevClose=row[4]?parseFloat(String(row[4]).replace(',','.'))||null:null
+    const book=row[5]?String(row[5]).trim()||null:null
+    const sector=row[6]?String(row[6]).trim()||null:null
+    // Determine currency and market
+    const currency=(['USD','BRL'].includes(currencyRaw))?currencyRaw:(/[0-9]/.test(ticker)?'BRL':'USD')
+    const market=currency==='BRL'?'BR':'US'
     if (!byPort[portName]) byPort[portName]=[]
-    byPort[portName].push({ticker,qty,market:/[0-9]/.test(ticker)?'BR':'US',prevClose,book,sector})
+    byPort[portName].push({ticker,qty,market,currency,prevClose,book,sector})
   }
+
   if (!Object.keys(byPort).length){toast('Nenhum ativo encontrado.','err');return}
 
   const today=new Date().toISOString().slice(0,10)
@@ -607,7 +649,6 @@ async function handleFile(file){
         await sb.from('portfolios').delete().eq('id',port.id)
         delete portfolios[port.portfolio_name]
       }
-      // Limpa o cache de cotações ao apagar carteiras
       await sb.from('quote_cache').delete().eq('group_id',groupId)
       toast(`${portsFaltando.length} carteira(s) removida(s)`,'ok')
       buildPortfolioTabs(Object.keys(portfolios))
@@ -626,7 +667,8 @@ async function handleFile(file){
     if (portErr){toast('Erro em '+portName+': '+portErr.message,'err');continue}
     await sb.from('positions').delete().eq('portfolio_id',port.id)
     const {error:insErr}=await sb.from('positions').insert(items.map(i=>({
-      portfolio_id:port.id,ticker:i.ticker,quantity:i.qty,market:i.market,
+      portfolio_id:port.id,ticker:i.ticker,quantity:i.qty,
+      market:i.market,currency:i.currency,
       prev_close:i.prevClose,book:i.book,sector:i.sector
     })))
     if (insErr){toast('Erro ao salvar '+portName+': '+insErr.message,'err');continue}
@@ -634,16 +676,16 @@ async function handleFile(file){
     sortStates[portName]={col:'valueBrl',asc:false}
     totalItems+=items.length
   }
+
   toast(`${totalItems} ativos em ${Object.keys(byPort).length} carteiras`,'ok')
   buildPortfolioTabs(Object.keys(portfolios))
   buildPortfolioPanels(Object.keys(portfolios))
   updateChartSelector(Object.keys(portfolios))
-  // Reset cooldown so upload triggers fresh refresh
   lastRefresh=null
   await refreshAll()
 }
 
-// ─── Market data fetchers ──────────────────────────────────
+// ─── Fetch market data ─────────────────────────────────────
 async function fetchUsdBrl(){
   try {
     const r=await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL')
@@ -654,8 +696,7 @@ async function fetchUsdBrl(){
 }
 
 async function fetchIbov(){
-  const token=window._brapiToken
-  if (!token) return
+  const token=window._brapiToken;if (!token) return
   try {
     const r=await fetch(`https://brapi.dev/api/quote/%5EBVSP?token=${token}`)
     const d=await r.json()
@@ -704,30 +745,24 @@ async function fetchFinnhub(tickers){
 // ─── Refresh (background) ──────────────────────────────────
 window.refreshAll=async function(){
   if (isRefreshing) return
-  const remaining=getRemainingCooldown()
-  if (remaining>0&&lastRefresh){
-    toast(`Aguarde ${formatCooldown(remaining)} para atualizar novamente`,'err')
-    return
+  if (getRemainingCooldown()>0&&lastRefresh){
+    toast(`Aguarde ${formatCooldown(getRemainingCooldown())} para atualizar`,'err');return
   }
   isRefreshing=true
   document.getElementById('live-dot').className='dot updating'
   updateRefreshButtons()
 
+  // Collect unique tickers by currency — only one call per ticker across all portfolios
   const all=Object.values(portfolios).flat()
-  const br=[...new Set(all.filter(p=>p.market==='BR').map(p=>p.ticker))]
-  const us=[...new Set(all.filter(p=>p.market==='US').map(p=>p.ticker))]
+  const brlTickers=[...new Set(all.filter(p=>p.currency==='BRL').map(p=>p.ticker))]
+  const usdTickers=[...new Set(all.filter(p=>p.currency==='USD').map(p=>p.ticker))]
 
-  // Fetch all in background — UI stays usable
-  await Promise.all([fetchUsdBrl(),fetchIbov(),fetchBrapi(br),fetchFinnhub(us)])
-
-  // Save to shared cache
+  await Promise.all([fetchUsdBrl(),fetchIbov(),fetchBrapi(brlTickers),fetchFinnhub(usdTickers)])
   await saveCachedQuotes()
 
-  // Re-render
   Object.keys(portfolios).forEach(name=>renderPortfolio(name))
   renderConsolidation()
   updateMarketCards()
-
   await saveSnapshots()
 
   lastRefresh=Date.now()
@@ -738,7 +773,7 @@ window.refreshAll=async function(){
 
 function updateMarketCards(){
   const sign=usdVarPct>=0?'+':'';const cls=usdVarPct>=0?'pos':'neg'
-  const ibovSign=ibovPct>=0?'+':'';const ibovCls=ibovPct>=0?'pos':'neg'
+  const ibovSign=ibovPct!=null?(ibovPct>=0?'+':''):'';const ibovCls=ibovPct!=null?(ibovPct>=0?'pos':'neg'):''
   Object.keys(portfolios).forEach(name=>{
     const sid=safeid(name)
     const uel=document.getElementById('v-usd-pct-'+sid)
@@ -751,66 +786,48 @@ function updateMarketCards(){
   })
 }
 
-// ─── Compute row data ──────────────────────────────────────
-function computeRowVar(p,q){
-  // Returns {varBrl, varPct, varDisplay, priceDisplay}
+// ─── Compute row variation ─────────────────────────────────
+function computeRowVar(p){
+  const q=quotes[p.ticker]
+  const isUSD=p.currency==='USD'
   const usdNow=usdBrl||5.8
-  const usdYest=usdNow/(1+usdVarPct/100)
+  const usdYest=usdNow/(1+(usdVarPct/100)||1)
 
+  // No quote available
   if (!q||q.error){
-    // Use prevClose — variation = 0
     if (p.prevClose!=null&&p.prevClose>0){
-      const price=p.prevClose*(p.market==='US'?usdNow:1)
-      return {price,valueBrl:price*p.qty,varBrl:0,varPct:0,varDisplayPct:'0.00',varDisplayAbs:'0',hasQuote:false,hasPrevClose:true}
+      const price=p.prevClose*(isUSD?usdNow:1)
+      return {price,valueBrl:price*p.qty,varBrl:0,varPct:0,varDisplayPct:'0.00',hasQuote:false,hasPrevClose:true}
     }
-    return {price:0,valueBrl:0,varBrl:0,varPct:0,varDisplayPct:'—',varDisplayAbs:'—',hasQuote:false,hasPrevClose:false}
+    return {price:0,valueBrl:0,varBrl:0,varPct:0,varDisplayPct:'—',hasQuote:false,hasPrevClose:false}
   }
 
-  if (p.market==='BR'){
+  if (!isUSD){
+    // BRL asset
     const price=q.price
     const varBrl=q.change*p.qty
-    const varPct=q.changePct
-    return {price,valueBrl:price*p.qty,varBrl,varPct,
-      varDisplayPct:q.changePct.toFixed(2),
-      varDisplayAbs:fmtBrl(varBrl),
-      hasQuote:true,hasPrevClose:false}
+    return {price,valueBrl:price*p.qty,varBrl,varPct:q.changePct,
+      varDisplayPct:q.changePct.toFixed(2),hasQuote:true,hasPrevClose:false}
   }
 
-  // US asset
-  const priceUsd=q.price
-  const priceBrl=priceUsd*usdNow
+  // USD asset
+  const priceBrl=q.price*usdNow
   const valueBrl=priceBrl*p.qty
-
-  // Var R$ = (preço_hoje × câmbio_hoje - preço_ontem × câmbio_ontem) × qty
-  const priceYestUsd=priceUsd-q.change
-  const varBrl=(priceBrl - priceYestUsd*usdYest)*p.qty
-
-  // Var % in original (USD)
-  const varPctOriginal=q.changePct
-  // Var % in BRL
-  const varPctBrl=((1+q.changePct/100)*(1+usdVarPct/100)-1)*100
+  const priceYestUsd=q.price-q.change
+  const varBrl=(priceBrl-priceYestUsd*usdYest)*p.qty
 
   if (currencyMode==='brl'){
+    const varPctBrl=((1+q.changePct/100)*(1+usdVarPct/100)-1)*100
     return {price:priceBrl,valueBrl,varBrl,varPct:varPctBrl,
-      varDisplayPct:varPctBrl.toFixed(2),
-      varDisplayAbs:fmtBrl(varBrl),
-      hasQuote:true,hasPrevClose:false,isUSD:true}
+      varDisplayPct:varPctBrl.toFixed(2),hasQuote:true,hasPrevClose:false,isUSD:true}
   } else {
-    // Original mode: show USD variation
-    const varUsd=q.change*p.qty
-    return {price:priceBrl,valueBrl,varBrl,varPct:varPctOriginal,
-      varDisplayPct:varPctOriginal.toFixed(2),
-      varDisplayAbs:`$ ${varUsd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`,
-      hasQuote:true,hasPrevClose:false,isUSD:true}
+    return {price:priceBrl,valueBrl,varBrl,varPct:q.changePct,
+      varDisplayPct:q.changePct.toFixed(2),hasQuote:true,hasPrevClose:false,isUSD:true}
   }
 }
 
 function computeRows(name){
-  return (portfolios[name]||[]).map(p=>{
-    const q=quotes[p.ticker]
-    const r=computeRowVar(p,q&&!q.error?q:null)
-    return {...p,...r}
-  })
+  return (portfolios[name]||[]).map(p=>({...p,...computeRowVar(p)}))
 }
 
 function computeSummary(rows){
@@ -845,7 +862,7 @@ function renderPortfolio(name){
   })
 
   document.getElementById('tbl-'+sid).innerHTML=sorted.map(row=>{
-    const {ticker,qty,market,book,sector,price,valueBrl,varPct,varDisplayPct,varDisplayAbs,hasQuote,hasPrevClose}=row
+    const {ticker,qty,currency,book,sector,price,valueBrl,varPct,varDisplayPct,hasQuote,hasPrevClose,isUSD}=row
     const weight=gross>0?(valueBrl/gross)*100:0
     const weightAbs=Math.abs(weight)
     const isPos=varPct>=0
@@ -853,12 +870,13 @@ function renderPortfolio(name){
     let priceCell,varCell
 
     if (hasQuote){
-      const pf=market==='BR'
-        ?`R$ ${q.price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
-        :currencyMode==='brl'
+      const pf=currency==='USD'
+        ?currencyMode==='brl'
           ?`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
           :`$ ${q.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+        :`R$ ${q.price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
       priceCell=pf
+      const sym=currency==='USD'&&currencyMode==='original'?'$ ':'R$ '
       varCell=`<span class="${isPos?'pos':'neg'}">${isPos?'+':''}${varDisplayPct}%</span>`
     } else if (hasPrevClose){
       priceCell=`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-size:9px;color:var(--muted)">prev</span>`
@@ -870,8 +888,9 @@ function renderPortfolio(name){
 
     const barW=Math.min(weightAbs*1.5,100)
     const barColor=qty<0?'var(--red)':(isPos?'var(--green)':'var(--red)')
+    const mktBadge=currency==='USD'?'us':'br'
     return `<tr>
-      <td><span class="badge ${market.toLowerCase()}">${market}</span><span class="tk">${ticker}</span></td>
+      <td><span class="badge ${mktBadge}">${currency}</span><span class="tk">${ticker}</span></td>
       <td style="font-size:11px;color:var(--muted)">${book||'—'}</td>
       <td style="font-size:11px;color:var(--muted)">${sector||'—'}</td>
       <td class="r" style="${qty<0?'color:var(--red)':''}">${qty.toLocaleString('pt-BR')}</td>
@@ -899,8 +918,7 @@ window.sortPortfolio=function(name,col){
 
 // ─── Consolidation ─────────────────────────────────────────
 function renderConsolidation(){
-  const names=Object.keys(portfolios)
-  if (!names.length) return
+  const names=Object.keys(portfolios);if (!names.length) return
   const summaries=names.map(name=>{const rows=computeRows(name);return {name,...computeSummary(rows),count:rows.length}})
   const sorted=[...summaries].sort((a,b)=>{
     if (consolSortCol==='name') return consolSortAsc?a.name.localeCompare(b.name):b.name.localeCompare(a.name)
@@ -912,7 +930,6 @@ function renderConsolidation(){
   const tP=tG>0?(tC/tG)*100:0
   const tCnt=summaries.reduce((s,r)=>s+r.count,0)
   const ibovStr=ibovPct!=null?`<span class="${ibovPct>=0?'pos':'neg'}">${ibovPct>=0?'+':''}${ibovPct.toFixed(2)}%</span>`:'—'
-
   document.getElementById('consol-body').innerHTML=
     sorted.map(r=>{
       const vs=ibovPct!=null?r.varPct-ibovPct:null
@@ -941,7 +958,7 @@ function renderConsolidation(){
 window.consolSort=function(col){
   consolSortAsc=consolSortCol===col?!consolSortAsc:false;consolSortCol=col
   document.querySelectorAll('[id^="csort-"]').forEach(el=>el.textContent='')
-  const el=document.getElementById('csort-'+col);if (el) el.textContent=consolSortAsc?' ↑':' ↓'
+  const el=document.getElementById('csort-'+col);if(el)el.textContent=consolSortAsc?' ↑':' ↓'
   renderConsolidation()
 }
 
