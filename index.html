@@ -23,7 +23,7 @@
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh;}
 
 /* NAV */
-nav{background:var(--nav);height:52px;display:flex;align-items:center;padding:0 24px;justify-content:space-between;}
+nav{height:52px;display:flex;align-items:center;padding:0 24px;justify-content:space-between;}
 .logo{color:#fff;font-weight:600;font-size:15px;letter-spacing:-0.3px;}
 .logo span{color:#4ade80;}
 .nav-right{display:flex;align-items:center;gap:12px;}
@@ -57,8 +57,8 @@ nav{background:var(--nav);height:52px;display:flex;align-items:center;padding:0 
 .mkt-lbl{font-size:10px;color:var(--text-2);font-weight:500;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:6px;}
 .mkt-main{font-size:20px;font-weight:600;letter-spacing:-0.5px;line-height:1.1;}
 .mkt-sub{font-size:12px;color:var(--text-2);margin-top:3px;}
-.refresh-card{background:var(--nav);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;padding:14px 20px;cursor:pointer;border:none;font-family:var(--font);font-size:12px;font-weight:500;color:#fff;gap:8px;transition:background .15s;white-space:nowrap;}
-.refresh-card:hover:not(:disabled){background:#1f2937;}
+.refresh-card{background:var(--green);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;padding:14px 20px;cursor:pointer;border:none;font-family:var(--font);font-size:12px;font-weight:500;color:#fff;gap:8px;transition:background .15s;white-space:nowrap;}
+.refresh-card:hover:not(:disabled){background:#15803d;}
 .refresh-card:disabled{background:var(--surface2);color:var(--text-3);border:1px solid var(--border);cursor:not-allowed;}
 
 /* PER-PORTFOLIO SECTION */
@@ -91,7 +91,7 @@ nav{background:var(--nav);height:52px;display:flex;align-items:center;padding:0 
 .tbl-scroll{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 thead tr{border-bottom:1px solid var(--border);}
-th{padding:9px 12px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;white-space:nowrap;cursor:pointer;user-select:none;letter-spacing:0.03em;text-transform:uppercase;background:var(--surface);}
+th{padding:9px 8px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;white-space:nowrap;cursor:pointer;user-select:none;letter-spacing:0.03em;text-transform:uppercase;background:var(--surface);}
 th:hover{color:var(--text);}
 th.r,td.r{text-align:right;}
 /* Sticky first column */
@@ -102,7 +102,7 @@ tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--bg);}
 tbody tr.total-row{background:var(--surface2);border-top:1px solid var(--border);font-weight:500;}
-td{padding:11px 12px;white-space:nowrap;}
+td{padding:11px 8px;white-space:nowrap;}
 /* Currency tag — compact */
 .curr-tag{font-size:9px;font-weight:600;color:var(--text-3);margin-right:4px;font-family:var(--font-mono);}
 .curr-tag.usd{color:var(--blue-text);}
@@ -223,17 +223,17 @@ td{padding:11px 12px;white-space:nowrap;}
   <div class="nav-right">
     <span class="group-badge" id="group-name">—</span>
     <span class="role-badge" id="role-badge">—</span>
-    <button class="nav-btn" onclick="navTo('alertas')">Alertas</button>
-    <button class="nav-btn" id="nav-setup" onclick="navTo('admin')" style="display:none">Setup</button>
+    <button class="nav-btn" onclick="navTo('alertas')">alertas</button>
+    <button class="nav-btn" id="nav-setup" onclick="navTo('admin')" style="display:none">setup</button>
     <span class="dot" id="live-dot" style="margin:0 4px;"></span>
     <span class="nav-time" id="clock">--:--:--</span>
-    <button class="nav-btn" onclick="doLogout()">Sair</button>
+    <button class="nav-btn" onclick="doLogout()">sair</button>
   </div>
 </nav>
 
 <div class="tabs" id="tabs-bar">
-  <button class="tab active" id="tab-consolidacao" onclick="switchToConsolidacao(this)">Consolidado</button>
-  <button class="tab tab-hist" id="tab-historico" onclick="switchTab('historico',this)">Histórico</button>
+  <button class="tab active" id="tab-consolidacao" onclick="switchToConsolidacao(this)">consolidado</button>
+  <button class="tab tab-hist" id="tab-historico" onclick="switchTab('historico',this)">histórico</button>
 </div>
 
 <!-- CONSOLIDADO -->
@@ -594,7 +594,7 @@ function renderPortfoliosGrid(){
   updateTopBar()
   grid.innerHTML=names.map(name=>`
     <div class="port-panel-inner" id="inner-${safeid(name)}">
-      <div class="port-section-name">${name}</div>
+      <div class="port-section-name">${name.toUpperCase()}</div>
       <div class="mini-cards" id="cards-${safeid(name)}">
         <div class="card"><div class="card-lbl">Gross <span class="card-lbl-unit">[R$]</span></div><div class="card-main" id="v-gross-${safeid(name)}">—</div><div class="card-sub muted" id="v-net-${safeid(name)}">—</div></div>
         <div class="card"><div class="card-lbl">P&L Dia <span class="card-lbl-unit">[R$]</span></div><div class="card-main" id="v-varpct-${safeid(name)}">—</div><div class="card-sub" id="v-varbrl-${safeid(name)}">—</div></div>
@@ -716,7 +716,7 @@ function buildPortfolioTabs(names){
   const bar=document.getElementById('tabs-bar'),histTab=document.getElementById('tab-historico')
   names.forEach(name=>{
     const btn=document.createElement('button')
-    btn.className='tab port-tab';btn.textContent=name;btn.dataset.portname=name
+    btn.className='tab port-tab';btn.textContent=nam.toUpperCase()e;btn.dataset.portname=name
     btn.onclick=function(){handlePortfolioTabClick(name)}
     bar.insertBefore(btn,histTab)
   })
@@ -1051,7 +1051,7 @@ window.openTickerModal=function(ticker,currentPortfolio){
   document.getElementById('modal-body').innerHTML=
     portRows.map(r=>`
       <tr class="${r.portName===currentPortfolio?'current-port':'other-port'}">
-        <td style="padding:10px 0;">${r.portName}</td>
+        <td style="padding:10px 0;">${r.portName.toUpperCase()}</td>
         <td style="padding:10px 0;text-align:right;font-variant-numeric:tabular-nums;">${r.qty.toLocaleString('pt-BR')}</td>
         <td style="padding:10px 0;text-align:right;font-variant-numeric:tabular-nums;">${r.qty<0?'−':''}${Math.abs(r.weight).toFixed(1)}%</td>
       </tr>`).join('')+
@@ -1089,7 +1089,7 @@ function renderConsolidation(){
       const vs=ibovPct!=null?r.varPct-ibovPct:null
       const vsStr=vs!=null?`<span class="${vs>=0?'var-pos':'var-neg'}">${vs>=0?'+':''}${vs.toFixed(2)}%</span>`:'—'
       return `<tr>
-        <td style="font-weight:500;">${r.name}</td>
+        <td style="font-weight:500;">${r.name.toUpperCase()}</td>
         <td class="r num">${fmtBrl(r.gross)}</td>
         <td class="r num" style="${r.net<0?'color:var(--red)':''}">${fmtBrl(r.net)}</td>
         <td class="r"><span class="${r.varPct>=0?'var-pos':'var-neg'}">${r.varPct>=0?'+':''}${r.varPct.toFixed(2)}%</span></td>
