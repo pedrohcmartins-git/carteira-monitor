@@ -638,7 +638,7 @@ function updateRefreshButtons(){
   document.querySelectorAll('.btn-refresh').forEach(btn=>{
     btn.disabled=isRefreshing||inCooldown
     const lbl=btn.querySelector('span[id^="refresh-label"]')
-    if (lbl) lbl.innerHTML=label else btn.innerHTML=label
+    if (lbl) { lbl.innerHTML=label } else { btn.innerHTML=label }
   })
 }
 
