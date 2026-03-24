@@ -38,72 +38,74 @@ nav{background:var(--nav);height:52px;display:flex;align-items:center;padding:0 
 .nav-btn:hover{background:var(--nav-surface);color:#fff;}
 
 /* TABS */
-.tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:0;overflow-x:auto;}
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;overflow-x:auto;}
 .tab{font-size:12px;font-weight:500;padding:13px 14px;color:var(--text-2);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;transition:all .15s;font-family:var(--font);}
 .tab:hover{color:var(--text);}
 .tab.active{color:var(--green);border-bottom-color:var(--green);}
 .tab.tab-hist{color:var(--text);margin-left:auto;}
 .tab.tab-hist.active{color:var(--text);border-bottom-color:var(--text);}
-/* Multi-select tab style */
 .tab.port-tab.selected{color:var(--green);border-bottom-color:var(--green);background:var(--green-bg);}
-.tab.port-tab.active:not(.selected){color:var(--text);border-bottom-color:var(--text);}
-.multi-badge{font-size:10px;background:var(--green);color:#fff;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:600;}
-.multi-hint{font-size:11px;color:var(--text-3);padding:0 12px;white-space:nowrap;}
+.multi-hint{font-size:11px;color:var(--text-3);padding:0 10px;white-space:nowrap;}
 
 /* PANELS */
 .panel{display:none;padding:20px 24px 60px;}
 .panel.active{display:block;}
 
-/* SHARED MARKET CARDS */
-.market-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-.market-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;display:flex;align-items:center;gap:24px;}
-.mkt-item{display:flex;flex-direction:column;gap:3px;}
-.mkt-lbl{font-size:10px;color:var(--text-2);font-weight:500;text-transform:uppercase;letter-spacing:0.03em;}
-.mkt-val{font-size:20px;font-weight:600;letter-spacing:-0.5px;}
-.mkt-sub{font-size:12px;color:var(--text-2);}
+/* TOP BAR: market cards + refresh button */
+.top-bar{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;margin-bottom:20px;align-items:stretch;}
+.mkt-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;}
+.mkt-lbl{font-size:10px;color:var(--text-2);font-weight:500;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:6px;}
+.mkt-main{font-size:20px;font-weight:600;letter-spacing:-0.5px;line-height:1.1;}
+.mkt-sub{font-size:12px;color:var(--text-2);margin-top:3px;}
+.refresh-card{background:var(--nav);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;padding:14px 20px;cursor:pointer;border:none;font-family:var(--font);font-size:12px;font-weight:500;color:#fff;gap:8px;transition:background .15s;white-space:nowrap;}
+.refresh-card:hover:not(:disabled){background:#1f2937;}
+.refresh-card:disabled{background:var(--surface2);color:var(--text-3);border:1px solid var(--border);cursor:not-allowed;}
 
-/* MULTI-PORTFOLIO LAYOUT */
+/* PER-PORTFOLIO SECTION */
+.port-sections{display:flex;flex-direction:column;gap:24px;}
+.port-section{}
+.port-section-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;}
+
+/* MULTI LAYOUT */
 .port-grid{display:grid;gap:20px;}
 .port-grid.count-1{grid-template-columns:1fr;}
 .port-grid.count-2{grid-template-columns:1fr 1fr;}
 .port-grid.count-3{grid-template-columns:1fr 1fr 1fr;}
 .port-panel-inner{min-width:0;}
 
-/* CARDS */
-.cards-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;}
-.card-lbl{font-size:10px;color:var(--text-2);margin-bottom:6px;font-weight:500;letter-spacing:0.03em;text-transform:uppercase;}
-.card-main{font-size:20px;font-weight:600;color:var(--text);letter-spacing:-0.5px;line-height:1.1;font-variant-numeric:tabular-nums;}
+/* MINI CARDS per portfolio */
+.mini-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 15px;}
+.card-lbl{font-size:10px;color:var(--text-2);margin-bottom:5px;font-weight:500;letter-spacing:0.03em;text-transform:uppercase;}
+.card-lbl-unit{font-size:9px;color:var(--text-3);font-weight:400;margin-left:3px;}
+.card-main{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-0.5px;line-height:1.1;font-variant-numeric:tabular-nums;}
 .card-sub{font-size:12px;margin-top:4px;}
 .pos{color:var(--green);} .neg{color:var(--red);} .muted{color:var(--text-2);}
-.card-counts{display:flex;flex-direction:column;gap:6px;}
+.card-counts{display:flex;flex-direction:column;gap:5px;}
 .count-row{display:flex;justify-content:space-between;align-items:center;}
 .count-lbl{font-size:10px;color:var(--text-2);font-weight:500;}
 .count-val{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;}
 
-/* CONTROLS */
-.controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
-.section-title{font-size:13px;font-weight:600;color:var(--text);}
-.btn-refresh{font-size:11px;font-weight:500;background:var(--nav);color:#fff;border:none;padding:7px 14px;border-radius:var(--radius);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;min-width:130px;justify-content:center;font-family:var(--font);}
-.btn-refresh:hover:not(:disabled){background:#1f2937;}
-.btn-refresh:disabled{background:var(--surface2);color:var(--text-3);border:1px solid var(--border);cursor:not-allowed;}
-
 /* TABLE */
-.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;overflow-x:auto;}
+.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
+.tbl-scroll{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 thead tr{border-bottom:1px solid var(--border);}
-th{padding:9px 12px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;white-space:nowrap;cursor:pointer;user-select:none;letter-spacing:0.03em;text-transform:uppercase;}
+th{padding:9px 12px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;white-space:nowrap;cursor:pointer;user-select:none;letter-spacing:0.03em;text-transform:uppercase;background:var(--surface);}
 th:hover{color:var(--text);}
-th.sorted{color:var(--green);}
 th.r,td.r{text-align:right;}
+/* Sticky first column */
+th.sticky,td.sticky{position:sticky;left:0;background:var(--surface);z-index:2;}
+tbody tr:hover th.sticky,tbody tr:hover td.sticky{background:var(--bg);}
+tbody tr.total-row td.sticky{background:var(--surface2);}
 tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--bg);}
 tbody tr.total-row{background:var(--surface2);border-top:1px solid var(--border);font-weight:500;}
 td{padding:11px 12px;white-space:nowrap;}
-.curr-pill{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;margin-right:5px;letter-spacing:0.03em;}
-.curr-brl{background:var(--green-bg);color:var(--green-text);}
-.curr-usd{background:var(--blue-bg);color:var(--blue-text);}
+/* Currency tag — compact */
+.curr-tag{font-size:9px;font-weight:600;color:var(--text-3);margin-right:4px;font-family:var(--font-mono);}
+.curr-tag.usd{color:var(--blue-text);}
 .tk{font-weight:600;font-size:13px;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;cursor:pointer;}
 .tk:hover{color:var(--green);}
 .meta-cell{font-size:11px;color:var(--text-2);}
@@ -111,11 +113,15 @@ td{padding:11px 12px;white-space:nowrap;}
 .var-neg{color:var(--red);font-weight:500;font-variant-numeric:tabular-nums;}
 .var-zero{color:var(--text-3);font-variant-numeric:tabular-nums;}
 .num{font-variant-numeric:tabular-nums;font-family:var(--font-mono);font-size:12px;}
+.prev-tag{font-size:9px;color:var(--text-3);display:block;margin-top:1px;}
 .bar-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:60px;}
 .bar{height:3px;background:var(--border);border-radius:2px;width:50px;}
 .bar-fill{height:100%;border-radius:2px;}
 .err-lbl{font-size:11px;color:var(--text-3);}
 .last-upd{font-size:11px;color:var(--text-3);text-align:right;margin-top:8px;}
+
+/* CONSOLIDADO */
+.consol-section{margin-top:0;}
 
 /* UPLOAD */
 .upload-zone{border:1.5px dashed var(--border-strong);padding:24px 32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative;margin-top:20px;border-radius:var(--radius-lg);}
@@ -128,7 +134,7 @@ td{padding:11px 12px;white-space:nowrap;}
 .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
 .chart-title{font-size:13px;font-weight:600;}
 .chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;}
-.chart-sel{font-family:var(--font);font-size:12px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:var(--radius);outline:none;cursor:pointer;}
+.chart-sel{font-family:var(--font);font-size:12px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:var(--radius);outline:none;}
 .chart-sel:focus{border-color:var(--green);}
 .empty-chart{display:flex;align-items:center;justify-content:center;height:200px;color:var(--text-3);font-size:13px;}
 
@@ -167,8 +173,6 @@ td{padding:11px 12px;white-space:nowrap;}
 .invite-row input:focus{border-color:var(--green);}
 .invite-row select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:8px 10px;border-radius:var(--radius);outline:none;}
 .btn-invite{font-family:var(--font);font-size:11px;font-weight:500;padding:8px 14px;background:var(--nav);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;white-space:nowrap;}
-
-/* TICKER MAP */
 .tmap-table{width:100%;border-collapse:collapse;font-size:12px;}
 .tmap-table th{padding:8px 10px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.03em;}
 .tmap-table td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
@@ -179,8 +183,7 @@ td{padding:11px 12px;white-space:nowrap;}
 .tmap-select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:4px 8px;border-radius:5px;outline:none;}
 .status-badge{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:500;text-transform:uppercase;}
 .status-auto{background:var(--green-bg);color:var(--green-text);}
-.status-ignore{background:var(--surface2);color:var(--text-2);}
-.status-manual{background:var(--blue-bg);color:var(--blue-text);}
+.status-ignore,.status-manual{background:var(--surface2);color:var(--text-2);}
 .status-brapi{background:var(--green-bg);color:var(--green-text);}
 .status-finnhub{background:var(--blue-bg);color:var(--blue-text);}
 .btn-save-map{font-family:var(--font);font-size:10px;font-weight:500;padding:4px 10px;background:var(--nav);color:#fff;border:none;border-radius:5px;cursor:pointer;}
@@ -188,15 +191,17 @@ td{padding:11px 12px;white-space:nowrap;}
 
 /* MODAL */
 #modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.25);z-index:998;}
-#modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;min-width:340px;max-width:500px;z-index:999;box-shadow:0 8px 40px rgba(0,0,0,0.12);}
+#modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;min-width:360px;max-width:520px;z-index:999;box-shadow:0 8px 40px rgba(0,0,0,0.12);}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-.modal-ticker{font-size:17px;font-weight:600;color:var(--text);}
+.modal-ticker{font-size:17px;font-weight:600;}
 .modal-close{background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3);padding:4px;border-radius:6px;line-height:1;}
 .modal-close:hover{background:var(--surface2);}
 .modal-table{width:100%;border-collapse:collapse;font-size:13px;}
+.modal-table th{font-size:10px;color:var(--text-2);font-weight:500;text-transform:uppercase;letter-spacing:0.03em;padding:0 0 8px;border-bottom:1px solid var(--border);}
+.modal-table th.r{text-align:right;}
 .modal-table td{padding:10px 0;border-bottom:1px solid var(--border);}
 .modal-table tr:last-child td{border-bottom:none;padding-top:12px;font-weight:600;}
-.modal-table .current-port td{font-weight:600;color:var(--text);}
+.modal-table .current-port td{font-weight:600;}
 .modal-table .other-port td{color:var(--text-2);}
 
 /* SPIN / TOAST */
@@ -207,8 +212,8 @@ td{padding:11px 12px;white-space:nowrap;}
 #toast.ok{border-color:var(--green);color:var(--green-text);}
 #toast.err{border-color:var(--red);color:var(--red-text);}
 
-@media(max-width:1100px){.port-grid.count-2,.port-grid.count-3{grid-template-columns:1fr;}}
-@media(max-width:600px){.cards-row{grid-template-columns:1fr 1fr;}.form-grid{grid-template-columns:1fr;}.market-cards{grid-template-columns:1fr;}}
+@media(max-width:1100px){.port-grid.count-2,.port-grid.count-3{grid-template-columns:1fr;}.top-bar{grid-template-columns:1fr 1fr;}.refresh-card{grid-column:span 2;}}
+@media(max-width:600px){.mini-cards{grid-template-columns:1fr 1fr;}.form-grid{grid-template-columns:1fr;}.top-bar{grid-template-columns:1fr;}.refresh-card{grid-column:1;}}
 </style>
 </head>
 <body>
@@ -233,20 +238,14 @@ td{padding:11px 12px;white-space:nowrap;}
 
 <!-- CONSOLIDADO -->
 <div class="panel active" id="panel-consolidacao">
-  <div class="controls" style="margin-top:4px;">
-    <span class="section-title">Resumo por carteira</span>
-    <button class="btn-refresh" id="btn-refresh-consol" onclick="refreshAll()">
-      <span id="refresh-label-consol">↻ Atualizar</span>
-    </button>
-  </div>
-  <div class="tbl-wrap">
+  <div class="tbl-wrap consol-section">
     <table>
       <thead><tr>
         <th onclick="consolSort('name')">Carteira <span id="csort-name"></span></th>
-        <th class="r" onclick="consolSort('gross')">Gross <span id="csort-gross"></span></th>
-        <th class="r" onclick="consolSort('net')">Net <span id="csort-net"></span></th>
-        <th class="r" onclick="consolSort('varPct')">Var. Dia % <span id="csort-varPct"></span></th>
-        <th class="r" onclick="consolSort('varBrl')">Var. Dia R$ <span id="csort-varBrl"></span></th>
+        <th class="r" onclick="consolSort('gross')">Gross [R$] <span id="csort-gross"></span></th>
+        <th class="r" onclick="consolSort('net')">Net [R$] <span id="csort-net"></span></th>
+        <th class="r" onclick="consolSort('varPct')">P&L Dia % <span id="csort-varPct"></span></th>
+        <th class="r" onclick="consolSort('varBrl')">P&L Dia [R$] <span id="csort-varBrl"></span></th>
         <th class="r" onclick="consolSort('count')">Posições <span id="csort-count"></span></th>
         <th class="r">vs IBOV</th>
       </tr></thead>
@@ -257,26 +256,25 @@ td{padding:11px 12px;white-space:nowrap;}
   </div>
 </div>
 
-<!-- PORTFOLIO VIEW (single or multi) -->
+<!-- PORTFOLIO VIEW -->
 <div class="panel" id="panel-portfolios">
-  <!-- shared market cards -->
-  <div class="market-cards" id="shared-market-cards" style="display:none;">
-    <div class="market-card">
-      <div class="mkt-item">
-        <span class="mkt-lbl">IBOVESPA</span>
-        <span class="mkt-val" id="shared-ibov-pct">—</span>
-        <span class="mkt-sub" id="shared-ibov-val">—</span>
-      </div>
+  <!-- TOP BAR: shared market cards + single refresh button -->
+  <div class="top-bar">
+    <div class="mkt-card">
+      <div class="mkt-lbl">IBOVESPA</div>
+      <div class="mkt-main" id="top-ibov-pct">—</div>
+      <div class="mkt-sub" id="top-ibov-val">—</div>
     </div>
-    <div class="market-card">
-      <div class="mkt-item">
-        <span class="mkt-lbl">USD / BRL</span>
-        <span class="mkt-val" id="shared-usd-pct">—</span>
-        <span class="mkt-sub" id="shared-usd-val">—</span>
-      </div>
+    <div class="mkt-card">
+      <div class="mkt-lbl">USD / BRL</div>
+      <div class="mkt-main" id="top-usd-pct">—</div>
+      <div class="mkt-sub" id="top-usd-val">—</div>
     </div>
+    <button class="refresh-card" id="btn-refresh-main" onclick="refreshAll()">
+      <span id="refresh-label-main">↻ Atualizar</span>
+    </button>
   </div>
-  <!-- portfolio panels grid -->
+  <!-- Portfolio sections grid -->
   <div class="port-grid count-1" id="port-grid"></div>
   <div class="last-upd" id="last-upd-shared"></div>
 </div>
@@ -303,7 +301,7 @@ td{padding:11px 12px;white-space:nowrap;}
       <div class="form-grid">
         <div class="form-field"><label>Tipo</label><select id="al-type"><option value="email">E-mail</option><option value="whatsapp">WhatsApp</option></select></div>
         <div class="form-field"><label>Destino</label><input type="text" id="al-dest" placeholder="email ou +55119..."/></div>
-        <div class="form-field"><label>Condição</label><select id="al-trigger"><option value="change_pct">Variação % no dia</option><option value="value_below">Gross abaixo de (BRL)</option><option value="value_above">Gross acima de (BRL)</option></select></div>
+        <div class="form-field"><label>Condição</label><select id="al-trigger"><option value="change_pct">P&L % no dia</option><option value="value_below">Gross abaixo de (R$)</option><option value="value_above">Gross acima de (R$)</option></select></div>
         <div class="form-field"><label>Limite</label><input type="number" id="al-threshold" placeholder="Ex: -3"/></div>
       </div>
       <button class="btn-add" onclick="addAlert()">+ Adicionar alerta</button>
@@ -325,7 +323,7 @@ td{padding:11px 12px;white-space:nowrap;}
       </div>
     </div>
     <div class="pref-row">
-      <div><div class="pref-label">Atualização automática</div><div class="pref-sub">Atualizar cotações automaticamente a cada 10 minutos</div></div>
+      <div><div class="pref-label">Atualização automática</div><div class="pref-sub">Atualizar cotações a cada 10 minutos</div></div>
       <button class="toggle-active" id="toggle-autorefresh" onclick="toggleAutoRefresh()"></button>
     </div>
   </div>
@@ -370,7 +368,14 @@ td{padding:11px 12px;white-space:nowrap;}
     <span class="modal-ticker" id="modal-ticker">—</span>
     <button class="modal-close" onclick="closeModal()">✕</button>
   </div>
-  <table class="modal-table" id="modal-table"></table>
+  <table class="modal-table" id="modal-table">
+    <thead><tr>
+      <th>Carteira</th>
+      <th class="r">Quantidade</th>
+      <th class="r">Peso</th>
+    </tr></thead>
+    <tbody id="modal-body"></tbody>
+  </table>
 </div>
 
 <div id="toast"></div>
@@ -381,20 +386,24 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js'
 const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
 
 let user=null,groupId=null,groupName=null,role=null
-let portfolios={},quotes={},usdBrl=null,usdVarPct=0,ibovPct=null
+let portfolios={},quotes={},usdBrl=null,usdVarPct=0,ibovPct=null,ibovVal=null
 let tickerMap={}
-let sortStates={} // {name: {col, asc, bookSectorClicks}}
+let sortStates={}
 let consolSortCol='gross',consolSortAsc=false
 let chartInstance=null
 let currencyMode='original',autoRefresh=false
 let lastRefresh=null,cooldownTimer=null,elapsedTimer=null,autoRefreshTimer=null,isRefreshing=false
-let selectedPortfolios=new Set() // multi-select
+let selectedPortfolios=new Set()
 const COOLDOWN_MS=5*60*1000
 const AUTO_REFRESH_MS=10*60*1000
 const MAX_MULTI=3
 const MULTI_MIN_WIDTH=1100
+const BRAPI_BATCH=20
 
 function safeid(s){return s.replace(/[^a-zA-Z0-9]/g,'_')}
+function fmtNum(v){return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmtBrl(v){return fmtNum(v)}
+function formatDate(d){const[y,m,day]=d.split('-');return`${day}/${m}/${y}`}
 
 async function boot(){
   const {data:{session}}=await sb.auth.getSession()
@@ -432,24 +441,18 @@ setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocal
 // ─── Preferences ──────────────────────────────────────────
 async function loadPreferences(){
   try {
-    const {data}=await sb.from('user_preferences')
-      .select('currency_mode,auto_refresh').eq('user_id',user.id).single()
-    currencyMode=data?.currency_mode||'original'
-    autoRefresh=data?.auto_refresh||false
+    const {data}=await sb.from('user_preferences').select('currency_mode,auto_refresh').eq('user_id',user.id).single()
+    currencyMode=data?.currency_mode||'original';autoRefresh=data?.auto_refresh||false
   } catch {currencyMode='original';autoRefresh=false}
   updateCurrencyUI();updateAutoRefreshUI()
   if (autoRefresh) startAutoRefreshTimer()
 }
 async function savePreferences(){
-  await sb.from('user_preferences').upsert(
-    {user_id:user.id,currency_mode:currencyMode,auto_refresh:autoRefresh},
-    {onConflict:'user_id'}
-  )
+  await sb.from('user_preferences').upsert({user_id:user.id,currency_mode:currencyMode,auto_refresh:autoRefresh},{onConflict:'user_id'})
 }
 window.setCurrencyMode=async function(mode){
   currencyMode=mode;updateCurrencyUI();await savePreferences()
-  Object.keys(portfolios).forEach(name=>renderPortfolio(name))
-  renderConsolidation()
+  Object.keys(portfolios).forEach(name=>renderPortfolio(name));renderConsolidation()
 }
 window.toggleAutoRefresh=async function(){
   autoRefresh=!autoRefresh;updateAutoRefreshUI();await savePreferences()
@@ -461,10 +464,7 @@ function updateCurrencyUI(){
   document.getElementById('curr-brl').classList.toggle('active',currencyMode==='brl')
 }
 function updateAutoRefreshUI(){document.getElementById('toggle-autorefresh').classList.toggle('on',autoRefresh)}
-function startAutoRefreshTimer(){
-  stopAutoRefreshTimer()
-  autoRefreshTimer=setInterval(()=>{if(!isRefreshing&&getRemainingCooldown()<=0)refreshAll()},AUTO_REFRESH_MS)
-}
+function startAutoRefreshTimer(){stopAutoRefreshTimer();autoRefreshTimer=setInterval(()=>{if(!isRefreshing&&getRemainingCooldown()<=0)refreshAll()},AUTO_REFRESH_MS)}
 function stopAutoRefreshTimer(){if(autoRefreshTimer)clearInterval(autoRefreshTimer);autoRefreshTimer=null}
 
 // ─── Ticker Map ────────────────────────────────────────────
@@ -491,50 +491,30 @@ async function resetTickerMapRow(ticker){
 function renderTickerMap(){
   const allTickers=[...new Set(Object.values(portfolios).flat().map(p=>({ticker:p.ticker,currency:p.currency}))
     .filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i))].sort((a,b)=>a.ticker.localeCompare(b.ticker))
-  if (!allTickers.length){
-    document.getElementById('tmap-body').innerHTML='<tr><td colspan="6" style="color:var(--text-3);padding:16px;">Nenhum ativo carregado.</td></tr>'
-    return
-  }
+  if (!allTickers.length){document.getElementById('tmap-body').innerHTML='<tr><td colspan="6" style="color:var(--text-3);padding:16px;">Nenhum ativo carregado.</td></tr>';return}
   const isAdmin=role==='admin'
   document.getElementById('tmap-body').innerHTML=allTickers.map(({ticker,currency})=>{
     const cfg=tickerMap[ticker];const source=cfg?.source||'auto';const sourceTicker=cfg?.sourceTicker||''
-    const statusBadge={
-      auto:`<span class="status-badge status-auto">auto</span>`,
-      brapi:`<span class="status-badge status-brapi">brapi</span>`,
-      finnhub:`<span class="status-badge status-finnhub">finnhub</span>`,
-      ignore:`<span class="status-badge status-ignore">ignorado</span>`,
-      manual:`<span class="status-badge status-manual">manual</span>`,
-    }[source]||`<span class="status-badge status-auto">auto</span>`
-    const currBadge=currency==='USD'?`<span class="curr-pill curr-usd">USD</span>`:`<span class="curr-pill curr-brl">BRL</span>`
-    if (!isAdmin){
-      const ec=getTickerConfig(ticker,currency)
-      return `<tr><td><span class="tk" style="cursor:default;text-decoration:none;">${ticker}</span></td><td>${currBadge}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td>${statusBadge}</td><td></td></tr>`
-    }
-    return `<tr>
-      <td><span class="tk" style="cursor:default;text-decoration:none;">${ticker}</span></td>
-      <td>${currBadge}</td>
+    const sb2={auto:`<span class="status-badge status-auto">auto</span>`,brapi:`<span class="status-badge status-brapi">brapi</span>`,finnhub:`<span class="status-badge status-finnhub">finnhub</span>`,ignore:`<span class="status-badge status-ignore">ign</span>`,manual:`<span class="status-badge status-manual">manual</span>`}[source]||`<span class="status-badge status-auto">auto</span>`
+    const cb=currency==='USD'?`<span style="font-size:10px;font-weight:600;color:var(--blue-text)">USD</span>`:`<span style="font-size:10px;font-weight:600;color:var(--green-text)">BRL</span>`
+    if (!isAdmin){const ec=getTickerConfig(ticker,currency);return `<tr><td><strong>${ticker}</strong></td><td>${cb}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td>${sb2}</td><td></td></tr>`}
+    return `<tr><td><strong>${ticker}</strong></td><td>${cb}</td>
       <td><select class="tmap-select" id="tmap-src-${safeid(ticker)}" onchange="onTickerSourceChange('${ticker}')">
         <option value="auto" ${source==='auto'?'selected':''}>Auto</option>
-        <option value="brapi" ${source==='brapi'?'selected':''}>brapi.dev</option>
+        <option value="brapi" ${source==='brapi'?'selected':''}>brapi</option>
         <option value="finnhub" ${source==='finnhub'?'selected':''}>Finnhub</option>
         <option value="ignore" ${source==='ignore'?'selected':''}>Ignorar</option>
         <option value="manual" ${source==='manual'?'selected':''}>Manual</option>
       </select></td>
-      <td><input class="tmap-input" id="tmap-sticker-${safeid(ticker)}" value="${sourceTicker}" placeholder="${ticker}" style="width:90px"
-        ${source==='ignore'||source==='manual'||source==='auto'?'disabled':''}/></td>
-      <td>${statusBadge}</td>
-      <td style="text-align:right">
-        <button class="btn-save-map" onclick="saveTickerRow('${ticker}')">Salvar</button>
-        ${cfg?`<button class="btn-reset-map" onclick="resetTickerMapRow('${ticker}')">Reset</button>`:''}
-      </td></tr>`
+      <td><input class="tmap-input" id="tmap-sticker-${safeid(ticker)}" value="${sourceTicker}" placeholder="${ticker}" style="width:90px" ${source==='ignore'||source==='manual'||source==='auto'?'disabled':''}/></td>
+      <td>${sb2}</td>
+      <td style="text-align:right"><button class="btn-save-map" onclick="saveTickerRow('${ticker}')">Salvar</button>${cfg?`<button class="btn-reset-map" onclick="resetTickerMapRow('${ticker}')">Reset</button>`:''}</td></tr>`
   }).join('')
 }
 window.onTickerSourceChange=function(ticker){
   const src=document.getElementById('tmap-src-'+safeid(ticker))?.value
   const inp=document.getElementById('tmap-sticker-'+safeid(ticker))
-  if (!inp) return
-  inp.disabled=(src==='auto'||src==='ignore'||src==='manual')
-  if (inp.disabled) inp.value=''
+  if (!inp) return;inp.disabled=(src==='auto'||src==='ignore'||src==='manual');if(inp.disabled)inp.value=''
 }
 window.saveTickerRow=async function(ticker){
   const src=document.getElementById('tmap-src-'+safeid(ticker))?.value||'auto'
@@ -544,26 +524,24 @@ window.saveTickerRow=async function(ticker){
   delete quotes[ticker];renderTickerMap();toast(`${ticker} → ${src} salvo`,'ok')
 }
 
-// ─── Tabs + Multi-select ───────────────────────────────────
+// ─── Tabs ──────────────────────────────────────────────────
 function deactivateAll(){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'))
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'))
 }
-
 function isWideScreen(){return window.innerWidth>=MULTI_MIN_WIDTH}
 
 window.switchTab=function(name,el){
   deactivateAll();el.classList.add('active')
   document.getElementById('panel-'+name).classList.add('active')
-  selectedPortfolios.clear()
+  selectedPortfolios.clear();updatePortfolioTabsUI()
   if (name==='historico') loadChart()
   if (name==='admin'){loadMembers();renderTickerMap()}
 }
 window.switchToConsolidacao=function(el){
   deactivateAll();el.classList.add('active')
   document.getElementById('panel-consolidacao').classList.add('active')
-  selectedPortfolios.clear()
-  updatePortfolioTabsUI()
+  selectedPortfolios.clear();updatePortfolioTabsUI()
 }
 window.navTo=function(name){
   deactivateAll()
@@ -572,32 +550,19 @@ window.navTo=function(name){
   if (name==='admin'){loadMembers();renderTickerMap()}
 }
 
-function handlePortfolioTabClick(name, el){
+function handlePortfolioTabClick(name){
   if (isWideScreen()){
-    // Multi-select mode
     if (selectedPortfolios.has(name)){
       selectedPortfolios.delete(name)
-      if (selectedPortfolios.size===0){
-        // Nothing selected — go to consolidado
-        switchToConsolidacao(document.getElementById('tab-consolidacao'))
-        return
-      }
+      if (selectedPortfolios.size===0){switchToConsolidacao(document.getElementById('tab-consolidacao'));return}
     } else {
-      if (selectedPortfolios.size>=MAX_MULTI){
-        toast(`Máximo de ${MAX_MULTI} carteiras simultâneas`,'err')
-        return
-      }
+      if (selectedPortfolios.size>=MAX_MULTI){toast(`Máximo de ${MAX_MULTI} carteiras simultâneas`,'err');return}
       selectedPortfolios.add(name)
     }
-    showPortfoliosPanel()
-    updatePortfolioTabsUI()
   } else {
-    // Single mode
-    selectedPortfolios.clear()
-    selectedPortfolios.add(name)
-    showPortfoliosPanel()
-    updatePortfolioTabsUI()
+    selectedPortfolios.clear();selectedPortfolios.add(name)
   }
+  showPortfoliosPanel();updatePortfolioTabsUI()
 }
 
 function showPortfoliosPanel(){
@@ -607,13 +572,11 @@ function showPortfoliosPanel(){
 }
 
 function updatePortfolioTabsUI(){
-  const tabs=document.querySelectorAll('.tab.port-tab')
-  tabs.forEach(tab=>{
+  document.querySelectorAll('.tab.port-tab').forEach(tab=>{
     const name=tab.dataset.portname
     tab.classList.toggle('selected',selectedPortfolios.has(name))
     tab.classList.remove('active')
   })
-  // Show/hide multi hint
   const existingHint=document.querySelector('.multi-hint')
   if (existingHint) existingHint.remove()
   if (isWideScreen()&&Object.keys(portfolios).length>1){
@@ -628,18 +591,13 @@ function renderPortfoliosGrid(){
   const names=[...selectedPortfolios]
   const grid=document.getElementById('port-grid')
   grid.className=`port-grid count-${names.length}`
-
-  // Show/hide shared market cards
-  const sharedCards=document.getElementById('shared-market-cards')
-  sharedCards.style.display=names.length>1?'grid':'none'
-
-  if (names.length>1) updateSharedMarketCards()
-
+  updateTopBar()
   grid.innerHTML=names.map(name=>`
     <div class="port-panel-inner" id="inner-${safeid(name)}">
-      <div class="cards-row" id="cards-${safeid(name)}">
-        <div class="card"><div class="card-lbl">Valor Gross</div><div class="card-main" id="v-gross-${safeid(name)}">—</div><div class="card-sub" id="v-net-${safeid(name)}">—</div></div>
-        <div class="card"><div class="card-lbl">Variação do Dia</div><div class="card-main" id="v-varpct-${safeid(name)}">—</div><div class="card-sub" id="v-varbrl-${safeid(name)}">—</div></div>
+      <div class="port-section-name">${name}</div>
+      <div class="mini-cards" id="cards-${safeid(name)}">
+        <div class="card"><div class="card-lbl">Gross <span class="card-lbl-unit">[R$]</span></div><div class="card-main" id="v-gross-${safeid(name)}">—</div><div class="card-sub muted" id="v-net-${safeid(name)}">—</div></div>
+        <div class="card"><div class="card-lbl">P&L Dia <span class="card-lbl-unit">[R$]</span></div><div class="card-main" id="v-varpct-${safeid(name)}">—</div><div class="card-sub" id="v-varbrl-${safeid(name)}">—</div></div>
         <div class="card"><div class="card-lbl">Posições</div>
           <div class="card-counts">
             <div class="count-row"><span class="count-lbl">Long</span><span class="count-val pos" id="v-longs-${safeid(name)}">—</span></div>
@@ -647,62 +605,49 @@ function renderPortfoliosGrid(){
             <div class="count-row"><span class="count-lbl">Total</span><span class="count-val" id="v-total-${safeid(name)}">—</span></div>
           </div>
         </div>
-        ${names.length===1?`
-        <div class="card"><div class="card-lbl">IBOVESPA</div><div class="card-main" id="v-ibov-pct-${safeid(name)}">—</div><div class="card-sub muted" id="v-ibov-val-${safeid(name)}">—</div></div>
-        <div class="card"><div class="card-lbl">USD / BRL</div><div class="card-main" id="v-usd-pct-${safeid(name)}">—</div><div class="card-sub muted" id="v-usd-val-${safeid(name)}">—</div></div>
-        `:''}
       </div>
-      <div class="controls">
-        <span class="section-title">${name}</span>
-        <button class="btn-refresh" id="btn-refresh-${safeid(name)}" onclick="refreshAll()"><span>↻ Atualizar</span></button>
-      </div>
-      <div class="tbl-wrap"><table>
+      <div class="tbl-wrap"><div class="tbl-scroll"><table>
         <thead><tr>
-          <th onclick="sortPortfolio('${name}','ticker')">Ativo <span id="sort-${safeid(name)}-ticker"></span></th>
+          <th class="sticky" onclick="sortPortfolio('${name}','ticker')">Ativo <span id="sort-${safeid(name)}-ticker"></span></th>
           <th onclick="sortPortfolio('${name}','bookSector')" id="th-booksector-${safeid(name)}">Book · Setor <span id="sort-${safeid(name)}-bookSector"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','price')">Preço <span id="sort-${safeid(name)}-price"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','changePct')">Var. Dia <span id="sort-${safeid(name)}-changePct"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','portVar')">Var. Carteira <span id="sort-${safeid(name)}-portVar"></span></th>
+          <th class="r" onclick="sortPortfolio('${name}','price')">Preço [R$] <span id="sort-${safeid(name)}-price"></span></th>
+          <th class="r" onclick="sortPortfolio('${name}','changePct')">P&L Dia <span id="sort-${safeid(name)}-changePct"></span></th>
+          <th class="r" onclick="sortPortfolio('${name}','portVar')">P&L Carteira <span id="sort-${safeid(name)}-portVar"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','weightAbs')">Peso <span id="sort-${safeid(name)}-weightAbs"></span></th>
         </tr></thead>
         <tbody id="tbl-${safeid(name)}"><tr><td colspan="6" style="padding:24px;color:var(--text-3);text-align:center;">Carregando...</td></tr></tbody>
-      </table></div>
+      </table></div></div>
     </div>`).join('')
-
   names.forEach(name=>renderPortfolio(name))
 }
 
-function updateSharedMarketCards(){
+function updateTopBar(){
   const sign=usdVarPct>=0?'+':'';const cls=usdVarPct>=0?'pos':'neg'
   const ibovSign=ibovPct!=null?(ibovPct>=0?'+':''):'';const ibovCls=ibovPct!=null?(ibovPct>=0?'pos':'neg'):''
-  const ibovEl=document.getElementById('shared-ibov-pct')
-  const ibovVl=document.getElementById('shared-ibov-val')
-  const usdEl=document.getElementById('shared-usd-pct')
-  const usdVl=document.getElementById('shared-usd-val')
-  if (ibovEl&&ibovPct!=null){ibovEl.textContent=ibovSign+ibovPct.toFixed(2)+'%';ibovEl.className='mkt-val '+ibovCls}
-  if (usdEl){usdEl.textContent=sign+usdVarPct.toFixed(2)+'%';usdEl.className='mkt-val '+cls}
+  const ibovEl=document.getElementById('top-ibov-pct')
+  const ibovVl=document.getElementById('top-ibov-val')
+  const usdEl=document.getElementById('top-usd-pct')
+  const usdVl=document.getElementById('top-usd-val')
+  if (ibovEl&&ibovPct!=null){ibovEl.textContent=ibovSign+ibovPct.toFixed(2)+'%';ibovEl.className='mkt-main '+ibovCls}
+  if (ibovVl&&ibovVal!=null) ibovVl.textContent=ibovVal.toLocaleString('pt-BR',{maximumFractionDigits:0})
+  if (usdEl){usdEl.textContent=sign+usdVarPct.toFixed(2)+'%';usdEl.className='mkt-main '+cls}
   if (usdVl&&usdBrl) usdVl.textContent=usdBrl.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})
 }
 
 // ─── Load portfolios ───────────────────────────────────────
 async function loadTodayPortfolios(){
   const today=new Date().toISOString().slice(0,10)
-  const {data:ports}=await sb.from('portfolios')
-    .select('id,portfolio_name').eq('group_id',groupId).eq('date',today)
+  const {data:ports}=await sb.from('portfolios').select('id,portfolio_name').eq('group_id',groupId).eq('date',today)
   if (!ports||!ports.length){
     document.getElementById('consol-body').innerHTML=
-      `<tr><td colspan="7" style="padding:32px;color:var(--text-3);text-align:center;">${
-        role==='admin'?'Nenhuma carteira enviada hoje. Use o upload abaixo.':'Aguardando o administrador enviar a carteira de hoje.'
-      }</td></tr>`
+      `<tr><td colspan="7" style="padding:32px;color:var(--text-3);text-align:center;">${role==='admin'?'Nenhuma carteira enviada hoje. Use o upload abaixo.':'Aguardando o administrador enviar a carteira de hoje.'}</td></tr>`
     if (role==='admin') buildUploadZone()
     return
   }
   for (const port of ports){
-    const {data:pos}=await sb.from('positions')
-      .select('ticker,quantity,market,currency,prev_close,book,sector').eq('portfolio_id',port.id)
+    const {data:pos}=await sb.from('positions').select('ticker,quantity,market,currency,prev_close,book,sector').eq('portfolio_id',port.id)
     portfolios[port.portfolio_name]=(pos||[]).map(p=>({
-      ticker:p.ticker,qty:p.quantity,market:p.market,
-      currency:p.currency||p.market,
+      ticker:p.ticker,qty:p.quantity,market:p.market,currency:p.currency||p.market,
       prevClose:p.prev_close,book:p.book||'—',sector:p.sector||'—'
     }))
     sortStates[port.portfolio_name]={col:'portVar',asc:false,bookSectorClicks:0}
@@ -716,12 +661,9 @@ async function loadTodayPortfolios(){
 // ─── Quote cache ───────────────────────────────────────────
 async function loadCachedQuotes(){
   const {data:cached}=await sb.from('quote_cache')
-    .select('ticker,price,change,change_pct,currency,usd_brl,usd_var_pct,ibov_pct,updated_at')
-    .eq('group_id',groupId)
+    .select('ticker,price,change,change_pct,currency,usd_brl,usd_var_pct,ibov_pct,updated_at').eq('group_id',groupId)
   if (cached&&cached.length){
-    cached.forEach(q=>{
-      quotes[q.ticker]={price:q.price||0,change:q.change||0,changePct:q.change_pct||0,currency:q.currency||'BRL',error:false}
-    })
+    cached.forEach(q=>{quotes[q.ticker]={price:q.price||0,change:q.change||0,changePct:q.change_pct||0,currency:q.currency||'BRL',error:false}})
     const first=cached[0]
     if (first.usd_brl) usdBrl=first.usd_brl
     if (first.usd_var_pct!=null) usdVarPct=first.usd_var_pct
@@ -750,11 +692,11 @@ function formatCooldown(ms){const s=Math.ceil(ms/1000),m=Math.floor(s/60),sec=s%
 function formatElapsed(ms){const s=Math.floor(ms/1000);if(s<60)return`${s}s atrás`;const m=Math.floor(s/60);if(m<60)return`${m}min atrás`;return`${Math.floor(m/60)}h atrás`}
 function startCooldownTimer(){
   if (cooldownTimer) clearInterval(cooldownTimer)
-  updateRefreshButtons()
-  cooldownTimer=setInterval(()=>{updateRefreshButtons();if(getRemainingCooldown()<=0)clearInterval(cooldownTimer)},1000)
+  updateRefreshButton()
+  cooldownTimer=setInterval(()=>{updateRefreshButton();if(getRemainingCooldown()<=0)clearInterval(cooldownTimer)},1000)
 }
-function startElapsedTimer(){if(elapsedTimer)clearInterval(elapsedTimer);elapsedTimer=setInterval(updateRefreshButtons,10000)}
-function updateRefreshButtons(){
+function startElapsedTimer(){if(elapsedTimer)clearInterval(elapsedTimer);elapsedTimer=setInterval(updateRefreshButton,10000)}
+function updateRefreshButton(){
   const remaining=getRemainingCooldown(),inCooldown=remaining>0
   const elapsed=lastRefresh?Date.now()-lastRefresh:null
   let label
@@ -762,11 +704,10 @@ function updateRefreshButtons(){
   else if (inCooldown) label=`↻ Atualizar (${formatCooldown(remaining)})`
   else if (elapsed) label=`↻ Atualizar · ${formatElapsed(elapsed)}`
   else label=`↻ Atualizar`
-  document.querySelectorAll('.btn-refresh').forEach(btn=>{
-    btn.disabled=isRefreshing||inCooldown
-    const lbl=btn.querySelector('span[id^="refresh-label"]')
-    if (lbl){lbl.innerHTML=label}else{btn.innerHTML=label}
-  })
+  const btn=document.getElementById('btn-refresh-main')
+  const lbl=document.getElementById('refresh-label-main')
+  if (btn) btn.disabled=isRefreshing||inCooldown
+  if (lbl) lbl.innerHTML=label
 }
 
 // ─── Build UI ──────────────────────────────────────────────
@@ -775,9 +716,8 @@ function buildPortfolioTabs(names){
   const bar=document.getElementById('tabs-bar'),histTab=document.getElementById('tab-historico')
   names.forEach(name=>{
     const btn=document.createElement('button')
-    btn.className='tab port-tab';btn.textContent=name
-    btn.dataset.portname=name
-    btn.onclick=function(){handlePortfolioTabClick(name,this)}
+    btn.className='tab port-tab';btn.textContent=name;btn.dataset.portname=name
+    btn.onclick=function(){handlePortfolioTabClick(name)}
     bar.insertBefore(btn,histTab)
   })
   updatePortfolioTabsUI()
@@ -833,7 +773,7 @@ async function handleFile(file){
   const portsFaltando=(portsHoje||[]).filter(p=>!byPort[p.portfolio_name])
   if (portsFaltando.length>0){
     const nomes=portsFaltando.map(p=>p.portfolio_name).join('\n• ')
-    const apagar=confirm(`As seguintes carteiras já existem hoje mas não estão no novo arquivo:\n\n• ${nomes}\n\nDeseja APAGAR?\n\nOK = Apagar  |  Cancelar = Manter`)
+    const apagar=confirm(`Carteiras existentes não incluídas no novo arquivo:\n\n• ${nomes}\n\nOK = Apagar  |  Cancelar = Manter`)
     if (apagar){
       for (const port of portsFaltando){
         await sb.from('positions').delete().eq('portfolio_id',port.id)
@@ -856,16 +796,12 @@ async function handleFile(file){
       prev_close:i.prevClose,book:i.book,sector:i.sector
     })))
     if (insErr){toast('Erro ao salvar '+portName+': '+insErr.message,'err');continue}
-    portfolios[portName]=items
-    sortStates[portName]={col:'portVar',asc:false,bookSectorClicks:0}
-    totalItems+=items.length
+    portfolios[portName]=items;sortStates[portName]={col:'portVar',asc:false,bookSectorClicks:0};totalItems+=items.length
   }
   toast(`${totalItems} ativos em ${Object.keys(byPort).length} carteiras`,'ok')
   selectedPortfolios.clear()
-  buildPortfolioTabs(Object.keys(portfolios))
-  updateChartSelector(Object.keys(portfolios))
-  lastRefresh=null
-  await refreshAll()
+  buildPortfolioTabs(Object.keys(portfolios));updateChartSelector(Object.keys(portfolios))
+  lastRefresh=null;await refreshAll()
 }
 
 // ─── Fetch market data ─────────────────────────────────────
@@ -876,6 +812,7 @@ async function fetchUsdBrl(){
     usdBrl=parseFloat(d.USDBRL.bid);usdVarPct=parseFloat(d.USDBRL.pctChange)||0
   } catch {usdBrl=usdBrl||5.8;usdVarPct=usdVarPct||0}
 }
+
 async function fetchIbov(){
   const token=window._brapiToken;if (!token) return
   try {
@@ -883,27 +820,42 @@ async function fetchIbov(){
     const d=await r.json()
     const q=d.results?.[0];if (!q) return
     ibovPct=q.regularMarketChangePercent||0
+    ibovVal=q.regularMarketPrice||null
   } catch {}
 }
+
+// brapi Pro: batch up to 20 tickers per request
 async function fetchBrapi(tickers){
   if (!tickers.length) return
   const token=window._brapiToken;const param=token?`?token=${token}`:''
+  // Separate fetchable from ignored/manual/special
+  const fetchable=[]
   for (const ticker of tickers){
     const cfg=getTickerConfig(ticker,'BRL')
     if (cfg.source==='ignore'||cfg.source==='manual'){quotes[ticker]={error:true,msg:cfg.source};continue}
     if (cfg.source==='finnhub') continue
     const ft=cfg.sourceTicker||ticker
-    if (!/^[A-Z0-9]{3,6}$/.test(ft)){quotes[ticker]={error:true,msg:'especial'};continue}
+    if (!/^[A-Z0-9]{3,8}$/.test(ft)){quotes[ticker]={error:true,msg:'especial'};continue}
+    fetchable.push({ticker,ft})
+  }
+  // Batch requests of up to BRAPI_BATCH tickers
+  for (let i=0;i<fetchable.length;i+=BRAPI_BATCH){
+    const batch=fetchable.slice(i,i+BRAPI_BATCH)
+    const symbols=batch.map(b=>b.ft).join(',')
     try {
-      const r=await fetch(`https://brapi.dev/api/quote/${ft}${param}`)
+      const r=await fetch(`https://brapi.dev/api/quote/${symbols}${param}`)
       const d=await r.json()
-      const q=d.results?.[0]
-      if (q?.regularMarketPrice) quotes[ticker]={price:q.regularMarketPrice,change:q.regularMarketChange||0,changePct:q.regularMarketChangePercent||0,currency:'BRL'}
-      else quotes[ticker]={error:true,msg:'não encontrado'}
-    } catch {quotes[ticker]={error:true,msg:'erro'}}
-    await new Promise(r=>setTimeout(r,200))
+      const results=d.results||[]
+      batch.forEach(({ticker,ft})=>{
+        const q=results.find(r=>r.symbol===ft||r.symbol===ticker)
+        if (q?.regularMarketPrice) quotes[ticker]={price:q.regularMarketPrice,change:q.regularMarketChange||0,changePct:q.regularMarketChangePercent||0,currency:'BRL'}
+        else quotes[ticker]={error:true,msg:'não encontrado'}
+      })
+    } catch {batch.forEach(({ticker})=>{quotes[ticker]={error:true,msg:'erro'}})}
+    if (i+BRAPI_BATCH<fetchable.length) await new Promise(r=>setTimeout(r,300))
   }
 }
+
 async function fetchFinnhub(tickers){
   if (!tickers.length) return
   const token=window._finnhubToken
@@ -929,7 +881,7 @@ window.refreshAll=async function(){
   if (getRemainingCooldown()>0&&lastRefresh){toast(`Aguarde ${formatCooldown(getRemainingCooldown())} para atualizar`,'err');return}
   isRefreshing=true
   document.getElementById('live-dot').className='dot updating'
-  updateRefreshButtons()
+  updateRefreshButton()
   const all=Object.values(portfolios).flat()
   const brlTickers=[...new Set(all.filter(p=>p.currency==='BRL').map(p=>p.ticker))]
   const usdTickers=[...new Set(all.filter(p=>p.currency==='USD').map(p=>p.ticker))]
@@ -938,30 +890,13 @@ window.refreshAll=async function(){
   await Promise.all([fetchUsdBrl(),fetchIbov(),fetchBrapi([...brlTickers,...brapiExtra]),fetchFinnhub([...usdTickers,...finnhubExtra])])
   await saveCachedQuotes()
   renderConsolidation()
-  if (selectedPortfolios.size>0) renderPortfoliosGrid()
-  if (selectedPortfolios.size===1){
-    // Update single portfolio cards including market cards
-    const name=[...selectedPortfolios][0]
-    const sid=safeid(name)
-    const sign=usdVarPct>=0?'+':'';const cls=usdVarPct>=0?'pos':'neg'
-    const ibovSign=ibovPct!=null?(ibovPct>=0?'+':''):'';const ibovCls=ibovPct!=null?(ibovPct>=0?'pos':'neg'):''
-    const usdEl=document.getElementById('v-usd-pct-'+sid)
-    const uvl=document.getElementById('v-usd-val-'+sid)
-    const iel=document.getElementById('v-ibov-pct-'+sid)
-    if (usdEl){usdEl.textContent=sign+usdVarPct.toFixed(2)+'%';usdEl.className='card-main '+cls}
-    if (uvl&&usdBrl) uvl.textContent=usdBrl.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})
-    if (iel&&ibovPct!=null){iel.textContent=ibovSign+ibovPct.toFixed(2)+'%';iel.className='card-main '+ibovCls}
-  } else if (selectedPortfolios.size>1){
-    updateSharedMarketCards()
-  }
+  if (selectedPortfolios.size>0){updateTopBar();renderPortfoliosGrid()}
   await saveSnapshots()
   lastRefresh=Date.now();isRefreshing=false
   document.getElementById('live-dot').className='dot live'
   startCooldownTimer();startElapsedTimer()
-  if (lastRefresh){
-    const lu=document.getElementById('last-upd-shared')
-    if (lu) lu.textContent='Atualizado às '+new Date(lastRefresh).toLocaleTimeString('pt-BR')
-  }
+  const lu=document.getElementById('last-upd-shared')
+  if (lu) lu.textContent='Atualizado às '+new Date(lastRefresh).toLocaleTimeString('pt-BR')
 }
 
 // ─── Compute rows ──────────────────────────────────────────
@@ -992,11 +927,8 @@ function computeRowVar(p){
   const priceYestUsd=q.price-q.change
   const varBrl=(priceBrl-priceYestUsd*usdYest)*p.qty
   const varPctBrl=((1+q.changePct/100)*(1+usdVarPct/100)-1)*100
-  if (currencyMode==='brl'){
-    return {price:priceBrl,valueBrl,varBrl,varPct:varPctBrl,hasQuote:true,hasPrevClose:false,isUSD:true}
-  } else {
-    return {price:priceBrl,valueBrl,varBrl,varPct:q.changePct,hasQuote:true,hasPrevClose:false,isUSD:true}
-  }
+  if (currencyMode==='brl') return {price:priceBrl,valueBrl,varBrl,varPct:varPctBrl,hasQuote:true,hasPrevClose:false,isUSD:true}
+  return {price:priceBrl,valueBrl,varBrl,varPct:q.changePct,hasQuote:true,hasPrevClose:false,isUSD:true}
 }
 function computeRows(name){return (portfolios[name]||[]).map(p=>({...p,...computeRowVar(p)}))}
 function computeSummary(rows){
@@ -1012,7 +944,6 @@ function renderPortfolio(name){
   const sid=safeid(name)
   const rows=computeRows(name)
   const {gross,net,varPct,varBrl,grossOntem}=computeSummary(rows)
-
   const vgEl=document.getElementById('v-gross-'+sid)
   if (vgEl) vgEl.textContent=fmtBrl(gross)
   const ne=document.getElementById('v-net-'+sid)
@@ -1021,12 +952,9 @@ function renderPortfolio(name){
   if (vp){vp.textContent=(varPct>=0?'+':'')+varPct.toFixed(2)+'%';vp.className='card-main '+(varPct>=0?'pos':'neg')}
   const vb=document.getElementById('v-varbrl-'+sid)
   if (vb){vb.textContent=(varBrl>=0?'+':'')+fmtBrl(varBrl);vb.className='card-sub '+(varBrl>=0?'pos':'neg')}
-  const lg=document.getElementById('v-longs-'+sid)
-  const sh=document.getElementById('v-shorts-'+sid)
-  const tot=document.getElementById('v-total-'+sid)
-  if (lg) lg.textContent=rows.filter(r=>r.qty>0).length
-  if (sh) sh.textContent=rows.filter(r=>r.qty<0).length
-  if (tot) tot.textContent=rows.length
+  const lg=document.getElementById('v-longs-'+sid);if(lg)lg.textContent=rows.filter(r=>r.qty>0).length
+  const sh=document.getElementById('v-shorts-'+sid);if(sh)sh.textContent=rows.filter(r=>r.qty<0).length
+  const tot=document.getElementById('v-total-'+sid);if(tot)tot.textContent=rows.length
 
   const ss=sortStates[name]||{col:'portVar',asc:false,bookSectorClicks:0}
   const sorted=[...rows].map(r=>({...r,
@@ -1041,34 +969,28 @@ function renderPortfolio(name){
       const av=String(a[sortField]||''),bv=String(b[sortField]||'')
       return ss.asc?av.localeCompare(bv):bv.localeCompare(av)
     }
-    if (['ticker','book','sector'].includes(ss.col)){
-      const av=String(a[ss.col]||''),bv=String(b[ss.col]||'')
-      return ss.asc?av.localeCompare(bv):bv.localeCompare(av)
-    }
+    if (['ticker','book','sector'].includes(ss.col)){const av=String(a[ss.col]||''),bv=String(b[ss.col]||'');return ss.asc?av.localeCompare(bv):bv.localeCompare(av)}
     const av=a[ss.col]||0,bv=b[ss.col]||0;return ss.asc?av-bv:bv-av
   })
 
-  const tbody=document.getElementById('tbl-'+sid)
-  if (!tbody) return
+  const tbody=document.getElementById('tbl-'+sid);if (!tbody) return
   tbody.innerHTML=sorted.map(row=>{
-    const {ticker,qty,currency,book,sector,price,valueBrl,varPct,hasQuote,hasPrevClose,isIgnored,isUSD,portVar,weightAbs}=row
+    const {ticker,qty,currency,book,sector,price,valueBrl,varPct,hasQuote,hasPrevClose,isIgnored,portVar,weightAbs}=row
     const isPos=varPct>=0
     const q=quotes[ticker]
     let priceCell,varCell
 
     if (isIgnored){
-      priceCell=price>0?`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-size:10px;color:var(--text-3)">prev</span>`:`<span class="err-lbl">sem preço</span>`
+      priceCell=price>0?`${fmtBrl(price)}<span class="prev-tag">prev</span>`:`<span class="err-lbl">sem preço</span>`
       varCell=`<span class="var-zero">—</span>`
     } else if (hasQuote){
       const pf=currency==='USD'
-        ?currencyMode==='brl'
-          ?`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
-          :`$ ${q.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`
-        :`R$ ${q.price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+        ?currencyMode==='brl'?fmtBrl(price):q.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+        :fmtBrl(q.price)
       priceCell=pf
       varCell=`<span class="${isPos?'var-pos':'var-neg'}">${isPos?'+':''}${varPct.toFixed(2)}%</span>`
     } else if (hasPrevClose){
-      priceCell=`R$ ${price.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-size:10px;color:var(--text-3)">prev</span>`
+      priceCell=`${fmtBrl(price)}<span class="prev-tag">prev</span>`
       varCell=`<span class="var-zero">0,00%</span>`
     } else {
       priceCell=`<span class="err-lbl">sem cotação</span>`
@@ -1076,15 +998,14 @@ function renderPortfolio(name){
     }
 
     const portVarPct=portVar*100
-    const portVarCell=grossOntem>0
-      ?`<span class="${portVarPct>=0?'var-pos':'var-neg'}">${portVarPct>=0?'+':''}${portVarPct.toFixed(2)}%</span>`
-      :`<span class="var-zero">—</span>`
+    const portVarCell=grossOntem>0?`<span class="${portVarPct>=0?'var-pos':'var-neg'}">${portVarPct>=0?'+':''}${portVarPct.toFixed(2)}%</span>`:`<span class="var-zero">—</span>`
     const weightPct=weightAbs*100
     const barColor=qty<0?'var(--red)':(isPos?'var(--green)':'var(--red)')
+    const currTag=currency==='USD'?`<span class="curr-tag usd">U$</span>`:`<span class="curr-tag">R$</span>`
 
     return `<tr>
-      <td onclick="openTickerModal('${ticker}','${name}')" style="cursor:pointer;">
-        <span class="curr-pill ${currency==='USD'?'curr-usd':'curr-brl'}">${currency}</span><span class="tk">${ticker}</span>
+      <td class="sticky" onclick="openTickerModal('${ticker}','${name}')" style="cursor:pointer;">
+        ${currTag}<span class="tk">${ticker}</span>
       </td>
       <td class="meta-cell">${book||'—'} · ${sector||'—'}</td>
       <td class="r num">${priceCell}</td>
@@ -1101,15 +1022,10 @@ window.sortPortfolio=function(name,col){
   const newAsc=ss.col===col?!ss.asc:false
   const newClicks=col==='bookSector'?(ss.bookSectorClicks||0)+1:ss.bookSectorClicks||0
   sortStates[name]={col,asc:newAsc,bookSectorClicks:newClicks}
-
-  // Update Book·Setor header label
   if (col==='bookSector'){
     const isBook=newClicks%4<2
     const th=document.getElementById('th-booksector-'+safeid(name))
-    if (th){
-      const span=document.getElementById('sort-'+safeid(name)+'-bookSector')
-      th.childNodes[0].textContent=(isBook?'Book · Setor ':'Setor · Book ')
-    }
+    if (th) th.childNodes[0].textContent=(isBook?'Book · Setor ':'Setor · Book ')
   }
   const sid=safeid(name)
   document.querySelectorAll(`[id^="sort-${sid}-"]`).forEach(el=>el.textContent='')
@@ -1120,22 +1036,29 @@ window.sortPortfolio=function(name,col){
 
 // ─── Ticker Modal ──────────────────────────────────────────
 window.openTickerModal=function(ticker,currentPortfolio){
-  const rows=Object.entries(portfolios).map(([portName,positions])=>{
+  const portRows=Object.entries(portfolios).map(([portName,positions])=>{
     const pos=positions.find(p=>p.ticker===ticker)
-    return {portName,qty:pos?pos.qty:null}
-  }).filter(r=>r.qty!==null)
-  if (rows.length===0) return
-  const total=rows.reduce((s,r)=>s+r.qty,0)
+    if (!pos) return null
+    const rows=computeRows(portName)
+    const {gross,grossOntem}=computeSummary(rows)
+    const row=rows.find(r=>r.ticker===ticker)
+    const weight=gross>0?Math.abs((row?.valueBrl||0))/gross*100:0
+    return {portName,qty:pos.qty,weight}
+  }).filter(Boolean)
+  if (!portRows.length) return
+  const total=portRows.reduce((s,r)=>s+r.qty,0)
   document.getElementById('modal-ticker').textContent=ticker
-  document.getElementById('modal-table').innerHTML=
-    rows.map(r=>`
+  document.getElementById('modal-body').innerHTML=
+    portRows.map(r=>`
       <tr class="${r.portName===currentPortfolio?'current-port':'other-port'}">
         <td style="padding:10px 0;">${r.portName}</td>
         <td style="padding:10px 0;text-align:right;font-variant-numeric:tabular-nums;">${r.qty.toLocaleString('pt-BR')}</td>
+        <td style="padding:10px 0;text-align:right;font-variant-numeric:tabular-nums;">${r.qty<0?'−':''}${Math.abs(r.weight).toFixed(1)}%</td>
       </tr>`).join('')+
-    (rows.length>1?`<tr style="border-top:2px solid var(--border);font-weight:600;">
+    (portRows.length>1?`<tr style="border-top:2px solid var(--border);font-weight:600;">
       <td style="padding:12px 0;">Total</td>
       <td style="padding:12px 0;text-align:right;font-variant-numeric:tabular-nums;">${total.toLocaleString('pt-BR')}</td>
+      <td></td>
     </tr>`:'')
   document.getElementById('modal').style.display='block'
   document.getElementById('modal-overlay').style.display='block'
@@ -1166,7 +1089,7 @@ function renderConsolidation(){
       const vs=ibovPct!=null?r.varPct-ibovPct:null
       const vsStr=vs!=null?`<span class="${vs>=0?'var-pos':'var-neg'}">${vs>=0?'+':''}${vs.toFixed(2)}%</span>`:'—'
       return `<tr>
-        <td><span class="tk" style="cursor:default;text-decoration:none;">${r.name}</span></td>
+        <td style="font-weight:500;">${r.name}</td>
         <td class="r num">${fmtBrl(r.gross)}</td>
         <td class="r num" style="${r.net<0?'color:var(--red)':''}">${fmtBrl(r.net)}</td>
         <td class="r"><span class="${r.varPct>=0?'var-pos':'var-neg'}">${r.varPct>=0?'+':''}${r.varPct.toFixed(2)}%</span></td>
@@ -1196,15 +1119,11 @@ window.consolSort=function(col){
 async function saveSnapshots(){
   const today=new Date().toISOString().slice(0,10)
   for (const name of Object.keys(portfolios)){
-    const {data:port}=await sb.from('portfolios')
-      .select('id').eq('group_id',groupId).eq('date',today).eq('portfolio_name',name).single()
+    const {data:port}=await sb.from('portfolios').select('id').eq('group_id',groupId).eq('date',today).eq('portfolio_name',name).single()
     if (!port) continue
     const rows=computeRows(name)
     const {gross,net,varPct,varBrl}=computeSummary(rows)
-    await sb.from('quote_snapshots').insert({
-      portfolio_id:port.id,total_brl:gross,day_change_pct:varPct,
-      usd_brl:usdBrl,snapshot_data:{net,gross,varBrl}
-    })
+    await sb.from('quote_snapshots').insert({portfolio_id:port.id,total_brl:gross,day_change_pct:varPct,usd_brl:usdBrl,snapshot_data:{net,gross,varBrl}})
   }
 }
 
@@ -1237,18 +1156,15 @@ window.loadChart=async function(){
     snaps.forEach(s=>{
       const min=new Date(s.captured_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
       if (!byMin[min]) byMin[min]={gross:0,varBrl:0}
-      byMin[min].gross+=parseFloat(s.total_brl||0)
-      byMin[min].varBrl+=parseFloat(s.snapshot_data?.varBrl||0)
+      byMin[min].gross+=parseFloat(s.total_brl||0);byMin[min].varBrl+=parseFloat(s.snapshot_data?.varBrl||0)
     })
     chartData=Object.entries(byMin).map(([label,v])=>{
-      const prev=v.gross-v.varBrl
-      return {label,gross:v.gross.toFixed(2),varPct:prev>0?((v.varBrl/prev)*100).toFixed(2):'0'}
+      const prev=v.gross-v.varBrl;return {label,gross:v.gross.toFixed(2),varPct:prev>0?((v.varBrl/prev)*100).toFixed(2):'0'}
     })
   } else {
     chartData=snaps.map(s=>({
       label:new Date(s.captured_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
-      gross:parseFloat(s.total_brl||0).toFixed(2),
-      varPct:parseFloat(s.day_change_pct||0).toFixed(2)
+      gross:parseFloat(s.total_brl||0).toFixed(2),varPct:parseFloat(s.day_change_pct||0).toFixed(2)
     }))
   }
   document.getElementById('empty-chart').style.display='none'
@@ -1257,8 +1173,8 @@ window.loadChart=async function(){
   chartInstance=new Chart(document.getElementById('chart-canvas'),{
     type:'line',
     data:{labels:chartData.map(d=>d.label),datasets:[
-      {label:'Gross (BRL)',data:chartData.map(d=>d.gross),borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.06)',borderWidth:1.5,pointRadius:2,fill:true,tension:0.3,yAxisID:'y'},
-      {label:'Var. Dia (%)',data:chartData.map(d=>d.varPct),borderColor:'#2563eb',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,borderDash:[4,3],tension:0.3,yAxisID:'y2'}
+      {label:'Gross',data:chartData.map(d=>d.gross),borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.06)',borderWidth:1.5,pointRadius:2,fill:true,tension:0.3,yAxisID:'y'},
+      {label:'P&L Dia (%)',data:chartData.map(d=>d.varPct),borderColor:'#2563eb',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,borderDash:[4,3],tension:0.3,yAxisID:'y2'}
     ]},
     options:{responsive:true,interaction:{mode:'index',intersect:false},
       plugins:{legend:{labels:{color:'#6b7280',font:{family:'Inter',size:11}}},
@@ -1267,31 +1183,23 @@ window.loadChart=async function(){
           callbacks:{label:ctx=>ctx.datasetIndex===0?` R$ ${parseFloat(ctx.raw).toLocaleString('pt-BR',{minimumFractionDigits:2})}`:` ${parseFloat(ctx.raw)>=0?'+':''}${ctx.raw}%`}}},
       scales:{
         x:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10}},grid:{color:'#f3f4f6'}},
-        y:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10},callback:v=>'R$ '+parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})},grid:{color:'#f3f4f6'},position:'left'},
+        y:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10},callback:v=>parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})},grid:{color:'#f3f4f6'},position:'left'},
         y2:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10},callback:v=>v+'%'},grid:{display:false},position:'right'}
       }}
   })
 }
-function showEmptyChart(){
-  document.getElementById('empty-chart').style.display='flex'
-  document.getElementById('chart-canvas').style.display='none'
-}
+function showEmptyChart(){document.getElementById('empty-chart').style.display='flex';document.getElementById('chart-canvas').style.display='none'}
 
 // ─── Alerts ────────────────────────────────────────────────
-async function loadAlerts(){
-  const {data}=await sb.from('alerts').select('*').eq('group_id',groupId)
-  renderAlerts(data||[])
-}
+async function loadAlerts(){const {data}=await sb.from('alerts').select('*').eq('group_id',groupId);renderAlerts(data||[])}
 function renderAlerts(list){
   document.getElementById('no-alerts').style.display=list.length?'none':'block'
   document.getElementById('alerts-list').innerHTML=list.map(a=>{
-    const tl={change_pct:`Var ≤ ${a.threshold}%`,value_below:`Gross < R$ ${fmtNum(a.threshold)}`,value_above:`Gross > R$ ${fmtNum(a.threshold)}`}[a.trigger_type]||''
+    const tl={change_pct:`P&L ≤ ${a.threshold}%`,value_below:`Gross < ${fmtBrl(a.threshold)}`,value_above:`Gross > ${fmtBrl(a.threshold)}`}[a.trigger_type]||''
     return `<div class="alert-item">
       <div class="alert-info"><strong>${a.type.toUpperCase()}</strong> → ${a.destination}<span>${tl}</span></div>
-      <div style="display:flex;gap:10px;align-items:center;">
-        ${role==='admin'?`<button class="toggle-active ${a.active?'on':''}" onclick="toggleAlert('${a.id}',${!a.active})"></button>
-        <button class="btn-del" onclick="deleteAlert('${a.id}')">remover</button>`:''}
-      </div></div>`
+      <div style="display:flex;gap:10px;align-items:center;">${role==='admin'?`<button class="toggle-active ${a.active?'on':''}" onclick="toggleAlert('${a.id}',${!a.active})"></button><button class="btn-del" onclick="deleteAlert('${a.id}')">remover</button>`:''}</div>
+    </div>`
   }).join('')
 }
 window.addAlert=async function(){
@@ -1326,21 +1234,12 @@ window.saveApiKeys=async function(){
   const finnhub=document.getElementById('cfg-finnhub').value.trim()
   const {error}=await sb.from('groups').update({brapi_token:brapi,finnhub_token:finnhub}).eq('id',groupId)
   if (error){toast('Erro: '+error.message,'err');return}
-  window._brapiToken=brapi;window._finnhubToken=finnhub
-  toast('Chaves salvas para o grupo!','ok')
+  window._brapiToken=brapi;window._finnhubToken=finnhub;toast('Chaves salvas!','ok')
 }
-
-// ─── Auth ──────────────────────────────────────────────────
 window.doLogout=async function(){await sb.auth.signOut();window.location.href='./login.html'}
-
-// ─── Helpers ───────────────────────────────────────────────
-function fmtBrl(v){return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function fmtNum(v){return parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2})}
-function formatDate(d){const[y,m,day]=d.split('-');return`${day}/${m}/${y}`}
 window.toast=function(msg,type='ok'){
   const t=document.getElementById('toast')
-  t.textContent=msg;t.className='show '+type
-  setTimeout(()=>t.className='',3200)
+  t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',3200)
 }
 
 boot()
