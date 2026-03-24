@@ -677,7 +677,7 @@ function buildPortfolioPanels(names){
       <div class="tbl-wrap"><table>
         <thead><tr>
           <th onclick="sortPortfolio('${name}','ticker')">Ativo <span id="sort-${safeid(name)}-ticker"></span></th>
-          <th onclick="sortPortfolio('${name}','meta')" style="color:var(--text-3)">Book · Setor <span id="sort-${safeid(name)}-meta"></span></th>
+          <th onclick="sortPortfolio('${name}','bookSector')" style="color:var(--text-3)" id="th-booksector-${safeid(name)}">Book · Setor <span id="sort-${safeid(name)}-bookSector"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','qty')">Qtd <span id="sort-${safeid(name)}-qty"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','price')">Preço <span id="sort-${safeid(name)}-price"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','changePct')">Var. Dia <span id="sort-${safeid(name)}-changePct"></span></th>
@@ -939,7 +939,16 @@ function renderPortfolio(name){
   })).sort((a,b)=>{
     if (ss.col==='weightAbs') return ss.asc?a.weightAbs-b.weightAbs:b.weightAbs-a.weightAbs
     if (ss.col==='portVar') return ss.asc?a.portVar-b.portVar:b.portVar-a.portVar
-    if (['ticker','book','sector'].includes(ss.col)){const av=String(a[ss.col]||''),bv=String(b[ss.col]||'');return ss.asc?av.localeCompare(bv):bv.localeCompare(av)}
+    if (['ticker','book','sector','bookSector'].includes(ss.col)){
+      let col=ss.col
+      if (ss.col==='bookSector'){
+        // Alterna entre book e sector a cada dois cliques
+        const clicks=sortStates[name]._bookSectorClicks||0
+        col=clicks%4<2?'book':'sector'
+      }
+      const av=String(a[col]||''),bv=String(b[col]||'')
+      return ss.asc?av.localeCompare(bv):bv.localeCompare(av)
+    }
     const av=a[ss.col]||0,bv=b[ss.col]||0;return ss.asc?av-bv:bv-av
   })
 
@@ -994,6 +1003,13 @@ function renderPortfolio(name){
 window.sortPortfolio=function(name,col){
   const ss=sortStates[name]||{col:'portVar',asc:false}
   sortStates[name]={col,asc:ss.col===col?!ss.asc:false}
+  if (col==='bookSector'){
+    const prev=sortStates[name]._bookSectorClicks||0
+    sortStates[name]._bookSectorClicks=prev+1
+    const isBook=(prev+1)%4<2
+    const th=document.getElementById('th-booksector-'+safeid(name))
+    if (th) th.childNodes[0].textContent=isBook?'Book · Setor ':'Setor · Book '
+  }
   const sid=safeid(name)
   document.querySelectorAll(`[id^="sort-${sid}-"]`).forEach(el=>el.textContent='')
   const arrow=document.getElementById(`sort-${sid}-${col}`)
