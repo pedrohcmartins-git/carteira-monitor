@@ -966,9 +966,6 @@ function renderBookSummary(name, rows, gross, grossOntem){
     pnlDia:v.weightSum>0?(v.portVarSum/v.weightSum)*100:0
   })).sort((a,b)=>b.weightPct-a.weightPct)
 
-  const totalWeight=bookList.reduce((s,r)=>s+r.weightPct,0)
-  const totalPnlCart=bookList.reduce((s,r)=>s+r.portVarPct,0)
-
   const wrap=document.createElement('div')
   wrap.id='book-tbl-'+sid
   wrap.className='book-summary'
@@ -989,12 +986,6 @@ function renderBookSummary(name, rows, gross, grossOntem){
             <div class="bar"><div class="bar-fill" style="width:${Math.min(r.weightPct*2,100)}%;background:var(--green)"></div></div>
           </div></td>
         </tr>`).join('')}
-        <tr class="total-row">
-          <td>Total</td>
-          <td class="r">—</td>
-          <td class="r"><span class="${totalPnlCart>=0?'var-pos':'var-neg'}">${totalPnlCart>=0?'+':''}${totalPnlCart.toFixed(2)}%</span></td>
-          <td class="r"><span class="num">${totalWeight.toFixed(1)}%</span></td>
-        </tr>
       </tbody>
     </table></div></div>`
 
