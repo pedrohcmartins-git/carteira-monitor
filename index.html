@@ -9,13 +9,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-  --bg:#f9fafb; --surface:#ffffff; --surface2:#f3f4f6;
+  --bg:#f9fafb; --surface:#fff; --surface2:#f3f4f6;
   --border:#e5e7eb; --border-strong:#d1d5db;
   --nav:#0f1117; --nav-muted:#6b7280; --nav-surface:#1f2937;
-  --accent:#16a34a; --accent-bg:#f0fdf4; --accent-text:#166534;
-  --blue:#1d4ed8; --blue-bg:#eff6ff; --blue-text:#1e40af;
-  --red:#dc2626; --red-bg:#fef2f2; --red-text:#991b1b;
   --green:#16a34a; --green-bg:#f0fdf4; --green-text:#166534;
+  --red:#dc2626; --red-bg:#fef2f2; --red-text:#991b1b;
+  --blue:#1d4ed8; --blue-bg:#eff6ff; --blue-text:#1e40af;
   --text:#111827; --text-2:#6b7280; --text-3:#9ca3af;
   --font:'Inter',system-ui,sans-serif; --font-mono:'DM Mono',monospace;
   --radius:8px; --radius-lg:10px;
@@ -24,58 +23,76 @@
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh;}
 
 /* NAV */
-nav{background:var(--nav);height:52px;display:flex;align-items:center;padding:0 24px;gap:16px;justify-content:space-between;}
+nav{background:var(--nav);height:52px;display:flex;align-items:center;padding:0 24px;justify-content:space-between;}
 .logo{color:#fff;font-weight:600;font-size:15px;letter-spacing:-0.3px;}
 .logo span{color:#4ade80;}
 .nav-right{display:flex;align-items:center;gap:12px;}
 .group-badge{font-size:11px;color:var(--nav-muted);background:var(--nav-surface);padding:4px 10px;border-radius:6px;}
 .role-badge{font-size:10px;background:#166534;color:#86efac;padding:3px 8px;border-radius:4px;font-weight:500;}
-.live-indicator{display:flex;align-items:center;gap:6px;}
-.dot{width:7px;height:7px;border-radius:50%;background:#4b5563;}
+.dot{width:7px;height:7px;border-radius:50%;background:#4b5563;display:inline-block;}
 .dot.live{background:#4ade80;}
 .dot.updating{background:#fbbf24;animation:pulse .8s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .nav-time{font-size:12px;color:var(--nav-muted);}
-.nav-btn{font-size:11px;color:var(--nav-muted);background:transparent;border:none;cursor:pointer;padding:6px 10px;border-radius:6px;transition:all .15s;}
+.nav-btn{font-size:11px;color:var(--nav-muted);background:transparent;border:none;cursor:pointer;padding:6px 10px;border-radius:6px;transition:all .15s;font-family:var(--font);}
 .nav-btn:hover{background:var(--nav-surface);color:#fff;}
 
 /* TABS */
-.tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;}
-.tab{font-size:12px;font-weight:500;padding:13px 16px;color:var(--text-2);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;transition:all .15s;}
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:0;overflow-x:auto;}
+.tab{font-size:12px;font-weight:500;padding:13px 14px;color:var(--text-2);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;transition:all .15s;font-family:var(--font);}
 .tab:hover{color:var(--text);}
 .tab.active{color:var(--green);border-bottom-color:var(--green);}
 .tab.tab-hist{color:var(--text);margin-left:auto;}
 .tab.tab-hist.active{color:var(--text);border-bottom-color:var(--text);}
-.tab.port-tab.active{color:var(--text);border-bottom-color:var(--text);}
+/* Multi-select tab style */
+.tab.port-tab.selected{color:var(--green);border-bottom-color:var(--green);background:var(--green-bg);}
+.tab.port-tab.active:not(.selected){color:var(--text);border-bottom-color:var(--text);}
+.multi-badge{font-size:10px;background:var(--green);color:#fff;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:600;}
+.multi-hint{font-size:11px;color:var(--text-3);padding:0 12px;white-space:nowrap;}
 
 /* PANELS */
-.panel{display:none;padding:24px;padding-bottom:60px;}
+.panel{display:none;padding:20px 24px 60px;}
 .panel.active{display:block;}
 
+/* SHARED MARKET CARDS */
+.market-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.market-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;display:flex;align-items:center;gap:24px;}
+.mkt-item{display:flex;flex-direction:column;gap:3px;}
+.mkt-lbl{font-size:10px;color:var(--text-2);font-weight:500;text-transform:uppercase;letter-spacing:0.03em;}
+.mkt-val{font-size:20px;font-weight:600;letter-spacing:-0.5px;}
+.mkt-sub{font-size:12px;color:var(--text-2);}
+
+/* MULTI-PORTFOLIO LAYOUT */
+.port-grid{display:grid;gap:20px;}
+.port-grid.count-1{grid-template-columns:1fr;}
+.port-grid.count-2{grid-template-columns:1fr 1fr;}
+.port-grid.count-3{grid-template-columns:1fr 1fr 1fr;}
+.port-panel-inner{min-width:0;}
+
 /* CARDS */
-.cards-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;margin-bottom:24px;}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;}
-.card-lbl{font-size:11px;color:var(--text-2);margin-bottom:8px;font-weight:500;letter-spacing:0.02em;text-transform:uppercase;}
-.card-main{font-size:22px;font-weight:600;color:var(--text);letter-spacing:-0.5px;line-height:1.1;font-variant-numeric:tabular-nums;}
-.card-sub{font-size:13px;margin-top:5px;color:var(--text-2);}
+.cards-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;}
+.card-lbl{font-size:10px;color:var(--text-2);margin-bottom:6px;font-weight:500;letter-spacing:0.03em;text-transform:uppercase;}
+.card-main{font-size:20px;font-weight:600;color:var(--text);letter-spacing:-0.5px;line-height:1.1;font-variant-numeric:tabular-nums;}
+.card-sub{font-size:12px;margin-top:4px;}
 .pos{color:var(--green);} .neg{color:var(--red);} .muted{color:var(--text-2);}
-.card-counts{display:flex;flex-direction:column;gap:8px;justify-content:center;}
+.card-counts{display:flex;flex-direction:column;gap:6px;}
 .count-row{display:flex;justify-content:space-between;align-items:center;}
-.count-lbl{font-size:11px;color:var(--text-2);font-weight:500;}
-.count-val{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;}
+.count-lbl{font-size:10px;color:var(--text-2);font-weight:500;}
+.count-val{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;}
 
 /* CONTROLS */
-.controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;}
+.controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
 .section-title{font-size:13px;font-weight:600;color:var(--text);}
-.btn-refresh{font-size:11px;font-weight:500;background:var(--nav);color:#fff;border:none;padding:8px 16px;border-radius:var(--radius);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;min-width:140px;justify-content:center;font-family:var(--font);}
+.btn-refresh{font-size:11px;font-weight:500;background:var(--nav);color:#fff;border:none;padding:7px 14px;border-radius:var(--radius);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;min-width:130px;justify-content:center;font-family:var(--font);}
 .btn-refresh:hover:not(:disabled){background:#1f2937;}
 .btn-refresh:disabled{background:var(--surface2);color:var(--text-3);border:1px solid var(--border);cursor:not-allowed;}
 
 /* TABLE */
 .tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
-thead tr{border-bottom:1px solid var(--border);background:var(--surface);}
-th{padding:10px 14px;text-align:left;font-size:11px;color:var(--text-2);font-weight:500;white-space:nowrap;cursor:pointer;user-select:none;letter-spacing:0.02em;text-transform:uppercase;}
+thead tr{border-bottom:1px solid var(--border);}
+th{padding:9px 12px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;white-space:nowrap;cursor:pointer;user-select:none;letter-spacing:0.03em;text-transform:uppercase;}
 th:hover{color:var(--text);}
 th.sorted{color:var(--green);}
 th.r,td.r{text-align:right;}
@@ -83,50 +100,49 @@ tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--bg);}
 tbody tr.total-row{background:var(--surface2);border-top:1px solid var(--border);font-weight:500;}
-td{padding:12px 14px;white-space:nowrap;color:var(--text);}
-.curr-pill{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;margin-right:6px;letter-spacing:0.03em;}
+td{padding:11px 12px;white-space:nowrap;}
+.curr-pill{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;margin-right:5px;letter-spacing:0.03em;}
 .curr-brl{background:var(--green-bg);color:var(--green-text);}
 .curr-usd{background:var(--blue-bg);color:var(--blue-text);}
-.tk{font-weight:600;font-size:13px;}
-.meta-cell{font-size:12px;color:var(--text-2);}
+.tk{font-weight:600;font-size:13px;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;cursor:pointer;}
+.tk:hover{color:var(--green);}
+.meta-cell{font-size:11px;color:var(--text-2);}
 .var-pos{color:var(--green);font-weight:500;font-variant-numeric:tabular-nums;}
 .var-neg{color:var(--red);font-weight:500;font-variant-numeric:tabular-nums;}
 .var-zero{color:var(--text-3);font-variant-numeric:tabular-nums;}
 .num{font-variant-numeric:tabular-nums;font-family:var(--font-mono);font-size:12px;}
-.bar-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:70px;}
-.bar{height:3px;background:var(--border);border-radius:2px;width:60px;}
+.bar-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:60px;}
+.bar{height:3px;background:var(--border);border-radius:2px;width:50px;}
 .bar-fill{height:100%;border-radius:2px;}
 .err-lbl{font-size:11px;color:var(--text-3);}
-.last-upd{font-size:11px;color:var(--text-3);text-align:right;margin-top:10px;}
+.last-upd{font-size:11px;color:var(--text-3);text-align:right;margin-top:8px;}
 
 /* UPLOAD */
-.upload-zone{border:1.5px dashed var(--border-strong);padding:28px 32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative;margin-top:24px;border-radius:var(--radius-lg);}
+.upload-zone{border:1.5px dashed var(--border-strong);padding:24px 32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative;margin-top:20px;border-radius:var(--radius-lg);}
 .upload-zone:hover,.upload-zone.over{border-color:var(--green);background:var(--green-bg);}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.upload-zone h3{font-size:14px;font-weight:600;margin-bottom:4px;color:var(--text);}
+.upload-zone h3{font-size:14px;font-weight:600;margin-bottom:4px;}
 .upload-zone p{font-size:12px;color:var(--text-2);}
 
 /* CHART */
 .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
-.chart-title{font-size:13px;font-weight:600;color:var(--text);}
-.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;}
+.chart-title{font-size:13px;font-weight:600;}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;}
 .chart-sel{font-family:var(--font);font-size:12px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:var(--radius);outline:none;cursor:pointer;}
 .chart-sel:focus{border-color:var(--green);}
 .empty-chart{display:flex;align-items:center;justify-content:center;height:200px;color:var(--text-3);font-size:13px;}
 
 /* ALERTS */
-.alert-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;}
-.form-section-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em;}
+.alert-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:18px;}
+.form-section-title{font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.05em;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.form-field label{display:block;font-size:11px;font-weight:500;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;}
-.form-field input,.form-field select{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;border-radius:var(--radius);outline:none;transition:border-color .15s;}
+.form-field label{display:block;font-size:10px;font-weight:500;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.03em;}
+.form-field input,.form-field select{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px;border-radius:var(--radius);outline:none;transition:border-color .15s;}
 .form-field input:focus,.form-field select:focus{border-color:var(--green);}
-.btn-add{margin-top:14px;font-family:var(--font);font-size:12px;font-weight:500;padding:9px 18px;background:var(--nav);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;}
+.btn-add{margin-top:12px;font-family:var(--font);font-size:12px;font-weight:500;padding:8px 16px;background:var(--nav);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;}
 .btn-add:hover{background:#1f2937;}
-.alert-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);margin-bottom:8px;gap:12px;flex-wrap:wrap;}
-.alert-info{font-size:13px;}
-.alert-info strong{color:var(--text);}
-.alert-info span{color:var(--text-2);margin-left:8px;}
+.alert-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);margin-bottom:8px;gap:12px;flex-wrap:wrap;}
+.alert-info{font-size:13px;} .alert-info strong{color:var(--text);} .alert-info span{color:var(--text-2);margin-left:8px;}
 .toggle-active{width:32px;height:18px;border-radius:9px;background:var(--border-strong);border:none;cursor:pointer;position:relative;transition:background .2s;}
 .toggle-active.on{background:var(--green);}
 .toggle-active::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;}
@@ -134,57 +150,65 @@ td{padding:12px 14px;white-space:nowrap;color:var(--text);}
 .btn-del{font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;}
 .btn-del:hover{background:var(--red-bg);}
 
-/* ADMIN / SETUP */
-.admin-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px;}
-.pref-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px;}
+/* SETUP */
+.admin-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px;}
+.pref-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px;}
 .pref-row:last-child{border-bottom:none;padding-bottom:0;}
 .pref-row:first-child{padding-top:0;}
-.pref-label{font-size:13px;font-weight:500;color:var(--text);}
+.pref-label{font-size:13px;font-weight:500;}
 .pref-sub{font-size:11px;color:var(--text-2);margin-top:2px;}
 .currency-toggle{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
-.currency-opt{font-family:var(--font);font-size:11px;font-weight:500;padding:6px 14px;background:transparent;color:var(--text-2);border:none;cursor:pointer;transition:all .15s;}
+.currency-opt{font-family:var(--font);font-size:11px;font-weight:500;padding:6px 12px;background:transparent;color:var(--text-2);border:none;cursor:pointer;transition:all .15s;}
 .currency-opt.active{background:var(--nav);color:#fff;}
-.member-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);gap:12px;}
+.member-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:12px;}
 .member-row:last-child{border-bottom:none;}
 .invite-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
-.invite-row input{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;border-radius:var(--radius);outline:none;}
+.invite-row input{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px;border-radius:var(--radius);outline:none;}
 .invite-row input:focus{border-color:var(--green);}
-.invite-row select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:9px 10px;border-radius:var(--radius);outline:none;}
-.btn-invite{font-family:var(--font);font-size:11px;font-weight:500;padding:9px 16px;background:var(--nav);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;white-space:nowrap;}
+.invite-row select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:8px 10px;border-radius:var(--radius);outline:none;}
+.btn-invite{font-family:var(--font);font-size:11px;font-weight:500;padding:8px 14px;background:var(--nav);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;white-space:nowrap;}
 
 /* TICKER MAP */
-.tmap-wrap{overflow-x:auto;}
 .tmap-table{width:100%;border-collapse:collapse;font-size:12px;}
-.tmap-table th{padding:9px 12px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.03em;}
-.tmap-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tmap-table th{padding:8px 10px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.03em;}
+.tmap-table td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .tmap-table tr:last-child td{border-bottom:none;}
 .tmap-table tr:hover td{background:var(--bg);}
-.tmap-input{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:5px 8px;border-radius:6px;outline:none;width:100%;}
+.tmap-input{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:4px 8px;border-radius:5px;outline:none;width:100%;}
 .tmap-input:focus{border-color:var(--green);}
-.tmap-select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:5px 8px;border-radius:6px;outline:none;}
-.tmap-select:focus{border-color:var(--green);}
-.status-badge{font-size:9px;padding:2px 8px;border-radius:10px;font-weight:500;text-transform:uppercase;}
+.tmap-select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:4px 8px;border-radius:5px;outline:none;}
+.status-badge{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:500;text-transform:uppercase;}
 .status-auto{background:var(--green-bg);color:var(--green-text);}
 .status-ignore{background:var(--surface2);color:var(--text-2);}
 .status-manual{background:var(--blue-bg);color:var(--blue-text);}
 .status-brapi{background:var(--green-bg);color:var(--green-text);}
 .status-finnhub{background:var(--blue-bg);color:var(--blue-text);}
-.btn-save-map{font-family:var(--font);font-size:10px;font-weight:500;padding:5px 10px;background:var(--nav);color:#fff;border:none;border-radius:5px;cursor:pointer;}
-.btn-reset-map{font-family:var(--font);font-size:10px;color:var(--text-2);background:none;border:1px solid var(--border);padding:5px 10px;border-radius:5px;cursor:pointer;margin-left:4px;}
+.btn-save-map{font-family:var(--font);font-size:10px;font-weight:500;padding:4px 10px;background:var(--nav);color:#fff;border:none;border-radius:5px;cursor:pointer;}
+.btn-reset-map{font-family:var(--font);font-size:10px;color:var(--text-2);background:none;border:1px solid var(--border);padding:4px 10px;border-radius:5px;cursor:pointer;margin-left:4px;}
 
-/* CONSOL TABLE */
-.consol-tbl .tk{font-weight:500;}
+/* MODAL */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.25);z-index:998;}
+#modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;min-width:340px;max-width:500px;z-index:999;box-shadow:0 8px 40px rgba(0,0,0,0.12);}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.modal-ticker{font-size:17px;font-weight:600;color:var(--text);}
+.modal-close{background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3);padding:4px;border-radius:6px;line-height:1;}
+.modal-close:hover{background:var(--surface2);}
+.modal-table{width:100%;border-collapse:collapse;font-size:13px;}
+.modal-table td{padding:10px 0;border-bottom:1px solid var(--border);}
+.modal-table tr:last-child td{border-bottom:none;padding-top:12px;font-weight:600;}
+.modal-table .current-port td{font-weight:600;color:var(--text);}
+.modal-table .other-port td{color:var(--text-2);}
 
 /* SPIN / TOAST */
 .spin{display:inline-block;width:11px;height:11px;border:1.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg)}}
-#toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;font-size:12px;z-index:999;opacity:0;transform:translateY(6px);transition:all .25s;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,.08);}
+#toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;font-size:12px;z-index:1000;opacity:0;transform:translateY(6px);transition:all .25s;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,.08);}
 #toast.show{opacity:1;transform:translateY(0);}
 #toast.ok{border-color:var(--green);color:var(--green-text);}
 #toast.err{border-color:var(--red);color:var(--red-text);}
 
-@media(max-width:1000px){.cards-row{grid-template-columns:1fr 1fr 1fr;}.cards-row .card:nth-child(5){grid-column:span 3;}}
-@media(max-width:600px){.cards-row{grid-template-columns:1fr 1fr;}.cards-row .card:nth-child(5){grid-column:span 2;}.form-grid{grid-template-columns:1fr;}}
+@media(max-width:1100px){.port-grid.count-2,.port-grid.count-3{grid-template-columns:1fr;}}
+@media(max-width:600px){.cards-row{grid-template-columns:1fr 1fr;}.form-grid{grid-template-columns:1fr;}.market-cards{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -196,10 +220,8 @@ td{padding:12px 14px;white-space:nowrap;color:var(--text);}
     <span class="role-badge" id="role-badge">—</span>
     <button class="nav-btn" onclick="navTo('alertas')">Alertas</button>
     <button class="nav-btn" id="nav-setup" onclick="navTo('admin')" style="display:none">Setup</button>
-    <div class="live-indicator">
-      <span class="dot" id="live-dot"></span>
-      <span class="nav-time" id="clock">--:--:--</span>
-    </div>
+    <span class="dot" id="live-dot" style="margin:0 4px;"></span>
+    <span class="nav-time" id="clock">--:--:--</span>
     <button class="nav-btn" onclick="doLogout()">Sair</button>
   </div>
 </nav>
@@ -217,7 +239,7 @@ td{padding:12px 14px;white-space:nowrap;color:var(--text);}
       <span id="refresh-label-consol">↻ Atualizar</span>
     </button>
   </div>
-  <div class="tbl-wrap consol-tbl">
+  <div class="tbl-wrap">
     <table>
       <thead><tr>
         <th onclick="consolSort('name')">Carteira <span id="csort-name"></span></th>
@@ -229,13 +251,35 @@ td{padding:12px 14px;white-space:nowrap;color:var(--text);}
         <th class="r">vs IBOV</th>
       </tr></thead>
       <tbody id="consol-body">
-        <tr><td colspan="7" style="padding:32px 14px;color:var(--text-3);text-align:center;">Carregando...</td></tr>
+        <tr><td colspan="7" style="padding:32px;color:var(--text-3);text-align:center;">Carregando...</td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
-<div id="portfolio-panels"></div>
+<!-- PORTFOLIO VIEW (single or multi) -->
+<div class="panel" id="panel-portfolios">
+  <!-- shared market cards -->
+  <div class="market-cards" id="shared-market-cards" style="display:none;">
+    <div class="market-card">
+      <div class="mkt-item">
+        <span class="mkt-lbl">IBOVESPA</span>
+        <span class="mkt-val" id="shared-ibov-pct">—</span>
+        <span class="mkt-sub" id="shared-ibov-val">—</span>
+      </div>
+    </div>
+    <div class="market-card">
+      <div class="mkt-item">
+        <span class="mkt-lbl">USD / BRL</span>
+        <span class="mkt-val" id="shared-usd-pct">—</span>
+        <span class="mkt-sub" id="shared-usd-val">—</span>
+      </div>
+    </div>
+  </div>
+  <!-- portfolio panels grid -->
+  <div class="port-grid count-1" id="port-grid"></div>
+  <div class="last-upd" id="last-upd-shared"></div>
+</div>
 
 <!-- HISTÓRICO -->
 <div class="panel" id="panel-historico">
@@ -260,7 +304,7 @@ td{padding:12px 14px;white-space:nowrap;color:var(--text);}
         <div class="form-field"><label>Tipo</label><select id="al-type"><option value="email">E-mail</option><option value="whatsapp">WhatsApp</option></select></div>
         <div class="form-field"><label>Destino</label><input type="text" id="al-dest" placeholder="email ou +55119..."/></div>
         <div class="form-field"><label>Condição</label><select id="al-trigger"><option value="change_pct">Variação % no dia</option><option value="value_below">Gross abaixo de (BRL)</option><option value="value_above">Gross acima de (BRL)</option></select></div>
-        <div class="form-field"><label>Limite</label><input type="number" id="al-threshold" placeholder="Ex: -3 para -3%"/></div>
+        <div class="form-field"><label>Limite</label><input type="number" id="al-threshold" placeholder="Ex: -3"/></div>
       </div>
       <button class="btn-add" onclick="addAlert()">+ Adicionar alerta</button>
     </div>
@@ -269,7 +313,7 @@ td{padding:12px 14px;white-space:nowrap;color:var(--text);}
   <div id="no-alerts" style="color:var(--text-3);font-size:13px;display:none;padding:20px 0;">Nenhum alerta configurado.</div>
 </div>
 
-<!-- SETUP (Admin) -->
+<!-- SETUP -->
 <div class="panel" id="panel-admin">
   <div class="admin-section">
     <div class="form-section-title">Minhas preferências</div>
@@ -285,24 +329,16 @@ td{padding:12px 14px;white-space:nowrap;color:var(--text);}
       <button class="toggle-active" id="toggle-autorefresh" onclick="toggleAutoRefresh()"></button>
     </div>
   </div>
-
   <div class="admin-section">
     <div class="form-section-title">Mapeamento de ativos</div>
-    <p style="font-size:12px;color:var(--text-2);margin-bottom:16px;">Define como cada ativo é buscado. Admins podem editar — todos podem visualizar.</p>
-    <div class="tmap-wrap">
-      <table class="tmap-table" id="tmap-table">
-        <thead><tr>
-          <th>Ticker</th><th>Moeda</th><th>Fonte</th>
-          <th>Ticker na fonte</th><th>Status</th>
-          <th style="text-align:right">Ação</th>
-        </tr></thead>
-        <tbody id="tmap-body">
-          <tr><td colspan="6" style="color:var(--text-3);padding:20px 12px;">Carregando...</td></tr>
-        </tbody>
+    <p style="font-size:12px;color:var(--text-2);margin-bottom:14px;">Define como cada ativo é buscado. Admins podem editar.</p>
+    <div style="overflow-x:auto;">
+      <table class="tmap-table">
+        <thead><tr><th>Ticker</th><th>Moeda</th><th>Fonte</th><th>Ticker na fonte</th><th>Status</th><th style="text-align:right">Ação</th></tr></thead>
+        <tbody id="tmap-body"><tr><td colspan="6" style="color:var(--text-3);padding:16px 10px;">Carregando...</td></tr></tbody>
       </table>
     </div>
   </div>
-
   <div class="admin-section" id="admin-api-section" style="display:none">
     <div class="form-section-title">Chaves de API do grupo</div>
     <div class="form-grid" style="margin-bottom:12px;">
@@ -310,9 +346,8 @@ td{padding:12px 14px;white-space:nowrap;color:var(--text);}
       <div class="form-field"><label>Finnhub (EUA)</label><input type="text" id="cfg-finnhub" placeholder="Token finnhub"/></div>
     </div>
     <button class="btn-add" onclick="saveApiKeys()">Salvar chaves</button>
-    <p style="font-size:11px;color:var(--text-2);margin-top:8px;">Chaves salvas aqui ficam disponíveis para todos os membros em qualquer dispositivo.</p>
+    <p style="font-size:11px;color:var(--text-2);margin-top:8px;">Chaves ficam disponíveis para todos os membros em qualquer dispositivo.</p>
   </div>
-
   <div class="admin-section">
     <div class="form-section-title">Membros do grupo</div>
     <div id="members-list"><span style="color:var(--text-3);font-size:13px;">Carregando...</span></div>
@@ -324,11 +359,20 @@ td{padding:12px 14px;white-space:nowrap;color:var(--text);}
       <select id="invite-role"><option value="viewer">Viewer</option><option value="admin">Admin</option></select>
       <button class="btn-invite" onclick="inviteUser()">Convidar</button>
     </div>
-    <p style="font-size:11px;color:var(--text-2);margin-top:8px;">Use Supabase → Authentication → Invite user, depois adicione ao grupo via SQL.</p>
+    <p style="font-size:11px;color:var(--text-2);margin-top:8px;">Use Supabase → Authentication → Invite user, depois adicione via SQL.</p>
   </div>
 </div>
 
+<!-- MODAL -->
+<div id="modal-overlay" onclick="closeModal()"></div>
+<div id="modal">
+  <div class="modal-header">
+    <span class="modal-ticker" id="modal-ticker">—</span>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+  <table class="modal-table" id="modal-table"></table>
 </div>
+
 <div id="toast"></div>
 
 <script type="module">
@@ -339,12 +383,16 @@ const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
 let user=null,groupId=null,groupName=null,role=null
 let portfolios={},quotes={},usdBrl=null,usdVarPct=0,ibovPct=null
 let tickerMap={}
-let sortStates={},consolSortCol='gross',consolSortAsc=false
+let sortStates={} // {name: {col, asc, bookSectorClicks}}
+let consolSortCol='gross',consolSortAsc=false
 let chartInstance=null
 let currencyMode='original',autoRefresh=false
 let lastRefresh=null,cooldownTimer=null,elapsedTimer=null,autoRefreshTimer=null,isRefreshing=false
+let selectedPortfolios=new Set() // multi-select
 const COOLDOWN_MS=5*60*1000
 const AUTO_REFRESH_MS=10*60*1000
+const MAX_MULTI=3
+const MULTI_MIN_WIDTH=1100
 
 function safeid(s){return s.replace(/[^a-zA-Z0-9]/g,'_')}
 
@@ -364,8 +412,7 @@ async function boot(){
   window._brapiToken=mem.groups.brapi_token||''
   window._finnhubToken=mem.groups.finnhub_token||''
   document.getElementById('group-name').textContent=groupName
-  const rb=document.getElementById('role-badge')
-  rb.textContent=role;rb.className='role-badge'
+  document.getElementById('role-badge').textContent=role
   if (role==='admin'){
     document.getElementById('nav-setup').style.display='block'
     document.getElementById('admin-api-section').style.display='block'
@@ -413,9 +460,7 @@ function updateCurrencyUI(){
   document.getElementById('curr-original').classList.toggle('active',currencyMode==='original')
   document.getElementById('curr-brl').classList.toggle('active',currencyMode==='brl')
 }
-function updateAutoRefreshUI(){
-  document.getElementById('toggle-autorefresh').classList.toggle('on',autoRefresh)
-}
+function updateAutoRefreshUI(){document.getElementById('toggle-autorefresh').classList.toggle('on',autoRefresh)}
 function startAutoRefreshTimer(){
   stopAutoRefreshTimer()
   autoRefreshTimer=setInterval(()=>{if(!isRefreshing&&getRemainingCooldown()<=0)refreshAll()},AUTO_REFRESH_MS)
@@ -434,28 +479,25 @@ function getTickerConfig(ticker,currency){
 }
 async function saveTickerMapRow(ticker,source,sourceTicker){
   const existing=tickerMap[ticker]
-  if (existing){await sb.from('ticker_map').update({source,source_ticker:sourceTicker||null,updated_at:new Date().toISOString()}).eq('id',existing.id)}
-  else{await sb.from('ticker_map').insert({group_id:groupId,ticker,source,source_ticker:sourceTicker||null})}
+  if (existing) await sb.from('ticker_map').update({source,source_ticker:sourceTicker||null,updated_at:new Date().toISOString()}).eq('id',existing.id)
+  else await sb.from('ticker_map').insert({group_id:groupId,ticker,source,source_ticker:sourceTicker||null})
   await loadTickerMap()
 }
 async function resetTickerMapRow(ticker){
   const existing=tickerMap[ticker]
   if (existing) await sb.from('ticker_map').delete().eq('id',existing.id)
-  await loadTickerMap();renderTickerMap()
-  toast(`${ticker} voltou para automático`,'ok')
+  await loadTickerMap();renderTickerMap();toast(`${ticker} voltou para automático`,'ok')
 }
 function renderTickerMap(){
   const allTickers=[...new Set(Object.values(portfolios).flat().map(p=>({ticker:p.ticker,currency:p.currency}))
     .filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i))].sort((a,b)=>a.ticker.localeCompare(b.ticker))
   if (!allTickers.length){
-    document.getElementById('tmap-body').innerHTML='<tr><td colspan="6" style="color:var(--text-3);padding:20px 12px;">Nenhum ativo carregado ainda.</td></tr>'
+    document.getElementById('tmap-body').innerHTML='<tr><td colspan="6" style="color:var(--text-3);padding:16px;">Nenhum ativo carregado.</td></tr>'
     return
   }
   const isAdmin=role==='admin'
   document.getElementById('tmap-body').innerHTML=allTickers.map(({ticker,currency})=>{
-    const cfg=tickerMap[ticker]
-    const source=cfg?.source||'auto'
-    const sourceTicker=cfg?.sourceTicker||''
+    const cfg=tickerMap[ticker];const source=cfg?.source||'auto';const sourceTicker=cfg?.sourceTicker||''
     const statusBadge={
       auto:`<span class="status-badge status-auto">auto</span>`,
       brapi:`<span class="status-badge status-brapi">brapi</span>`,
@@ -463,18 +505,13 @@ function renderTickerMap(){
       ignore:`<span class="status-badge status-ignore">ignorado</span>`,
       manual:`<span class="status-badge status-manual">manual</span>`,
     }[source]||`<span class="status-badge status-auto">auto</span>`
-    const currBadge=currency==='USD'
-      ?`<span class="curr-pill curr-usd">USD</span>`
-      :`<span class="curr-pill curr-brl">BRL</span>`
+    const currBadge=currency==='USD'?`<span class="curr-pill curr-usd">USD</span>`:`<span class="curr-pill curr-brl">BRL</span>`
     if (!isAdmin){
-      const effectiveCfg=getTickerConfig(ticker,currency)
-      return `<tr><td><span class="tk">${ticker}</span></td><td>${currBadge}</td>
-        <td class="meta-cell">${effectiveCfg.source}</td>
-        <td class="meta-cell">${effectiveCfg.sourceTicker}</td>
-        <td>${statusBadge}</td><td></td></tr>`
+      const ec=getTickerConfig(ticker,currency)
+      return `<tr><td><span class="tk" style="cursor:default;text-decoration:none;">${ticker}</span></td><td>${currBadge}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td>${statusBadge}</td><td></td></tr>`
     }
-    return `<tr id="tmap-row-${safeid(ticker)}">
-      <td><span class="tk">${ticker}</span></td>
+    return `<tr>
+      <td><span class="tk" style="cursor:default;text-decoration:none;">${ticker}</span></td>
       <td>${currBadge}</td>
       <td><select class="tmap-select" id="tmap-src-${safeid(ticker)}" onchange="onTickerSourceChange('${ticker}')">
         <option value="auto" ${source==='auto'?'selected':''}>Auto</option>
@@ -483,7 +520,7 @@ function renderTickerMap(){
         <option value="ignore" ${source==='ignore'?'selected':''}>Ignorar</option>
         <option value="manual" ${source==='manual'?'selected':''}>Manual</option>
       </select></td>
-      <td><input class="tmap-input" id="tmap-sticker-${safeid(ticker)}" value="${sourceTicker}" placeholder="${ticker}" style="width:100px"
+      <td><input class="tmap-input" id="tmap-sticker-${safeid(ticker)}" value="${sourceTicker}" placeholder="${ticker}" style="width:90px"
         ${source==='ignore'||source==='manual'||source==='auto'?'disabled':''}/></td>
       <td>${statusBadge}</td>
       <td style="text-align:right">
@@ -504,33 +541,147 @@ window.saveTickerRow=async function(ticker){
   const sticker=document.getElementById('tmap-sticker-'+safeid(ticker))?.value.trim().toUpperCase()||''
   await saveTickerMapRow(ticker,src,sticker||ticker)
   await sb.from('quote_cache').delete().eq('group_id',groupId).eq('ticker',ticker)
-  delete quotes[ticker]
-  renderTickerMap();toast(`${ticker} → ${src} salvo`,'ok')
+  delete quotes[ticker];renderTickerMap();toast(`${ticker} → ${src} salvo`,'ok')
 }
 
-// ─── Tabs ──────────────────────────────────────────────────
+// ─── Tabs + Multi-select ───────────────────────────────────
 function deactivateAll(){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'))
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'))
 }
+
+function isWideScreen(){return window.innerWidth>=MULTI_MIN_WIDTH}
+
 window.switchTab=function(name,el){
   deactivateAll();el.classList.add('active')
   document.getElementById('panel-'+name).classList.add('active')
+  selectedPortfolios.clear()
   if (name==='historico') loadChart()
   if (name==='admin'){loadMembers();renderTickerMap()}
 }
 window.switchToConsolidacao=function(el){
   deactivateAll();el.classList.add('active')
   document.getElementById('panel-consolidacao').classList.add('active')
+  selectedPortfolios.clear()
+  updatePortfolioTabsUI()
 }
 window.navTo=function(name){
   deactivateAll()
   document.getElementById('panel-'+name).classList.add('active')
+  selectedPortfolios.clear()
   if (name==='admin'){loadMembers();renderTickerMap()}
 }
-function switchToPortfolio(name,el){
-  deactivateAll();el.classList.add('active')
-  document.getElementById('panel-port-'+safeid(name)).classList.add('active')
+
+function handlePortfolioTabClick(name, el){
+  if (isWideScreen()){
+    // Multi-select mode
+    if (selectedPortfolios.has(name)){
+      selectedPortfolios.delete(name)
+      if (selectedPortfolios.size===0){
+        // Nothing selected — go to consolidado
+        switchToConsolidacao(document.getElementById('tab-consolidacao'))
+        return
+      }
+    } else {
+      if (selectedPortfolios.size>=MAX_MULTI){
+        toast(`Máximo de ${MAX_MULTI} carteiras simultâneas`,'err')
+        return
+      }
+      selectedPortfolios.add(name)
+    }
+    showPortfoliosPanel()
+    updatePortfolioTabsUI()
+  } else {
+    // Single mode
+    selectedPortfolios.clear()
+    selectedPortfolios.add(name)
+    showPortfoliosPanel()
+    updatePortfolioTabsUI()
+  }
+}
+
+function showPortfoliosPanel(){
+  deactivateAll()
+  document.getElementById('panel-portfolios').classList.add('active')
+  renderPortfoliosGrid()
+}
+
+function updatePortfolioTabsUI(){
+  const tabs=document.querySelectorAll('.tab.port-tab')
+  tabs.forEach(tab=>{
+    const name=tab.dataset.portname
+    tab.classList.toggle('selected',selectedPortfolios.has(name))
+    tab.classList.remove('active')
+  })
+  // Show/hide multi hint
+  const existingHint=document.querySelector('.multi-hint')
+  if (existingHint) existingHint.remove()
+  if (isWideScreen()&&Object.keys(portfolios).length>1){
+    const hint=document.createElement('span')
+    hint.className='multi-hint'
+    hint.textContent=selectedPortfolios.size>0?`${selectedPortfolios.size} selecionada(s)`:'Clique para comparar'
+    document.getElementById('tabs-bar').insertBefore(hint,document.getElementById('tab-historico'))
+  }
+}
+
+function renderPortfoliosGrid(){
+  const names=[...selectedPortfolios]
+  const grid=document.getElementById('port-grid')
+  grid.className=`port-grid count-${names.length}`
+
+  // Show/hide shared market cards
+  const sharedCards=document.getElementById('shared-market-cards')
+  sharedCards.style.display=names.length>1?'grid':'none'
+
+  if (names.length>1) updateSharedMarketCards()
+
+  grid.innerHTML=names.map(name=>`
+    <div class="port-panel-inner" id="inner-${safeid(name)}">
+      <div class="cards-row" id="cards-${safeid(name)}">
+        <div class="card"><div class="card-lbl">Valor Gross</div><div class="card-main" id="v-gross-${safeid(name)}">—</div><div class="card-sub" id="v-net-${safeid(name)}">—</div></div>
+        <div class="card"><div class="card-lbl">Variação do Dia</div><div class="card-main" id="v-varpct-${safeid(name)}">—</div><div class="card-sub" id="v-varbrl-${safeid(name)}">—</div></div>
+        <div class="card"><div class="card-lbl">Posições</div>
+          <div class="card-counts">
+            <div class="count-row"><span class="count-lbl">Long</span><span class="count-val pos" id="v-longs-${safeid(name)}">—</span></div>
+            <div class="count-row"><span class="count-lbl">Short</span><span class="count-val neg" id="v-shorts-${safeid(name)}">—</span></div>
+            <div class="count-row"><span class="count-lbl">Total</span><span class="count-val" id="v-total-${safeid(name)}">—</span></div>
+          </div>
+        </div>
+        ${names.length===1?`
+        <div class="card"><div class="card-lbl">IBOVESPA</div><div class="card-main" id="v-ibov-pct-${safeid(name)}">—</div><div class="card-sub muted" id="v-ibov-val-${safeid(name)}">—</div></div>
+        <div class="card"><div class="card-lbl">USD / BRL</div><div class="card-main" id="v-usd-pct-${safeid(name)}">—</div><div class="card-sub muted" id="v-usd-val-${safeid(name)}">—</div></div>
+        `:''}
+      </div>
+      <div class="controls">
+        <span class="section-title">${name}</span>
+        <button class="btn-refresh" id="btn-refresh-${safeid(name)}" onclick="refreshAll()"><span>↻ Atualizar</span></button>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th onclick="sortPortfolio('${name}','ticker')">Ativo <span id="sort-${safeid(name)}-ticker"></span></th>
+          <th onclick="sortPortfolio('${name}','bookSector')" id="th-booksector-${safeid(name)}">Book · Setor <span id="sort-${safeid(name)}-bookSector"></span></th>
+          <th class="r" onclick="sortPortfolio('${name}','price')">Preço <span id="sort-${safeid(name)}-price"></span></th>
+          <th class="r" onclick="sortPortfolio('${name}','changePct')">Var. Dia <span id="sort-${safeid(name)}-changePct"></span></th>
+          <th class="r" onclick="sortPortfolio('${name}','portVar')">Var. Carteira <span id="sort-${safeid(name)}-portVar"></span></th>
+          <th class="r" onclick="sortPortfolio('${name}','weightAbs')">Peso <span id="sort-${safeid(name)}-weightAbs"></span></th>
+        </tr></thead>
+        <tbody id="tbl-${safeid(name)}"><tr><td colspan="6" style="padding:24px;color:var(--text-3);text-align:center;">Carregando...</td></tr></tbody>
+      </table></div>
+    </div>`).join('')
+
+  names.forEach(name=>renderPortfolio(name))
+}
+
+function updateSharedMarketCards(){
+  const sign=usdVarPct>=0?'+':'';const cls=usdVarPct>=0?'pos':'neg'
+  const ibovSign=ibovPct!=null?(ibovPct>=0?'+':''):'';const ibovCls=ibovPct!=null?(ibovPct>=0?'pos':'neg'):''
+  const ibovEl=document.getElementById('shared-ibov-pct')
+  const ibovVl=document.getElementById('shared-ibov-val')
+  const usdEl=document.getElementById('shared-usd-pct')
+  const usdVl=document.getElementById('shared-usd-val')
+  if (ibovEl&&ibovPct!=null){ibovEl.textContent=ibovSign+ibovPct.toFixed(2)+'%';ibovEl.className='mkt-val '+ibovCls}
+  if (usdEl){usdEl.textContent=sign+usdVarPct.toFixed(2)+'%';usdEl.className='mkt-val '+cls}
+  if (usdVl&&usdBrl) usdVl.textContent=usdBrl.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})
 }
 
 // ─── Load portfolios ───────────────────────────────────────
@@ -554,10 +705,9 @@ async function loadTodayPortfolios(){
       currency:p.currency||p.market,
       prevClose:p.prev_close,book:p.book||'—',sector:p.sector||'—'
     }))
-    sortStates[port.portfolio_name]={col:'portVar',asc:false}
+    sortStates[port.portfolio_name]={col:'portVar',asc:false,bookSectorClicks:0}
   }
   buildPortfolioTabs(Object.keys(portfolios))
-  buildPortfolioPanels(Object.keys(portfolios))
   updateChartSelector(Object.keys(portfolios))
   if (role==='admin') buildUploadZone()
   await loadCachedQuotes()
@@ -576,15 +726,11 @@ async function loadCachedQuotes(){
     if (first.usd_brl) usdBrl=first.usd_brl
     if (first.usd_var_pct!=null) usdVarPct=first.usd_var_pct
     if (first.ibov_pct!=null) ibovPct=first.ibov_pct
-    Object.keys(portfolios).forEach(name=>renderPortfolio(name))
-    renderConsolidation();updateMarketCards()
+    renderConsolidation()
+    if (selectedPortfolios.size>0) renderPortfoliosGrid()
     const age=Date.now()-new Date(first.updated_at).getTime()
     if (age>10*60*1000){refreshAll()}
-    else{
-      lastRefresh=new Date(first.updated_at).getTime()
-      startCooldownTimer();startElapsedTimer()
-      document.getElementById('live-dot').className='dot live'
-    }
+    else{lastRefresh=new Date(first.updated_at).getTime();startCooldownTimer();startElapsedTimer();document.getElementById('live-dot').className='dot live'}
   } else {refreshAll()}
 }
 
@@ -595,50 +741,31 @@ async function saveCachedQuotes(){
     updated_at:new Date().toISOString(),updated_by:user.id
   }))
   if (!rows.length) return
-  for (let i=0;i<rows.length;i+=50){
-    await sb.from('quote_cache').upsert(rows.slice(i,i+50),{onConflict:'group_id,ticker'})
-  }
+  for (let i=0;i<rows.length;i+=50) await sb.from('quote_cache').upsert(rows.slice(i,i+50),{onConflict:'group_id,ticker'})
 }
 
-// ─── Cooldown + Elapsed timer ──────────────────────────────
-function getRemainingCooldown(){
-  if (!lastRefresh) return 0
-  return Math.max(0,COOLDOWN_MS-(Date.now()-lastRefresh))
-}
-function formatCooldown(ms){
-  const s=Math.ceil(ms/1000),m=Math.floor(s/60),sec=s%60
-  return `${m}:${sec.toString().padStart(2,'0')}`
-}
-function formatElapsed(ms){
-  const s=Math.floor(ms/1000)
-  if (s<60) return `${s}s atrás`
-  const m=Math.floor(s/60)
-  if (m<60) return `${m}min atrás`
-  return `${Math.floor(m/60)}h atrás`
-}
+// ─── Cooldown / Elapsed ────────────────────────────────────
+function getRemainingCooldown(){if (!lastRefresh) return 0;return Math.max(0,COOLDOWN_MS-(Date.now()-lastRefresh))}
+function formatCooldown(ms){const s=Math.ceil(ms/1000),m=Math.floor(s/60),sec=s%60;return `${m}:${sec.toString().padStart(2,'0')}`}
+function formatElapsed(ms){const s=Math.floor(ms/1000);if(s<60)return`${s}s atrás`;const m=Math.floor(s/60);if(m<60)return`${m}min atrás`;return`${Math.floor(m/60)}h atrás`}
 function startCooldownTimer(){
   if (cooldownTimer) clearInterval(cooldownTimer)
   updateRefreshButtons()
   cooldownTimer=setInterval(()=>{updateRefreshButtons();if(getRemainingCooldown()<=0)clearInterval(cooldownTimer)},1000)
 }
-function startElapsedTimer(){
-  if (elapsedTimer) clearInterval(elapsedTimer)
-  elapsedTimer=setInterval(updateRefreshButtons,10000)
-}
+function startElapsedTimer(){if(elapsedTimer)clearInterval(elapsedTimer);elapsedTimer=setInterval(updateRefreshButtons,10000)}
 function updateRefreshButtons(){
-  const remaining=getRemainingCooldown()
-  const inCooldown=remaining>0
+  const remaining=getRemainingCooldown(),inCooldown=remaining>0
   const elapsed=lastRefresh?Date.now()-lastRefresh:null
   let label
   if (isRefreshing) label=`<span class="spin"></span> Atualizando...`
   else if (inCooldown) label=`↻ Atualizar (${formatCooldown(remaining)})`
   else if (elapsed) label=`↻ Atualizar · ${formatElapsed(elapsed)}`
   else label=`↻ Atualizar`
-
   document.querySelectorAll('.btn-refresh').forEach(btn=>{
     btn.disabled=isRefreshing||inCooldown
     const lbl=btn.querySelector('span[id^="refresh-label"]')
-    if (lbl) { lbl.innerHTML=label } else { btn.innerHTML=label }
+    if (lbl){lbl.innerHTML=label}else{btn.innerHTML=label}
   })
 }
 
@@ -649,45 +776,11 @@ function buildPortfolioTabs(names){
   names.forEach(name=>{
     const btn=document.createElement('button')
     btn.className='tab port-tab';btn.textContent=name
-    btn.onclick=function(){switchToPortfolio(name,this)}
+    btn.dataset.portname=name
+    btn.onclick=function(){handlePortfolioTabClick(name,this)}
     bar.insertBefore(btn,histTab)
   })
-}
-
-function buildPortfolioPanels(names){
-  document.getElementById('portfolio-panels').innerHTML=names.map(name=>`
-    <div class="panel" id="panel-port-${safeid(name)}">
-      <div class="cards-row" id="cards-${safeid(name)}">
-        <div class="card"><div class="card-lbl">Valor Gross</div><div class="card-main" id="v-gross-${safeid(name)}">—</div><div class="card-sub" id="v-net-${safeid(name)}">—</div></div>
-        <div class="card"><div class="card-lbl">Variação do Dia</div><div class="card-main" id="v-varpct-${safeid(name)}">—</div><div class="card-sub" id="v-varbrl-${safeid(name)}">—</div></div>
-        <div class="card"><div class="card-lbl">IBOVESPA</div><div class="card-main" id="v-ibov-pct-${safeid(name)}">—</div><div class="card-sub" id="v-ibov-val-${safeid(name)}" style="color:var(--text-2)">—</div></div>
-        <div class="card"><div class="card-lbl">USD / BRL</div><div class="card-main" id="v-usd-pct-${safeid(name)}">—</div><div class="card-sub" id="v-usd-val-${safeid(name)}" style="color:var(--text-2)">—</div></div>
-        <div class="card"><div class="card-lbl">Posições</div>
-          <div class="card-counts">
-            <div class="count-row"><span class="count-lbl">Long</span><span class="count-val pos" id="v-longs-${safeid(name)}">—</span></div>
-            <div class="count-row"><span class="count-lbl">Short</span><span class="count-val neg" id="v-shorts-${safeid(name)}">—</span></div>
-            <div class="count-row"><span class="count-lbl">Total</span><span class="count-val" id="v-total-${safeid(name)}">—</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="controls">
-        <span class="section-title">${name}</span>
-        <button class="btn-refresh" id="btn-refresh-${safeid(name)}" onclick="refreshAll()"><span>↻ Atualizar</span></button>
-      </div>
-      <div class="tbl-wrap"><table>
-        <thead><tr>
-          <th onclick="sortPortfolio('${name}','ticker')">Ativo <span id="sort-${safeid(name)}-ticker"></span></th>
-          <th onclick="sortPortfolio('${name}','bookSector')" style="color:var(--text-3)" id="th-booksector-${safeid(name)}">Book · Setor <span id="sort-${safeid(name)}-bookSector"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','qty')">Qtd <span id="sort-${safeid(name)}-qty"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','price')">Preço <span id="sort-${safeid(name)}-price"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','changePct')">Var. Dia <span id="sort-${safeid(name)}-changePct"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','portVar')">Var. Carteira <span id="sort-${safeid(name)}-portVar"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','weightAbs')">Peso <span id="sort-${safeid(name)}-weightAbs"></span></th>
-        </tr></thead>
-        <tbody id="tbl-${safeid(name)}"><tr><td colspan="7" style="padding:32px;color:var(--text-3);text-align:center;">Carregando...</td></tr></tbody>
-      </table></div>
-      <div class="last-upd" id="last-upd-${safeid(name)}"></div>
-    </div>`).join('')
+  updatePortfolioTabsUI()
 }
 
 function buildUploadZone(){
@@ -736,12 +829,11 @@ async function handleFile(file){
   }
   if (!Object.keys(byPort).length){toast('Nenhum ativo encontrado.','err');return}
   const today=new Date().toISOString().slice(0,10)
-  const {data:portsHoje}=await sb.from('portfolios')
-    .select('id,portfolio_name').eq('group_id',groupId).eq('date',today)
+  const {data:portsHoje}=await sb.from('portfolios').select('id,portfolio_name').eq('group_id',groupId).eq('date',today)
   const portsFaltando=(portsHoje||[]).filter(p=>!byPort[p.portfolio_name])
   if (portsFaltando.length>0){
     const nomes=portsFaltando.map(p=>p.portfolio_name).join('\n• ')
-    const apagar=confirm(`As seguintes carteiras já existem hoje mas não estão no novo arquivo:\n\n• ${nomes}\n\nDeseja APAGAR essas carteiras?\n\nOK = Apagar\nCancelar = Manter`)
+    const apagar=confirm(`As seguintes carteiras já existem hoje mas não estão no novo arquivo:\n\n• ${nomes}\n\nDeseja APAGAR?\n\nOK = Apagar  |  Cancelar = Manter`)
     if (apagar){
       for (const port of portsFaltando){
         await sb.from('positions').delete().eq('portfolio_id',port.id)
@@ -750,9 +842,6 @@ async function handleFile(file){
       }
       await sb.from('quote_cache').delete().eq('group_id',groupId)
       toast(`${portsFaltando.length} carteira(s) removida(s)`,'ok')
-      buildPortfolioTabs(Object.keys(portfolios))
-      buildPortfolioPanels(Object.keys(portfolios))
-      updateChartSelector(Object.keys(portfolios))
     } else {toast(`${portsFaltando.length} carteira(s) mantida(s)`,'ok')}
   }
   let totalItems=0
@@ -768,12 +857,12 @@ async function handleFile(file){
     })))
     if (insErr){toast('Erro ao salvar '+portName+': '+insErr.message,'err');continue}
     portfolios[portName]=items
-    sortStates[portName]={col:'portVar',asc:false}
+    sortStates[portName]={col:'portVar',asc:false,bookSectorClicks:0}
     totalItems+=items.length
   }
   toast(`${totalItems} ativos em ${Object.keys(byPort).length} carteiras`,'ok')
+  selectedPortfolios.clear()
   buildPortfolioTabs(Object.keys(portfolios))
-  buildPortfolioPanels(Object.keys(portfolios))
   updateChartSelector(Object.keys(portfolios))
   lastRefresh=null
   await refreshAll()
@@ -848,29 +937,34 @@ window.refreshAll=async function(){
   const finnhubExtra=brlTickers.filter(t=>{const cfg=getTickerConfig(t,'BRL');return cfg.source==='finnhub'})
   await Promise.all([fetchUsdBrl(),fetchIbov(),fetchBrapi([...brlTickers,...brapiExtra]),fetchFinnhub([...usdTickers,...finnhubExtra])])
   await saveCachedQuotes()
-  Object.keys(portfolios).forEach(name=>renderPortfolio(name))
-  renderConsolidation();updateMarketCards()
+  renderConsolidation()
+  if (selectedPortfolios.size>0) renderPortfoliosGrid()
+  if (selectedPortfolios.size===1){
+    // Update single portfolio cards including market cards
+    const name=[...selectedPortfolios][0]
+    const sid=safeid(name)
+    const sign=usdVarPct>=0?'+':'';const cls=usdVarPct>=0?'pos':'neg'
+    const ibovSign=ibovPct!=null?(ibovPct>=0?'+':''):'';const ibovCls=ibovPct!=null?(ibovPct>=0?'pos':'neg'):''
+    const usdEl=document.getElementById('v-usd-pct-'+sid)
+    const uvl=document.getElementById('v-usd-val-'+sid)
+    const iel=document.getElementById('v-ibov-pct-'+sid)
+    if (usdEl){usdEl.textContent=sign+usdVarPct.toFixed(2)+'%';usdEl.className='card-main '+cls}
+    if (uvl&&usdBrl) uvl.textContent=usdBrl.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})
+    if (iel&&ibovPct!=null){iel.textContent=ibovSign+ibovPct.toFixed(2)+'%';iel.className='card-main '+ibovCls}
+  } else if (selectedPortfolios.size>1){
+    updateSharedMarketCards()
+  }
   await saveSnapshots()
   lastRefresh=Date.now();isRefreshing=false
   document.getElementById('live-dot').className='dot live'
   startCooldownTimer();startElapsedTimer()
+  if (lastRefresh){
+    const lu=document.getElementById('last-upd-shared')
+    if (lu) lu.textContent='Atualizado às '+new Date(lastRefresh).toLocaleTimeString('pt-BR')
+  }
 }
 
-function updateMarketCards(){
-  const usdSign=usdVarPct>=0?'+':'';const usdCls=usdVarPct>=0?'pos':'neg'
-  const ibovSign=ibovPct!=null?(ibovPct>=0?'+':''):'';const ibovCls=ibovPct!=null?(ibovPct>=0?'pos':'neg'):''
-  Object.keys(portfolios).forEach(name=>{
-    const sid=safeid(name)
-    const uel=document.getElementById('v-usd-pct-'+sid)
-    const uvl=document.getElementById('v-usd-val-'+sid)
-    const iel=document.getElementById('v-ibov-pct-'+sid)
-    if (uel){uel.textContent=usdSign+usdVarPct.toFixed(2)+'%';uel.className='card-main '+usdCls}
-    if (uvl&&usdBrl) uvl.textContent=usdBrl.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})
-    if (iel&&ibovPct!=null){iel.textContent=ibovSign+ibovPct.toFixed(2)+'%';iel.className='card-main '+ibovCls}
-  })
-}
-
-// ─── Compute row variation ─────────────────────────────────
+// ─── Compute rows ──────────────────────────────────────────
 function computeRowVar(p){
   const q=quotes[p.ticker]
   const isUSD=p.currency==='USD'
@@ -881,7 +975,7 @@ function computeRowVar(p){
       const price=p.prevClose*(isUSD?usdNow:1)
       return {price,valueBrl:price*p.qty,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:true,isIgnored:true}
     }
-    return {price:0,valueBrl:0,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:false,isIgnored:q.msg==='ignorado'||q.msg==='ignore'}
+    return {price:0,valueBrl:0,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:false,isIgnored:true}
   }
   if (!q||q.error){
     if (p.prevClose!=null&&p.prevClose>0){
@@ -904,9 +998,7 @@ function computeRowVar(p){
     return {price:priceBrl,valueBrl,varBrl,varPct:q.changePct,hasQuote:true,hasPrevClose:false,isUSD:true}
   }
 }
-
 function computeRows(name){return (portfolios[name]||[]).map(p=>({...p,...computeRowVar(p)}))}
-
 function computeSummary(rows){
   let gross=0,net=0,totalVarBrl=0
   rows.forEach(r=>{gross+=Math.abs(r.valueBrl);net+=r.valueBrl;totalVarBrl+=r.varBrl})
@@ -921,38 +1013,44 @@ function renderPortfolio(name){
   const rows=computeRows(name)
   const {gross,net,varPct,varBrl,grossOntem}=computeSummary(rows)
 
-  document.getElementById('v-gross-'+sid).textContent=fmtBrl(gross)
+  const vgEl=document.getElementById('v-gross-'+sid)
+  if (vgEl) vgEl.textContent=fmtBrl(gross)
   const ne=document.getElementById('v-net-'+sid)
-  ne.textContent='Net '+fmtBrl(net);ne.className='card-sub '+(net>=0?'muted':'neg')
+  if (ne){ne.textContent='Net '+fmtBrl(net);ne.className='card-sub '+(net>=0?'muted':'neg')}
   const vp=document.getElementById('v-varpct-'+sid)
-  vp.textContent=(varPct>=0?'+':'')+varPct.toFixed(2)+'%';vp.className='card-main '+(varPct>=0?'pos':'neg')
+  if (vp){vp.textContent=(varPct>=0?'+':'')+varPct.toFixed(2)+'%';vp.className='card-main '+(varPct>=0?'pos':'neg')}
   const vb=document.getElementById('v-varbrl-'+sid)
-  vb.textContent=(varBrl>=0?'+':'')+fmtBrl(varBrl);vb.className='card-sub '+(varBrl>=0?'pos':'neg')
-  document.getElementById('v-longs-'+sid).textContent=rows.filter(r=>r.qty>0).length
-  document.getElementById('v-shorts-'+sid).textContent=rows.filter(r=>r.qty<0).length
-  document.getElementById('v-total-'+sid).textContent=rows.length
+  if (vb){vb.textContent=(varBrl>=0?'+':'')+fmtBrl(varBrl);vb.className='card-sub '+(varBrl>=0?'pos':'neg')}
+  const lg=document.getElementById('v-longs-'+sid)
+  const sh=document.getElementById('v-shorts-'+sid)
+  const tot=document.getElementById('v-total-'+sid)
+  if (lg) lg.textContent=rows.filter(r=>r.qty>0).length
+  if (sh) sh.textContent=rows.filter(r=>r.qty<0).length
+  if (tot) tot.textContent=rows.length
 
-  const ss=sortStates[name]||{col:'portVar',asc:false}
+  const ss=sortStates[name]||{col:'portVar',asc:false,bookSectorClicks:0}
   const sorted=[...rows].map(r=>({...r,
     weightAbs:gross>0?Math.abs(r.valueBrl)/gross:0,
     portVar:grossOntem>0?r.varBrl/grossOntem:0
   })).sort((a,b)=>{
     if (ss.col==='weightAbs') return ss.asc?a.weightAbs-b.weightAbs:b.weightAbs-a.weightAbs
     if (ss.col==='portVar') return ss.asc?a.portVar-b.portVar:b.portVar-a.portVar
-    if (['ticker','book','sector','bookSector'].includes(ss.col)){
-      let col=ss.col
-      if (ss.col==='bookSector'){
-        // Alterna entre book e sector a cada dois cliques
-        const clicks=sortStates[name]._bookSectorClicks||0
-        col=clicks%4<2?'book':'sector'
-      }
-      const av=String(a[col]||''),bv=String(b[col]||'')
+    if (ss.col==='bookSector'){
+      const clicks=ss.bookSectorClicks||0
+      const sortField=clicks%4<2?'book':'sector'
+      const av=String(a[sortField]||''),bv=String(b[sortField]||'')
+      return ss.asc?av.localeCompare(bv):bv.localeCompare(av)
+    }
+    if (['ticker','book','sector'].includes(ss.col)){
+      const av=String(a[ss.col]||''),bv=String(b[ss.col]||'')
       return ss.asc?av.localeCompare(bv):bv.localeCompare(av)
     }
     const av=a[ss.col]||0,bv=b[ss.col]||0;return ss.asc?av-bv:bv-av
   })
 
-  document.getElementById('tbl-'+sid).innerHTML=sorted.map(row=>{
+  const tbody=document.getElementById('tbl-'+sid)
+  if (!tbody) return
+  tbody.innerHTML=sorted.map(row=>{
     const {ticker,qty,currency,book,sector,price,valueBrl,varPct,hasQuote,hasPrevClose,isIgnored,isUSD,portVar,weightAbs}=row
     const isPos=varPct>=0
     const q=quotes[ticker]
@@ -981,13 +1079,14 @@ function renderPortfolio(name){
     const portVarCell=grossOntem>0
       ?`<span class="${portVarPct>=0?'var-pos':'var-neg'}">${portVarPct>=0?'+':''}${portVarPct.toFixed(2)}%</span>`
       :`<span class="var-zero">—</span>`
-
     const weightPct=weightAbs*100
     const barColor=qty<0?'var(--red)':(isPos?'var(--green)':'var(--red)')
+
     return `<tr>
-      <td><span class="curr-pill ${currency==='USD'?'curr-usd':'curr-brl'}">${currency}</span><span class="tk">${ticker}</span></td>
+      <td onclick="openTickerModal('${ticker}','${name}')" style="cursor:pointer;">
+        <span class="curr-pill ${currency==='USD'?'curr-usd':'curr-brl'}">${currency}</span><span class="tk">${ticker}</span>
+      </td>
       <td class="meta-cell">${book||'—'} · ${sector||'—'}</td>
-      <td class="r num" style="${qty<0?'color:var(--red)':''}">${qty.toLocaleString('pt-BR')}</td>
       <td class="r num">${priceCell}</td>
       <td class="r">${varCell}</td>
       <td class="r">${portVarCell}</td>
@@ -995,27 +1094,57 @@ function renderPortfolio(name){
         <div class="bar"><div class="bar-fill" style="width:${Math.min(weightPct*2,100)}%;background:${barColor}"></div></div></div></td>
     </tr>`
   }).join('')
-
-  const lu=document.getElementById('last-upd-'+sid)
-  if (lu&&lastRefresh) lu.textContent='Atualizado às '+new Date(lastRefresh).toLocaleTimeString('pt-BR')
 }
 
 window.sortPortfolio=function(name,col){
-  const ss=sortStates[name]||{col:'portVar',asc:false}
-  sortStates[name]={col,asc:ss.col===col?!ss.asc:false}
+  const ss=sortStates[name]||{col:'portVar',asc:false,bookSectorClicks:0}
+  const newAsc=ss.col===col?!ss.asc:false
+  const newClicks=col==='bookSector'?(ss.bookSectorClicks||0)+1:ss.bookSectorClicks||0
+  sortStates[name]={col,asc:newAsc,bookSectorClicks:newClicks}
+
+  // Update Book·Setor header label
   if (col==='bookSector'){
-    const prev=sortStates[name]._bookSectorClicks||0
-    sortStates[name]._bookSectorClicks=prev+1
-    const isBook=(prev+1)%4<2
+    const isBook=newClicks%4<2
     const th=document.getElementById('th-booksector-'+safeid(name))
-    if (th) th.childNodes[0].textContent=isBook?'Book · Setor ':'Setor · Book '
+    if (th){
+      const span=document.getElementById('sort-'+safeid(name)+'-bookSector')
+      th.childNodes[0].textContent=(isBook?'Book · Setor ':'Setor · Book ')
+    }
   }
   const sid=safeid(name)
   document.querySelectorAll(`[id^="sort-${sid}-"]`).forEach(el=>el.textContent='')
   const arrow=document.getElementById(`sort-${sid}-${col}`)
-  if (arrow) arrow.textContent=sortStates[name].asc?' ↑':' ↓'
+  if (arrow) arrow.textContent=newAsc?' ↑':' ↓'
   renderPortfolio(name)
 }
+
+// ─── Ticker Modal ──────────────────────────────────────────
+window.openTickerModal=function(ticker,currentPortfolio){
+  const rows=Object.entries(portfolios).map(([portName,positions])=>{
+    const pos=positions.find(p=>p.ticker===ticker)
+    return {portName,qty:pos?pos.qty:null}
+  }).filter(r=>r.qty!==null)
+  if (rows.length===0) return
+  const total=rows.reduce((s,r)=>s+r.qty,0)
+  document.getElementById('modal-ticker').textContent=ticker
+  document.getElementById('modal-table').innerHTML=
+    rows.map(r=>`
+      <tr class="${r.portName===currentPortfolio?'current-port':'other-port'}">
+        <td style="padding:10px 0;">${r.portName}</td>
+        <td style="padding:10px 0;text-align:right;font-variant-numeric:tabular-nums;">${r.qty.toLocaleString('pt-BR')}</td>
+      </tr>`).join('')+
+    (rows.length>1?`<tr style="border-top:2px solid var(--border);font-weight:600;">
+      <td style="padding:12px 0;">Total</td>
+      <td style="padding:12px 0;text-align:right;font-variant-numeric:tabular-nums;">${total.toLocaleString('pt-BR')}</td>
+    </tr>`:'')
+  document.getElementById('modal').style.display='block'
+  document.getElementById('modal-overlay').style.display='block'
+}
+window.closeModal=function(){
+  document.getElementById('modal').style.display='none'
+  document.getElementById('modal-overlay').style.display='none'
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal()})
 
 // ─── Consolidation ─────────────────────────────────────────
 function renderConsolidation(){
@@ -1037,7 +1166,7 @@ function renderConsolidation(){
       const vs=ibovPct!=null?r.varPct-ibovPct:null
       const vsStr=vs!=null?`<span class="${vs>=0?'var-pos':'var-neg'}">${vs>=0?'+':''}${vs.toFixed(2)}%</span>`:'—'
       return `<tr>
-        <td><span class="tk">${r.name}</span></td>
+        <td><span class="tk" style="cursor:default;text-decoration:none;">${r.name}</span></td>
         <td class="r num">${fmtBrl(r.gross)}</td>
         <td class="r num" style="${r.net<0?'color:var(--red)':''}">${fmtBrl(r.net)}</td>
         <td class="r"><span class="${r.varPct>=0?'var-pos':'var-neg'}">${r.varPct>=0?'+':''}${r.varPct.toFixed(2)}%</span></td>
@@ -1047,7 +1176,7 @@ function renderConsolidation(){
       </tr>`
     }).join('')+
     `<tr class="total-row">
-      <td><span class="tk">Total</span></td>
+      <td>Total</td>
       <td class="r num">${fmtBrl(tG)}</td>
       <td class="r num" style="${tN<0?'color:var(--red)':''}">${fmtBrl(tN)}</td>
       <td class="r"><span class="${tP>=0?'var-pos':'var-neg'}">${tP>=0?'+':''}${tP.toFixed(2)}%</span></td>
@@ -1056,7 +1185,6 @@ function renderConsolidation(){
       <td class="r">${ibovStr}</td>
     </tr>`
 }
-
 window.consolSort=function(col){
   consolSortAsc=consolSortCol===col?!consolSortAsc:false;consolSortCol=col
   document.querySelectorAll('[id^="csort-"]').forEach(el=>el.textContent='')
