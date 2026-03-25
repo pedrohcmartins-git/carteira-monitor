@@ -946,7 +946,7 @@ function renderPortfolio(name){
       <td class="r num">${priceCell}</td>
       <td class="r">${varCell}</td>
       <td class="r">${portVarCell}</td>
-      <td class="r"><div class="bar-wrap"><span class="num ${qty<0?'neg':''}">${qty<0?'−':''}${weightPct.toFixed(1)}%</span>
+      <td class="r"><div class="bar-wrap"><span class="num ${weightPct<0?'neg':''}">${weightPct>=0?'':'-'}${Math.abs(weightPct).toFixed(1)}%</span>
         <div class="bar"><div class="bar-fill" style="width:${Math.min(weightPct*2,100)}%;background:${barColor}"></div></div></div></td>
     </tr>`
   }).join('')
