@@ -879,10 +879,16 @@ function computeRowVar(p){
 }
 function computeRows(name){return(portfolios[name]||[]).map(p=>({...p,...computeRowVar(p)}))}
 function computeSummary(rows){
-  let gross=0,net=0,totalVarBrl=0,grossOntem=0
-  rows.forEach(r=>{gross+=Math.abs(r.valueBrl);net+=r.valueBrl;totalVarBrl+=r.varBrl;grossOntem+=Math.abs(r.valueBrlOntem||0)})
-  const denom=grossOntem>0?grossOntem:gross
-  return{gross,net,varPct:denom>0?(totalVarBrl/denom)*100:0,varBrl:totalVarBrl,grossOntem:denom}
+  let gross=0,net=0,totalVarBrl=0,grossOntem=0,netOntem=0
+  rows.forEach(r=>{
+    gross+=Math.abs(r.valueBrl)
+    net+=r.valueBrl
+    totalVarBrl+=r.varBrl
+    grossOntem+=Math.abs(r.valueBrlOntem||0)
+    netOntem+=(r.valueBrlOntem||0)
+  })
+  const denom=netOntem!==0?netOntem:net
+  return{gross,net,varPct:denom!==0?(totalVarBrl/denom)*100:0,varBrl:totalVarBrl,grossOntem,netOntem:denom}
 }
 
 // ─── Render portfolio ──────────────────────────────────────
@@ -900,8 +906,8 @@ function renderPortfolio(name){
 
   const ss=sortStates[name]||{col:'portVar',asc:false,bookSectorClicks:0}
   const sorted=[...rows].map(r=>({...r,
-    weightAbs:gross>0?Math.abs(r.valueBrl)/gross:0,
-    portVar:grossOntem>0?r.varBrl/grossOntem:0
+    weightAbs:netOntem!==0?r.valueBrl/netOntem:0,
+    portVar:netOntem!==0?r.varBrl/netOntem:0
   })).sort((a,b)=>{
     if(ss.col==='weightAbs')return ss.asc?a.weightAbs-b.weightAbs:b.weightAbs-a.weightAbs
     if(ss.col==='portVar')return ss.asc?a.portVar-b.portVar:b.portVar-a.portVar
