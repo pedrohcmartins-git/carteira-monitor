@@ -858,22 +858,20 @@ function computeRowVar(p){
   const usdNow=usdBrl||5.8
   const usdYest=usdNow/(1+(usdVarPct/100)||1)
   if(q&&(q.msg==='ignorado'||q.msg==='ignore'||q.msg==='manual')){
-      if(p.prevClose!=null&&p.prevClose>0){const price=p.prevClose*(isUSD?usdNow:1);const prevBrl=p.prevClose*(isUSD?usdYest:1);return{price,valueBrl:price*p.qty,valueBrlOntem:prevBrl*Math.abs(p.qty),varBrl:0,varPct:0,hasQuote:false,hasPrevClose:true,isIgnored:true}}
+      if(p.prevClose!=null&&p.prevClose>0){const price=p.prevClose*(isUSD?usdNow:1);const prevBrl=p.prevClose*(isUSD?usdYest:1);return{price,valueBrl:price*p.qty,valueBrlOntem:prevBrl*p.qty,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:true,isIgnored:true}}
       return{price:0,valueBrl:0,valueBrlOntem:0,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:false,isIgnored:true}
   }
   if(!q||q.error){
-    if(p.prevClose!=null&&p.prevClose>0){const price=p.prevClose*(isUSD?usdNow:1);return{price,valueBrl:price*p.qty,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:true}}
-    return{price:0,valueBrl:0,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:false}
+    if(p.prevClose!=null&&p.prevClose>0){const price=p.prevClose*(isUSD?usdNow:1);const prevBrl=p.prevClose*(isUSD?usdYest:1);return{price,valueBrl:price*p.qty,valueBrlOntem:prevBrl*p.qty,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:true}}
+    return{price:0,valueBrl:0,valueBrlOntem:0,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:false}
   }
   if(!isUSD){
-    return{price:q.price,valueBrl:q.price*p.qty,
-      valueBrlOntem:p.prevClose*p.qty,  // ← adicionar
-      varBrl:q.change*p.qty,varPct:q.changePct,hasQuote:true,hasPrevClose:false}
+    return{price:q.price,valueBrl:q.price*p.qty,valueBrlOntem:p.prevClose*p.qty,varBrl:q.change*p.qty,varPct:q.changePct,hasQuote:true,hasPrevClose:false}
   }
   const priceBrl=q.price*usdNow;const valueBrl=priceBrl*p.qty
   const priceYestUsd=q.price-q.change;const varBrl=(priceBrl-priceYestUsd*usdYest)*p.qty
   const varPctBrl=((1+q.changePct/100)*(1+usdVarPct/100)-1)*100
-  const valueBrlOntemUSD=(q.price-q.change)*Math.abs(p.qty)*usdYest
+  const valueBrlOntemUSD=(q.price-q.change)*p.qty*usdYest
   if(currencyMode==='brl')return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:varPctBrl,hasQuote:true,hasPrevClose:false,isUSD:true}
   return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:q.changePct,hasQuote:true,hasPrevClose:false,isUSD:true}
 }
