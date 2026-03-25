@@ -895,7 +895,7 @@ function computeSummary(rows){
 function renderPortfolio(name){
   const sid=safeid(name)
   const rows=computeRows(name)
-  const {gross,net,varPct,varBrl,grossOntem}=computeSummary(rows)
+  const {gross,net,varPct,varBrl,grossOntem,netOntem}=computeSummary(rows)
   const vgEl=document.getElementById('v-gross-'+sid);if(vgEl)vgEl.textContent=fmtBrl(gross)
   const ne=document.getElementById('v-net-'+sid);if(ne){ne.textContent='Net '+fmtBrl(net);ne.className='card-sub '+(net>=0?'muted':'neg')}
   const vp=document.getElementById('v-varpct-'+sid);if(vp){vp.textContent=(varPct>=0?'+':'')+varPct.toFixed(2)+'%';vp.className='card-main '+(varPct>=0?'pos':'neg')}
