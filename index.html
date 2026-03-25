@@ -858,25 +858,30 @@ function computeRowVar(p){
   const usdNow=usdBrl||5.8
   const usdYest=usdNow/(1+(usdVarPct/100)||1)
   if(q&&(q.msg==='ignorado'||q.msg==='ignore'||q.msg==='manual')){
-    if(p.prevClose!=null&&p.prevClose>0){const price=p.prevClose*(isUSD?usdNow:1);return{price,valueBrl:price*p.qty,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:true,isIgnored:true}}
-    return{price:0,valueBrl:0,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:false,isIgnored:true}
+      if(p.prevClose!=null&&p.prevClose>0){const price=p.prevClose*(isUSD?usdNow:1);const prevBrl=p.prevClose*(isUSD?usdYest:1);return{price,valueBrl:price*p.qty,valueBrlOntem:prevBrl*Math.abs(p.qty),varBrl:0,varPct:0,hasQuote:false,hasPrevClose:true,isIgnored:true}}
+      return{price:0,valueBrl:0,valueBrlOntem:0,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:false,isIgnored:true}
   }
   if(!q||q.error){
     if(p.prevClose!=null&&p.prevClose>0){const price=p.prevClose*(isUSD?usdNow:1);return{price,valueBrl:price*p.qty,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:true}}
     return{price:0,valueBrl:0,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:false}
   }
-  if(!isUSD) return{price:q.price,valueBrl:q.price*p.qty,varBrl:q.change*p.qty,varPct:q.changePct,hasQuote:true,hasPrevClose:false}
+  if(!isUSD){
+    return{price:q.price,valueBrl:q.price*p.qty,
+      valueBrlOntem:p.prevClose*p.qty,  // ← adicionar
+      varBrl:q.change*p.qty,varPct:q.changePct,hasQuote:true,hasPrevClose:false}
+  }
   const priceBrl=q.price*usdNow;const valueBrl=priceBrl*p.qty
   const priceYestUsd=q.price-q.change;const varBrl=(priceBrl-priceYestUsd*usdYest)*p.qty
   const varPctBrl=((1+q.changePct/100)*(1+usdVarPct/100)-1)*100
-  if(currencyMode==='brl')return{price:priceBrl,valueBrl,varBrl,varPct:varPctBrl,hasQuote:true,hasPrevClose:false,isUSD:true}
-  return{price:priceBrl,valueBrl,varBrl,varPct:q.changePct,hasQuote:true,hasPrevClose:false,isUSD:true}
+  const valueBrlOntemUSD=(q.price-q.change)*Math.abs(p.qty)*usdYest
+  if(currencyMode==='brl')return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:varPctBrl,hasQuote:true,hasPrevClose:false,isUSD:true}
+  return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:q.changePct,hasQuote:true,hasPrevClose:false,isUSD:true}
 }
 function computeRows(name){return(portfolios[name]||[]).map(p=>({...p,...computeRowVar(p)}))}
 function computeSummary(rows){
-  let gross=0,net=0,totalVarBrl=0
-  rows.forEach(r=>{gross+=Math.abs(r.valueBrl);net+=r.valueBrl;totalVarBrl+=r.varBrl})
-  const grossOntem=gross-totalVarBrl;const denom=grossOntem>0?grossOntem:gross
+  let gross=0,net=0,totalVarBrl=0,grossOntem=0
+  rows.forEach(r=>{gross+=Math.abs(r.valueBrl);net+=r.valueBrl;totalVarBrl+=r.varBrl;grossOntem+=Math.abs(r.valueBrlOntem||0)})
+  const denom=grossOntem>0?grossOntem:gross
   return{gross,net,varPct:denom>0?(totalVarBrl/denom)*100:0,varBrl:totalVarBrl,grossOntem:denom}
 }
 
