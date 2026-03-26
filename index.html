@@ -1007,20 +1007,24 @@ window.sortPortfolio=function(name,col){
   const newAsc=ss.col===col?!ss.asc:false
   const newClicks=col==='bookSector'?(ss.bookSectorClicks||0)+1:ss.bookSectorClicks||0
   sortStates[name]={col,asc:newAsc,bookSectorClicks:newClicks}
+
+  const sid=safeid(name)
+  document.querySelectorAll(`[id^="sort-${sid}-"]`).forEach(el=>el.textContent='')
+
   if(col==='bookSector'){
     const isBook=newClicks%4<2
-    const th=document.getElementById('th-booksector-'+safeid(name))
+    const th=document.getElementById('th-booksector-'+sid)
     const arrow=newAsc?' ↑':' ↓'
     if(th){
       th.innerHTML=isBook
-        ?`${arrow} Book · Setor <span id="sort-${safeid(name)}-bookSector"></span>`
-        :`Book · Setor ${arrow} <span id="sort-${safeid(name)}-bookSector"></span>`
+        ?`<span id="sort-${sid}-bookSector">${arrow}</span> Book · Setor`
+        :`Book · Setor <span id="sort-${sid}-bookSector">${arrow}</span>`
     }
+  } else {
+    const arrow=document.getElementById(`sort-${sid}-${col}`)
+    if(arrow)arrow.textContent=newAsc?' ↑':' ↓'
   }
-  const sid=safeid(name)
-  document.querySelectorAll(`[id^="sort-${sid}-"]`).forEach(el=>el.textContent='')
-  const arrow=document.getElementById(`sort-${sid}-${col}`)
-  if(arrow)arrow.textContent=newAsc?' ↑':' ↓'
+
   renderPortfolio(name)
 }
 
