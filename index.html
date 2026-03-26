@@ -317,7 +317,8 @@ function updatePriceColumnTitles(){
 }
 
 async function boot(){
-  const{data:{session}}=await sb.auth.getSession()
+  const{data:{session},error:sessionError}=await sb.auth.getSession()
+  if(sessionError||!session){toast('Sessão expirada, faça login novamente.','err');return}
   if(!session){window.location.href='./login.html';return}
   user=session.user
   const{data:mem}=await sb.from('group_members').select('group_id,role,groups(name,brapi_token,finnhub_token)').eq('user_id',user.id).single()
@@ -875,6 +876,7 @@ window.inviteUser=async function(){
       method:'POST',
       headers:{
         'Content-Type':'application/json',
+        console.log('token:', session?.access_token?.substring(0,20))
         'Authorization':`Bearer ${session.access_token}`,
         'apikey':SUPABASE_ANON_KEY
       },
