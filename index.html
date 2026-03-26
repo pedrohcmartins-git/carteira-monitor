@@ -869,11 +869,16 @@ window.inviteUser=async function(){
   btn.textContent='enviando...';btn.disabled=true
   try{
     const{data:{session}}=await sb.auth.getSession()
-    const supabaseUrl=SUPABASE_URL
-    const res=await fetch(`${supabaseUrl}/functions/v1/invite-member`,{
+    const body=JSON.stringify({email,role,group_id:groupId})
+    const url=`${SUPABASE_URL}/functions/v1/invite-member`.replace(/\/$/,'')
+    const res=await fetch(url,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},
-      body:JSON.stringify({email,role,group_id:groupId})
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${session.access_token}`,
+        'apikey':SUPABASE_ANON_KEY
+      },
+      body
     })
     const d=await res.json()
     if(d.error)throw new Error(d.error)
