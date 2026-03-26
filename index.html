@@ -1010,7 +1010,12 @@ window.sortPortfolio=function(name,col){
   if(col==='bookSector'){
     const isBook=newClicks%4<2
     const th=document.getElementById('th-booksector-'+safeid(name))
-    if(th)th.childNodes[0].textContent=(isBook?'Book · Setor ':'Setor · Book ')
+    const arrow=newAsc?' ↑':' ↓'
+    if(th){
+      th.innerHTML=isBook
+        ?`${arrow} Book · Setor <span id="sort-${safeid(name)}-bookSector"></span>`
+        :`Book · Setor ${arrow} <span id="sort-${safeid(name)}-bookSector"></span>`
+    }
   }
   const sid=safeid(name)
   document.querySelectorAll(`[id^="sort-${sid}-"]`).forEach(el=>el.textContent='')
