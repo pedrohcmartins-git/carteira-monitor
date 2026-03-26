@@ -431,6 +431,15 @@ function updateCurrencyUI(){
   document.getElementById('curr-original').classList.toggle('active',currencyMode==='original')
   document.getElementById('curr-brl').classList.toggle('active',currencyMode==='brl')
 }
+Object.keys(portfolios).forEach(name=>{
+  const th=document.getElementById('th-price-'+safeid(name))
+  if(th){
+    const span=th.querySelector('span')
+    th.innerHTML=`Preço [${mode==='brl'?'R$':'R$|U$'}] `
+    th.appendChild(span)
+    th.setAttribute('onclick',`sortPortfolio('${name}','price')`)
+  }
+})
 function updateAutoRefreshUI(){document.getElementById('toggle-autorefresh').classList.toggle('on',autoRefresh)}
 function startAutoRefreshTimer(){stopAutoRefreshTimer();autoRefreshTimer=setInterval(()=>{if(!isRefreshing&&getRemainingCooldown()<=0)refreshAll()},AUTO_REFRESH_MS)}
 function stopAutoRefreshTimer(){if(autoRefreshTimer)clearInterval(autoRefreshTimer);autoRefreshTimer=null}
@@ -573,7 +582,7 @@ function renderPortfoliosGrid(){
         <thead><tr>
           <th class="sticky" onclick="sortPortfolio('${name}','ticker')">Ativo <span id="sort-${safeid(name)}-ticker"></span></th>
           <th onclick="sortPortfolio('${name}','bookSector')" id="th-booksector-${safeid(name)}">Book · Setor <span id="sort-${safeid(name)}-bookSector"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','price')">Preço [R$] <span id="sort-${safeid(name)}-price"></span></th>
+          <th class="r" onclick="sortPortfolio('${name}','price')" id="th-price-${safeid(name)}">Preço [R$] <span id="sort-${safeid(name)}-price"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','changePct')">P&L Dia <span id="sort-${safeid(name)}-changePct"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','portVar')">P&L Carteira <span id="sort-${safeid(name)}-portVar"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','weightAbs')">Peso <span id="sort-${safeid(name)}-weightAbs"></span></th>
