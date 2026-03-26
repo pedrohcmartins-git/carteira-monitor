@@ -271,7 +271,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
     <button class="modal-close" onclick="closeModal()">✕</button>
   </div>
   <table class="modal-table">
-    <thead><tr><th>Carteira</th><th class="r">Quantidade</th><th class="r">Peso</th></tr></thead>
+    <thead id="modal-thead"><tr><th>Carteira</th><th class="r">Quantidade</th><th class="r">Peso</th></tr></thead>
     <tbody id="modal-body"></tbody>
   </table>
 </div>
@@ -730,7 +730,7 @@ function renderBookSummary(name,rows,netOntem){
   wrap.innerHTML=`<div class="tbl-wrap"><div class="tbl-scroll"><table>
     <thead><tr><th>Book</th><th class="r">P&L Dia</th><th class="r">P&L Carteira</th><th class="r">Peso</th></tr></thead>
     <tbody>${bookList.map(r=>`<tr>
-      <td style="font-weight:500">${r.book}</td>
+      <td style="font-weight:500;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="openBookModal('${r.book}','${name}')">${r.book}</td>
       <td class="r"><span class="${r.pnlDia>=0?'var-pos':'var-neg'}">${fmtPct(r.pnlDia)}</span></td>
       <td class="r"><span class="${r.portVarPct>=0?'var-pos':'var-neg'}">${fmtPct(r.portVarPct)}</span></td>
       <td class="r"><div class="bar-wrap"><span class="num ${r.weightPct<0?'neg':''}">${r.weightPct<0?'−':''}${Math.abs(r.weightPct).toFixed(1)}%</span>
@@ -755,6 +755,7 @@ window.sortPortfolio=function(name,col){
 }
 
 window.openTickerModal=function(ticker,currentPortfolio){
+  document.getElementById('modal-thead').innerHTML='<tr><th>Carteira</th><th class="r">Quantidade</th><th class="r">Peso</th></tr>'
   const portRows=Object.entries(portfolios).map(([portName,positions])=>{
     const pos=positions.find(p=>p.ticker===ticker);if(!pos)return null
     const rows=computeRows(portName);const{netOntem}=computeSummary(rows)
@@ -865,6 +866,37 @@ window.saveApiKeys=async function(){
 }
 window.doLogout=async function(){await sb.auth.signOut();window.location.href='./login.html'}
 window.toast=function(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',3200)}
+  
+window.openBookModal=function(book,portName){
+  const rows=computeRows(portName)
+  const{netOntem}=computeSummary(rows)
+  const bookRows=[...rows]
+    .filter(r=>r.book===book)
+    .map(r=>({...r,weightAbs:netOntem!==0?r.valueBrlOntem/netOntem:0,portVar:netOntem!==0?r.varBrl/netOntem:0}))
+    .sort((a,b)=>Math.abs(b.weightAbs)-Math.abs(a.weightAbs))
+  document.getElementById('modal-ticker').textContent=book
+  document.getElementById('modal-thead').innerHTML=
+  '<tr><th>Ativo</th><th class="r">Preço</th><th class="r">P&L Dia</th><th class="r">P&L Carteira</th><th class="r">Peso</th></tr>'
+  document.getElementById('modal-body').innerHTML=bookRows.map(r=>{
+    const isUSD=r.currency==='USD'
+    const weightPct=r.weightAbs*100
+    const portVarPct=r.portVar*100
+    const q=quotes[r.ticker]
+    const priceStr=r.hasQuote
+      ?(isUSD&&currencyMode==='original'?fmtUSD(q.price):fmtBRL(r.price))
+      :r.hasPrevClose?fmtBRL(r.price)+'*':'—'
+    return`<tr class="other-port">
+      <td style="padding:8px 0;font-weight:600">${r.ticker}</td>
+      <td style="padding:8px 0;text-align:right">${priceStr}</td>
+      <td style="padding:8px 0;text-align:right"><span class="${r.varPct>=0?'var-pos':'var-neg'}">${fmtPct(r.varPct,isUSD)}</span></td>
+      <td style="padding:8px 0;text-align:right"><span class="${portVarPct>=0?'var-pos':'var-neg'}">${fmtPct(portVarPct)}</span></td>
+      <td style="padding:8px 0;text-align:right">${weightPct<0?'−':''}${Math.abs(weightPct).toFixed(1)}%</td>
+    </tr>`
+  }).join('')
+  document.getElementById('modal').style.display='block'
+  document.getElementById('modal-overlay').style.display='block'
+}
+  
 boot()
 </script>
 </body>
