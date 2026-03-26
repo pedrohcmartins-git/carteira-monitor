@@ -876,7 +876,6 @@ window.inviteUser=async function(){
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        console.log('token:', session?.access_token?.substring(0,20))
         'Authorization':`Bearer ${session.access_token}`,
         'apikey':SUPABASE_ANON_KEY
       },
