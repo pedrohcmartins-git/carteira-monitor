@@ -145,7 +145,25 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;font-size:12px;z-index:1000;opacity:0;transform:translateY(6px);transition:all .25s;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
 #toast.show{opacity:1;transform:translateY(0)}#toast.ok{border-color:var(--green);color:var(--green-text)}#toast.err{border-color:var(--red);color:var(--red-text)}
 @media(max-width:1100px){.port-grid.count-2,.port-grid.count-3{grid-template-columns:1fr}.top-bar{grid-template-columns:1fr 1fr}.refresh-card{grid-column:span 2}}
-@media(max-width:600px){.mini-cards{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.top-bar{grid-template-columns:1fr}.refresh-card{grid-column:1}}
+@media(max-width:768px){
+  .group-badge,.role-badge,.nav-time{display:none}
+  .nav-btn{padding:6px 8px;font-size:10px}
+  td{padding:9px 4px;font-size:12px}
+  th{padding:7px 4px;font-size:9px}
+  .bar-wrap{min-width:44px}
+  .bar{width:36px}
+  .num{font-size:11px}
+  .top-bar{grid-template-columns:1fr 1fr}
+  .refresh-card{grid-column:span 2}
+  .mini-cards{grid-template-columns:1fr 1fr}
+  .card-main{font-size:15px}
+  .form-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .top-bar{grid-template-columns:1fr}
+  .refresh-card{grid-column:1}
+  .mini-cards{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
