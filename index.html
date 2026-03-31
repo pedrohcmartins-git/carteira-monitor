@@ -337,10 +337,14 @@ function updatePriceColumnTitles(){
 }
 
 async function boot(){
-  const{data:{session},error:sessionError}=await sb.auth.getSession()
-  if(sessionError||!session){toast('Sessão expirada, faça login novamente.','err');return}
+  const{data:{session}}=await sb.auth.getSession()
   if(!session){window.location.href='./login.html';return}
   user=session.user
+  // Se usuário nunca fez login antes (veio de convite), redirecionar para definir senha
+  if(!user.last_sign_in_at){
+    window.location.href='./reset-password.html'
+    return
+  }
   const{data:mem}=await sb.from('group_members').select('group_id,role,groups(name,brapi_token,finnhub_token)').eq('user_id',user.id).single()
   if(!mem){document.getElementById('consol-body').innerHTML='<tr><td colspan="7" style="padding:32px;color:var(--text-3);text-align:center">Você não pertence a nenhum grupo.</td></tr>';return}
   groupId=mem.group_id;groupName=mem.groups.name;role=mem.role
