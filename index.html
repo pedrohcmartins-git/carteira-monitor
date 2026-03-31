@@ -299,7 +299,7 @@ VALUES ('${groupId || 'SEU_GROUP_ID'}', 'USER_ID_AQUI', 'viewer');</pre>
 <script type="module">
 import{createClient}from'https://esm.sh/@supabase/supabase-js@2.49.1'
 import{SUPABASE_URL,SUPABASE_ANON_KEY}from'./config.js'
-const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{flowType:'implicit'}})
+const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
 let user=null,groupId=null,groupName=null,role=null
 let portfolios={},quotes={},usdBrl=null,usdVarPct=0,ibovPct=null,ibovVal=null
 let tickerMap={},sortStates={},consolSortCol='gross',consolSortAsc=false
