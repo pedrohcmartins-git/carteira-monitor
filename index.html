@@ -274,14 +274,15 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   </div>
 <div class="admin-section">
   <div class="form-section-title">Convidar membro</div>
-  <p style="font-size:12px;color:var(--text-2);line-height:1.6">
-    Para adicionar um novo membro:<br>
-    1. Vá em <strong>Supabase → Authentication → Users → Invite user</strong><br>
-    2. Digite o email e envie o convite<br>
-    3. Copie o User ID gerado e rode no SQL Editor:<br>
+  <p style="font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:12px">
+    Digite o email e clique em convidar. O novo membro receberá um email para definir a senha e já terá acesso ao grupo.
   </p>
-  <pre style="background:var(--surface2);border:1px solid var(--border);padding:12px;font-size:11px;margin-top:10px;border-radius:var(--radius);overflow-x:auto">INSERT INTO public.group_members (group_id, user_id, role)
-VALUES ('${groupId || 'SEU_GROUP_ID'}', 'USER_ID_AQUI', 'viewer');</pre>
+  <div class="invite-row">
+    <input type="email" id="invite-email" placeholder="email do novo membro"/>
+    <select id="invite-role"><option value="viewer">viewer</option><option value="admin">admin</option></select>
+    <button class="btn-invite" id="btn-invite" onclick="inviteMember()">Convidar</button>
+  </div>
+  <div id="invite-msg" style="font-size:12px;margin-top:10px;display:none"></div>
 </div>
 </div>
 <div id="modal-overlay" onclick="closeModal()"></div>
@@ -886,8 +887,20 @@ async function loadMembers(){
 }
 window.removeMember=async function(id){if(!confirm('Remover?'))return;await sb.from('group_members').delete().eq('id',id);loadMembers();toast('Membro removido','ok')}
 
-window.inviteUser=function(){
-  toast('Para convidar: Supabase → Authentication → Invite user, depois rode o SQL para adicionar ao grupo.','ok')
+window.inviteMember=async function(){
+  const email=document.getElementById('invite-email').value.trim()
+  const inviteRole=document.getElementById('invite-role').value
+  const btn=document.getElementById('btn-invite')
+  const inviteMsg=document.getElementById('invite-msg')
+  if(!email){inviteMsg.textContent='Preencha o email.';inviteMsg.style.color='var(--red)';inviteMsg.style.display='block';return}
+  btn.disabled=true;btn.textContent='Enviando…';inviteMsg.style.display='none'
+  try{
+    const{data,error}=await sb.functions.invoke('invite-member',{body:{email,role:inviteRole,redirectUrl:window.location.origin+'/auth-callback.html'}})
+    if(error)throw error
+    if(data?.error){inviteMsg.textContent=data.error;inviteMsg.style.color='var(--red)'}
+    else{inviteMsg.textContent=data?.message||'Convite enviado!';inviteMsg.style.color='var(--green)';document.getElementById('invite-email').value='';loadMembers()}
+  }catch(e){inviteMsg.textContent='Erro: '+(e.message||'falha na requisição');inviteMsg.style.color='var(--red)'}
+  btn.disabled=false;btn.textContent='Convidar';inviteMsg.style.display='block'
 }
   
 window.saveApiKeys=async function(){
