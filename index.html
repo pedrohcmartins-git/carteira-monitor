@@ -254,8 +254,8 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
     <p style="font-size:12px;color:var(--text-2);margin-bottom:14px">Define como cada ativo é buscado, seu book e setor. Admins podem editar.</p>
     <div style="overflow-x:auto">
       <table class="tmap-table">
-        <thead><tr><th>Ticker</th><th>Moeda</th><th>Fonte</th><th>Ticker na fonte</th><th>Book</th><th>Setor</th><th>Status</th><th style="text-align:right">Ação</th></tr></thead>
-        <tbody id="tmap-body"><tr><td colspan="8" style="color:var(--text-3);padding:16px 10px">Carregando...</td></tr></tbody>
+        <thead><tr><th>Ticker</th><th>Moeda</th><th>Fonte</th><th>Ticker na fonte</th><th>Preço manual</th><th>Book</th><th>Setor</th><th>Status</th><th style="text-align:right">Ação</th></tr></thead>
+        <tbody id="tmap-body"><tr><td colspan="9" style="color:var(--text-3);padding:16px 10px">Carregando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -382,16 +382,16 @@ function stopAutoRefreshTimer(){if(autoRefreshTimer)clearInterval(autoRefreshTim
 
 async function loadTickerMap(){
   const{data}=await sb.from('ticker_map').select('*').eq('group_id',groupId)
-  tickerMap={};(data||[]).forEach(r=>{tickerMap[r.ticker]={id:r.id,source:r.source,sourceTicker:r.source_ticker,book:r.book||'',sector:r.sector||''}})
+  tickerMap={};(data||[]).forEach(r=>{tickerMap[r.ticker]={id:r.id,source:r.source,sourceTicker:r.source_ticker,book:r.book||'',sector:r.sector||'',manualPrice:r.manual_price||null}})
 }
 function getTickerConfig(ticker,currency){
   const cfg=tickerMap[ticker];if(cfg)return{source:cfg.source,sourceTicker:cfg.sourceTicker||ticker}
   return{source:currency==='USD'?'finnhub':'brapi',sourceTicker:ticker}
 }
-async function saveTickerMapRow(ticker,source,sourceTicker,book,sector){
+async function saveTickerMapRow(ticker,source,sourceTicker,book,sector,manualPrice){
   const existing=tickerMap[ticker]
-  if(existing)await sb.from('ticker_map').update({source,source_ticker:sourceTicker||null,book:book||null,sector:sector||null,updated_at:new Date().toISOString()}).eq('id',existing.id)
-  else await sb.from('ticker_map').insert({group_id:groupId,ticker,source,source_ticker:sourceTicker||null,book:book||null,sector:sector||null})
+  if(existing)await sb.from('ticker_map').update({source,source_ticker:sourceTicker||null,book:book||null,sector:sector||null,manual_price:manualPrice||null,updated_at:new Date().toISOString()}).eq('id',existing.id)
+  else await sb.from('ticker_map').insert({group_id:groupId,ticker,source,source_ticker:sourceTicker||null,book:book||null,sector:sector||null,manual_price:manualPrice||null})
   await loadTickerMap()
 }
 async function resetTickerMapRow(ticker){
@@ -400,16 +400,17 @@ async function resetTickerMapRow(ticker){
 }
 function renderTickerMap(){
   const allTickers=[...new Set(Object.values(portfolios).flat().map(p=>({ticker:p.ticker,currency:p.currency})).filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i))].sort((a,b)=>a.ticker.localeCompare(b.ticker))
-  if(!allTickers.length){document.getElementById('tmap-body').innerHTML='<tr><td colspan="8" style="color:var(--text-3);padding:16px">Nenhum ativo carregado.</td></tr>';return}
+  if(!allTickers.length){document.getElementById('tmap-body').innerHTML='<tr><td colspan="9" style="color:var(--text-3);padding:16px">Nenhum ativo carregado.</td></tr>';return}
   const isAdmin=role==='admin'
   // Get current book/sector from positions as fallback
   const posInfo={};Object.values(portfolios).flat().forEach(p=>{if(!posInfo[p.ticker]||(p.book&&p.book!=='—'))posInfo[p.ticker]={book:p.book||'',sector:p.sector||''}})
   document.getElementById('tmap-body').innerHTML=allTickers.map(({ticker,currency})=>{
     const cfg=tickerMap[ticker];const source=cfg?.source||'auto';const sourceTicker=cfg?.sourceTicker||''
     const book=cfg?.book||posInfo[ticker]?.book||'';const sector=cfg?.sector||posInfo[ticker]?.sector||''
+    const manualPrice=cfg?.manualPrice||''
     const sb2={auto:`<span class="status-badge status-auto">auto</span>`,brapi:`<span class="status-badge status-brapi">brapi</span>`,finnhub:`<span class="status-badge status-finnhub">finnhub</span>`,ignore:`<span class="status-badge status-ignore">ign</span>`,manual:`<span class="status-badge status-manual">manual</span>`}[source]||`<span class="status-badge status-auto">auto</span>`
     const cb=currency==='USD'?`<span style="font-size:10px;font-weight:600;color:var(--blue-text)">USD</span>`:`<span style="font-size:10px;font-weight:600;color:var(--green-text)">BRL</span>`
-    if(!isAdmin){const ec=getTickerConfig(ticker,currency);return`<tr><td><strong>${ticker}</strong></td><td>${cb}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td class="meta-cell">${book||'—'}</td><td class="meta-cell">${sector||'—'}</td><td>${sb2}</td><td></td></tr>`}
+    if(!isAdmin){const ec=getTickerConfig(ticker,currency);return`<tr><td><strong>${ticker}</strong></td><td>${cb}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td class="meta-cell">${source==='manual'&&manualPrice?manualPrice:'—'}</td><td class="meta-cell">${book||'—'}</td><td class="meta-cell">${sector||'—'}</td><td>${sb2}</td><td></td></tr>`}
     return`<tr><td><strong>${ticker}</strong></td><td>${cb}</td>
       <td><select class="tmap-select" id="tmap-src-${safeid(ticker)}" onchange="onTickerSourceChange('${ticker}')">
         <option value="auto" ${source==='auto'?'selected':''}>Auto</option><option value="brapi" ${source==='brapi'?'selected':''}>brapi</option>
@@ -417,6 +418,7 @@ function renderTickerMap(){
         <option value="manual" ${source==='manual'?'selected':''}>Manual</option>
       </select></td>
       <td><input class="tmap-input" id="tmap-sticker-${safeid(ticker)}" value="${sourceTicker}" placeholder="${ticker}" style="width:90px" ${source==='ignore'||source==='manual'||source==='auto'?'disabled':''}/></td>
+      <td><input class="tmap-input" id="tmap-mprice-${safeid(ticker)}" type="number" step="0.01" value="${manualPrice}" placeholder="0,00" style="width:80px" ${source!=='manual'?'disabled':''}/></td>
       <td><input class="tmap-input" id="tmap-book-${safeid(ticker)}" value="${book}" placeholder="Book" style="width:80px"/></td>
       <td><input class="tmap-input" id="tmap-sector-${safeid(ticker)}" value="${sector}" placeholder="Setor" style="width:80px"/></td>
       <td>${sb2}</td>
@@ -426,14 +428,17 @@ function renderTickerMap(){
 window.onTickerSourceChange=function(ticker){
   const src=document.getElementById('tmap-src-'+safeid(ticker))?.value
   const inp=document.getElementById('tmap-sticker-'+safeid(ticker))
-  if(!inp)return;inp.disabled=(src==='auto'||src==='ignore'||src==='manual');if(inp.disabled)inp.value=''
+  const priceInp=document.getElementById('tmap-mprice-'+safeid(ticker))
+  if(inp){inp.disabled=(src==='auto'||src==='ignore'||src==='manual');if(inp.disabled)inp.value=''}
+  if(priceInp){priceInp.disabled=(src!=='manual');if(src!=='manual')priceInp.value=''}
 }
 window.saveTickerRow=async function(ticker){
   const src=document.getElementById('tmap-src-'+safeid(ticker))?.value||'auto'
   const sticker=document.getElementById('tmap-sticker-'+safeid(ticker))?.value.trim().toUpperCase()||''
   const book=document.getElementById('tmap-book-'+safeid(ticker))?.value.trim()||''
   const sector=document.getElementById('tmap-sector-'+safeid(ticker))?.value.trim()||''
-  await saveTickerMapRow(ticker,src,sticker||ticker,book,sector)
+  const manualPrice=src==='manual'?parseFloat(document.getElementById('tmap-mprice-'+safeid(ticker))?.value)||null:null
+  await saveTickerMapRow(ticker,src,sticker||ticker,book,sector,manualPrice)
   await sb.from('quote_cache').delete().eq('group_id',groupId).eq('ticker',ticker)
   delete quotes[ticker];renderTickerMap();toast(`${ticker} → ${src} salvo`,'ok')
 }
@@ -652,7 +657,8 @@ async function fetchBrapi(tickers){
   const fetchable=[]
   for(const ticker of tickers){
     const cfg=getTickerConfig(ticker,'BRL')
-    if(cfg.source==='ignore'||cfg.source==='manual'){quotes[ticker]={error:true,msg:cfg.source};continue}
+    if(cfg.source==='ignore'){quotes[ticker]={error:true,msg:cfg.source};continue}
+    if(cfg.source==='manual'){const mp=tickerMap[ticker]?.manualPrice;if(mp>0)quotes[ticker]={price:mp,change:0,changePct:0,currency:'BRL',manual:true};else quotes[ticker]={error:true,msg:'manual'};continue}
     if(cfg.source==='finnhub')continue
     const ft=cfg.sourceTicker||ticker
     if(!/^[A-Z0-9]{3,8}$/.test(ft)){quotes[ticker]={error:true,msg:'especial'};continue}
@@ -672,7 +678,8 @@ async function fetchFinnhub(tickers){
   if(!token){tickers.forEach(t=>{if(!quotes[t])quotes[t]={error:true,msg:'sem token'}});return}
   for(const ticker of tickers){
     const cfg=getTickerConfig(ticker,'USD')
-    if(cfg.source==='ignore'||cfg.source==='manual'){quotes[ticker]={error:true,msg:cfg.source};continue}
+    if(cfg.source==='ignore'){quotes[ticker]={error:true,msg:cfg.source};continue}
+    if(cfg.source==='manual'){const mp=tickerMap[ticker]?.manualPrice;if(mp>0)quotes[ticker]={price:mp,change:0,changePct:0,currency:'USD',manual:true};else quotes[ticker]={error:true,msg:'manual'};continue}
     if(cfg.source==='brapi')continue
     const ft=cfg.sourceTicker||ticker
     try{const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${ft}&token=${token}`);const d=await r.json();if(d.c>0)quotes[ticker]={price:d.c,change:d.d||0,changePct:d.dp||0,currency:'USD'};else quotes[ticker]={error:true,msg:'não encontrado'}}
