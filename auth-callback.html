@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carteira Monitor · Processando…</title>
+<title>Carteira Monitor · Confirmar Acesso</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -27,7 +27,7 @@
   }
   .card {
     position:relative; z-index:1;
-    width:100%; max-width:400px;
+    width:100%; max-width:420px;
     padding:48px 40px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -35,27 +35,52 @@
   }
   .logo { font-family: var(--font-display); font-size:20px; font-weight:800; letter-spacing:-.5px; margin-bottom:8px; }
   .logo span { color: var(--accent); }
-  .status { font-size: 13px; color: var(--muted); margin-top: 24px; }
-  .error { font-size: 12px; color: var(--red); margin-top: 16px; display: none; }
-  .spinner {
-    margin: 24px auto 0;
-    width: 32px; height: 32px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
+  .subtitle { font-size:13px; color:var(--muted); margin-top:16px; line-height:1.6; }
+  .btn {
+    display:inline-block; margin-top:28px; padding:16px 40px;
+    background:var(--accent); color:var(--bg); border:none;
+    font-family:var(--font-mono); font-size:13px; font-weight:500;
+    letter-spacing:.08em; text-transform:uppercase;
+    cursor:pointer; transition:background .15s;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
+  .btn:hover { background:#d4f54a; }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+  .error { font-size:12px; color:var(--red); margin-top:16px; display:none; }
+  .spinner {
+    display:none; margin:24px auto 0;
+    width:28px; height:28px;
+    border:2px solid var(--border);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
+  .spinner.active { display:block; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .hidden { display:none !important; }
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">CARTEIRA<span>.</span>monitor</div>
-  <div class="spinner" id="spinner"></div>
-  <div class="status" id="status">Validando seu acesso…</div>
-  <div class="error" id="error"></div>
+
+  <!-- State 1: Confirm button (default) -->
+  <div id="state-confirm">
+    <div class="subtitle">Clique abaixo para confirmar seu acesso.</div>
+    <button class="btn" id="btn-confirm" onclick="confirmAccess()">Confirmar acesso</button>
+  </div>
+
+  <!-- State 2: Loading -->
+  <div id="state-loading" class="hidden">
+    <div class="subtitle">Validando seu acesso…</div>
+    <div class="spinner active"></div>
+  </div>
+
+  <!-- State 3: Error -->
+  <div id="state-error" class="hidden">
+    <div class="error" id="error-msg" style="display:block"></div>
+  </div>
 </div>
 
 <script type="module">
@@ -63,88 +88,85 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js'
 
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-const status = document.getElementById('status')
-const error = document.getElementById('error')
-const spinner = document.getElementById('spinner')
 
-function fail(msg) {
-  spinner.style.display = 'none'
-  status.style.display = 'none'
-  error.style.display = 'block'
-  error.innerHTML = msg + '<br><br><a href="./login.html">← Voltar ao login</a>'
+// Parse token info from URL (but do NOT verify yet — wait for user click)
+const hash = new URLSearchParams(window.location.hash.substring(1))
+const query = new URLSearchParams(window.location.search)
+
+const tokenHash = query.get('token_hash')
+const type = query.get('type')
+const accessToken = hash.get('access_token')
+const refreshToken = hash.get('refresh_token')
+const hashType = hash.get('type')
+const errorCode = hash.get('error_code') || query.get('error_code')
+const errorDesc = hash.get('error_description') || query.get('error_description')
+
+function showState(state) {
+  document.getElementById('state-confirm').classList.add('hidden')
+  document.getElementById('state-loading').classList.add('hidden')
+  document.getElementById('state-error').classList.add('hidden')
+  document.getElementById('state-' + state).classList.remove('hidden')
 }
 
-async function handleCallback() {
-  // 1. Check for errors in URL
-  const hash = new URLSearchParams(window.location.hash.substring(1))
-  const query = new URLSearchParams(window.location.search)
+function showError(msg) {
+  showState('error')
+  document.getElementById('error-msg').innerHTML = msg + '<br><br><a href="./login.html">← Voltar ao login</a>'
+}
 
-  const errorCode = hash.get('error_code') || query.get('error_code')
-  const errorDesc = hash.get('error_description') || query.get('error_description')
-
-  if (errorCode) {
-    fail('Link inválido ou expirado.<br>Solicite um novo link ao administrador.')
-    return
-  }
-
-  // 2. Try PKCE flow (token_hash in query params) — newer Supabase default
-  const tokenHash = query.get('token_hash')
-  const type = query.get('type')
-
-  if (tokenHash && type) {
-    status.textContent = 'Verificando token…'
-    const { data, error: err } = await sb.auth.verifyOtp({ token_hash: tokenHash, type })
-    if (err) {
-      fail('Link expirado ou já utilizado.<br>Solicite um novo link.')
-      return
-    }
-    return routeByType(type)
-  }
-
-  // 3. Try implicit flow (access_token in hash) — older Supabase or manual config
-  const accessToken = hash.get('access_token')
-  const refreshToken = hash.get('refresh_token')
-  const hashType = hash.get('type')
-
-  if (accessToken) {
-    status.textContent = 'Autenticando…'
-    const { error: err } = await sb.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken || ''
-    })
-    if (err) {
-      fail('Token inválido ou expirado.<br>Solicite um novo link.')
-      return
-    }
-    return routeByType(hashType)
-  }
-
-  // 4. Check if already has a valid session (e.g. page refresh)
+// If URL already has an error (from Supabase redirect), show it
+if (errorCode) {
+  showError('Link inválido ou expirado.<br>Peça ao administrador para enviar um novo convite.')
+}
+// If no token at all, check session or show error
+else if (!tokenHash && !accessToken) {
   const { data: { session } } = await sb.auth.getSession()
   if (session) {
     window.location.href = './index.html'
+  } else {
+    showError('Nenhum token encontrado.<br>Use o link enviado por e-mail.')
+  }
+}
+// Otherwise: token is present, show the confirm button and wait for click
+
+function routeByType(t) {
+  if (t === 'invite' || t === 'recovery') {
+    window.location.href = './reset-password.html'
+  } else {
+    window.location.href = './index.html'
+  }
+}
+
+// Only called when user CLICKS the button (scanners won't trigger this)
+window.confirmAccess = async function() {
+  showState('loading')
+
+  // PKCE flow (token_hash in query)
+  if (tokenHash && type) {
+    const { data, error } = await sb.auth.verifyOtp({ token_hash: tokenHash, type })
+    if (error) {
+      showError('Link expirado ou já utilizado.<br>Peça um novo convite ao administrador.')
+      return
+    }
+    routeByType(type)
     return
   }
 
-  // 5. Nothing to process
-  fail('Nenhum token encontrado.<br>Use o link enviado por e-mail.')
-}
-
-function routeByType(type) {
-  // invite, recovery, magiclink → need to set/reset password
-  if (type === 'invite' || type === 'recovery') {
-    status.textContent = 'Redirecionando…'
-    window.location.href = './reset-password.html'
-  } else if (type === 'magiclink' || type === 'signup' || type === 'email') {
-    status.textContent = 'Acesso confirmado!'
-    window.location.href = './index.html'
-  } else {
-    // fallback — if type is unknown, go to index
-    window.location.href = './index.html'
+  // Implicit flow (access_token in hash)
+  if (accessToken) {
+    const { error } = await sb.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken || ''
+    })
+    if (error) {
+      showError('Token inválido.<br>Peça um novo convite ao administrador.')
+      return
+    }
+    routeByType(hashType)
+    return
   }
-}
 
-handleCallback()
+  showError('Nenhum token para processar.')
+}
 </script>
 </body>
 </html>
