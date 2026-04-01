@@ -190,8 +190,8 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
         <th onclick="consolSort('name')">Carteira <span id="csort-name"></span></th>
         <th class="r" onclick="consolSort('gross')">Gross [R$] <span id="csort-gross"></span></th>
         <th class="r" onclick="consolSort('net')">Net [R$] <span id="csort-net"></span></th>
-        <th class="r" onclick="consolSort('varPct')">P&L Dia % <span id="csort-varPct"></span></th>
-        <th class="r" onclick="consolSort('varBrl')">P&L Dia [R$] <span id="csort-varBrl"></span></th>
+        <th class="r" onclick="consolSort('varPct')">% Dia <span id="csort-varPct"></span></th>
+        <th class="r" onclick="consolSort('varBrl')">Var Dia [R$] <span id="csort-varBrl"></span></th>
         <th class="r" onclick="consolSort('count')">Posições <span id="csort-count"></span></th>
         <th class="r">vs IBOV</th>
       </tr></thead>
@@ -473,7 +473,7 @@ function renderPortfoliosGrid(){
       <div class="port-section-name">${name.toUpperCase()}</div>
       <div class="mini-cards" id="cards-${safeid(name)}">
         <div class="card"><div class="card-lbl">Gross <span class="card-lbl-unit">[R$]</span></div><div class="card-main" id="v-gross-${safeid(name)}">—</div><div class="card-sub muted" id="v-net-${safeid(name)}">—</div></div>
-        <div class="card"><div class="card-lbl">P&L Dia <span class="card-lbl-unit">[R$]</span></div><div class="card-main" id="v-varpct-${safeid(name)}">—</div><div class="card-sub" id="v-varbrl-${safeid(name)}">—</div></div>
+        <div class="card"><div class="card-lbl">% Dia <span class="card-lbl-unit">[R$]</span></div><div class="card-main" id="v-varpct-${safeid(name)}">—</div><div class="card-sub" id="v-varbrl-${safeid(name)}">—</div></div>
         <div class="card"><div class="card-lbl">Posições</div>
           <div class="card-counts">
             <div class="count-row"><span class="count-lbl">Long</span><span class="count-val pos" id="v-longs-${safeid(name)}">—</span></div>
@@ -487,7 +487,7 @@ function renderPortfoliosGrid(){
           <th class="sticky" onclick="sortPortfolio('${name}','ticker')">Ativo <span id="sort-${safeid(name)}-ticker"></span></th>
           <th onclick="sortPortfolio('${name}','bookSector')" id="th-booksector-${safeid(name)}">Book · Setor <span id="sort-${safeid(name)}-bookSector"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','price')" id="th-price-${safeid(name)}">${priceColTitle()} <span id="sort-${safeid(name)}-price"></span></th>
-          <th class="r" onclick="sortPortfolio('${name}','changePct')">P&L Dia <span id="sort-${safeid(name)}-changePct"></span></th>
+          <th class="r" onclick="sortPortfolio('${name}','changePct')">% Dia <span id="sort-${safeid(name)}-changePct"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','portVar')">P&L Carteira <span id="sort-${safeid(name)}-portVar"></span></th>
           <th class="r" onclick="sortPortfolio('${name}','weightAbs')">Peso <span id="sort-${safeid(name)}-weightAbs"></span></th>
         </tr></thead>
@@ -709,13 +709,19 @@ function computeRowVar(p){
     if(p.prevClose!=null&&p.prevClose>0){const price=p.prevClose*(isUSD?usdNow:1);const prevBrl=p.prevClose*(isUSD?usdYest:1);return{price,valueBrl:price*p.qty,valueBrlOntem:prevBrl*p.qty,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:true}}
     return{price:0,valueBrl:0,valueBrlOntem:0,varBrl:0,varPct:0,hasQuote:false,hasPrevClose:false}
   }
-  if(!isUSD){return{price:q.price,valueBrl:q.price*p.qty,valueBrlOntem:p.prevClose*p.qty,varBrl:q.change*p.qty,varPct:q.changePct,hasQuote:true,hasPrevClose:false}}
+  if(!isUSD){
+    const varPct=p.prevClose>0?((q.price-p.prevClose)/Math.abs(p.prevClose))*100:q.changePct
+    const varBrl=p.prevClose>0?(q.price-p.prevClose)*p.qty:q.change*p.qty
+    return{price:q.price,valueBrl:q.price*p.qty,valueBrlOntem:p.prevClose*p.qty,varBrl,varPct,hasQuote:true,hasPrevClose:!!p.prevClose}
+  }
   const priceBrl=q.price*usdNow;const valueBrl=priceBrl*p.qty
-  const priceYestUsd=q.price-q.change;const varBrl=(priceBrl-priceYestUsd*usdYest)*p.qty
-  const varPctBrl=((1+q.changePct/100)*(1+usdVarPct/100)-1)*100
-  const valueBrlOntemUSD=(q.price-q.change)*p.qty*usdYest
-  if(currencyMode==='brl')return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:varPctBrl,hasQuote:true,hasPrevClose:false,isUSD:true}
-  return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:q.changePct,hasQuote:true,hasPrevClose:false,isUSD:true}
+  const stockVarPctUsd=p.prevClose>0?((q.price-p.prevClose)/Math.abs(p.prevClose))*100:q.changePct
+  const prevBrl=(p.prevClose||q.price-q.change)*usdYest
+  const varBrl=(priceBrl-prevBrl)*p.qty
+  const varPctBrl=((1+stockVarPctUsd/100)*(1+usdVarPct/100)-1)*100
+  const valueBrlOntemUSD=(p.prevClose||q.price-q.change)*p.qty*usdYest
+  if(currencyMode==='brl')return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:varPctBrl,hasQuote:true,hasPrevClose:!!p.prevClose,isUSD:true}
+  return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:stockVarPctUsd,hasQuote:true,hasPrevClose:!!p.prevClose,isUSD:true}
 }
 function computeRows(name){return(portfolios[name]||[]).map(p=>({...p,...computeRowVar(p)}))}
 function computeSummary(rows){
@@ -785,7 +791,7 @@ function renderBookSummary(name,rows,netOntem){
   const bookList=Object.entries(books).map(([book,v])=>({book,weightPct:v.weightSum*100,portVarPct:v.portVarSum*100,pnlDia:v.weightSum!==0?(v.portVarSum/v.weightSum)*100:0})).sort((a,b)=>b.weightPct-a.weightPct)
   const wrap=document.createElement('div');wrap.id='book-tbl-'+sid;wrap.className='book-summary'
   wrap.innerHTML=`<div class="tbl-wrap"><div class="tbl-scroll"><table>
-    <thead><tr><th>Book</th><th class="r">P&L Dia</th><th class="r">P&L Carteira</th><th class="r">Peso</th></tr></thead>
+    <thead><tr><th>Book</th><th class="r">% Dia</th><th class="r">P&L Carteira</th><th class="r">Peso</th></tr></thead>
     <tbody>${bookList.map(r=>`<tr>
       <td style="font-weight:500;cursor:pointer;" onclick="openBookModal('${r.book}','${name}')">${r.book}</td>
       <td class="r"><span class="${r.pnlDia>=0?'var-pos':'var-neg'}">${fmtPct(r.pnlDia)}</span></td>
@@ -887,7 +893,7 @@ window.loadChart=async function(){
   } else{chartData=snaps.map(s=>({label:new Date(s.captured_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),gross:parseFloat(s.total_brl||0).toFixed(2),varPct:parseFloat(s.day_change_pct||0).toFixed(2)}))}
   document.getElementById('empty-chart').style.display='none';document.getElementById('chart-canvas').style.display='block'
   if(chartInstance)chartInstance.destroy()
-  chartInstance=new Chart(document.getElementById('chart-canvas'),{type:'line',data:{labels:chartData.map(d=>d.label),datasets:[{label:'Gross',data:chartData.map(d=>d.gross),borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.06)',borderWidth:1.5,pointRadius:2,fill:true,tension:0.3,yAxisID:'y'},{label:'P&L Dia (%)',data:chartData.map(d=>d.varPct),borderColor:'#2563eb',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,borderDash:[4,3],tension:0.3,yAxisID:'y2'}]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#6b7280',font:{family:'Inter',size:11}}},tooltip:{backgroundColor:'#fff',borderColor:'#e5e7eb',borderWidth:1,titleColor:'#6b7280',bodyColor:'#111827',titleFont:{family:'Inter',size:10},bodyFont:{family:'Inter',size:12},callbacks:{label:ctx=>ctx.datasetIndex===0?` R$ ${parseFloat(ctx.raw).toLocaleString('pt-BR',{minimumFractionDigits:2})}`:` ${parseFloat(ctx.raw)>=0?'+':''}${ctx.raw}%`}}},scales:{x:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10}},grid:{color:'#f3f4f6'}},y:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10},callback:v=>parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})},grid:{color:'#f3f4f6'},position:'left'},y2:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10},callback:v=>v+'%'},grid:{display:false},position:'right'}}}})
+  chartInstance=new Chart(document.getElementById('chart-canvas'),{type:'line',data:{labels:chartData.map(d=>d.label),datasets:[{label:'Gross',data:chartData.map(d=>d.gross),borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.06)',borderWidth:1.5,pointRadius:2,fill:true,tension:0.3,yAxisID:'y'},{label:'%Dia',data:chartData.map(d=>d.varPct),borderColor:'#2563eb',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,borderDash:[4,3],tension:0.3,yAxisID:'y2'}]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#6b7280',font:{family:'Inter',size:11}}},tooltip:{backgroundColor:'#fff',borderColor:'#e5e7eb',borderWidth:1,titleColor:'#6b7280',bodyColor:'#111827',titleFont:{family:'Inter',size:10},bodyFont:{family:'Inter',size:12},callbacks:{label:ctx=>ctx.datasetIndex===0?` R$ ${parseFloat(ctx.raw).toLocaleString('pt-BR',{minimumFractionDigits:2})}`:` ${parseFloat(ctx.raw)>=0?'+':''}${ctx.raw}%`}}},scales:{x:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10}},grid:{color:'#f3f4f6'}},y:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10},callback:v=>parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})},grid:{color:'#f3f4f6'},position:'left'},y2:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10},callback:v=>v+'%'},grid:{display:false},position:'right'}}}})
 }
 function showEmptyChart(){document.getElementById('empty-chart').style.display='flex';document.getElementById('chart-canvas').style.display='none'}
 
@@ -949,7 +955,7 @@ window.openBookModal=function(book,portName){
     .sort((a,b)=>Math.abs(b.weightAbs)-Math.abs(a.weightAbs))
   document.getElementById('modal-ticker').textContent=book
   document.getElementById('modal-thead').innerHTML=
-  '<tr><th>Ativo</th><th class="r">Preço</th><th class="r">P&L Dia</th><th class="r">P&L Carteira</th><th class="r">Peso</th></tr>'
+  '<tr><th>Ativo</th><th class="r">Preço</th><th class="r">% Dia</th><th class="r">P&L Carteira</th><th class="r">Peso</th></tr>'
   document.getElementById('modal-body').innerHTML=bookRows.map(r=>{
     const isUSD=r.currency==='USD'
     const weightPct=r.weightAbs*100
