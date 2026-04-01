@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carteira Monitor · Processando…</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a; --surface: #111111; --border: #1e1e1e;
+    --accent: #c8f135; --text: #e8e8e8; --muted: #555;
+    --red: #f13560;
+    --font-display: 'Syne', sans-serif; --font-mono: 'DM Mono', monospace;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--font-mono); min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(200,241,53,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,241,53,.025) 1px, transparent 1px);
+    background-size: 48px 48px; pointer-events:none;
+  }
+  .card {
+    position:relative; z-index:1;
+    width:100%; max-width:400px;
+    padding:48px 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .logo { font-family: var(--font-display); font-size:20px; font-weight:800; letter-spacing:-.5px; margin-bottom:8px; }
+  .logo span { color: var(--accent); }
+  .status { font-size: 13px; color: var(--muted); margin-top: 24px; }
+  .error { font-size: 12px; color: var(--red); margin-top: 16px; display: none; }
+  .spinner {
+    margin: 24px auto 0;
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">CARTEIRA<span>.</span>monitor</div>
+  <div class="spinner" id="spinner"></div>
+  <div class="status" id="status">Validando seu acesso…</div>
+  <div class="error" id="error"></div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js'
+
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const status = document.getElementById('status')
+const error = document.getElementById('error')
+const spinner = document.getElementById('spinner')
+
+function fail(msg) {
+  spinner.style.display = 'none'
+  status.style.display = 'none'
+  error.style.display = 'block'
+  error.innerHTML = msg + '<br><br><a href="./login.html">← Voltar ao login</a>'
+}
+
+async function handleCallback() {
+  // 1. Check for errors in URL
+  const hash = new URLSearchParams(window.location.hash.substring(1))
+  const query = new URLSearchParams(window.location.search)
+
+  const errorCode = hash.get('error_code') || query.get('error_code')
+  const errorDesc = hash.get('error_description') || query.get('error_description')
+
+  if (errorCode) {
+    fail('Link inválido ou expirado.<br>Solicite um novo link ao administrador.')
+    return
+  }
+
+  // 2. Try PKCE flow (token_hash in query params) — newer Supabase default
+  const tokenHash = query.get('token_hash')
+  const type = query.get('type')
+
+  if (tokenHash && type) {
+    status.textContent = 'Verificando token…'
+    const { data, error: err } = await sb.auth.verifyOtp({ token_hash: tokenHash, type })
+    if (err) {
+      fail('Link expirado ou já utilizado.<br>Solicite um novo link.')
+      return
+    }
+    return routeByType(type)
+  }
+
+  // 3. Try implicit flow (access_token in hash) — older Supabase or manual config
+  const accessToken = hash.get('access_token')
+  const refreshToken = hash.get('refresh_token')
+  const hashType = hash.get('type')
+
+  if (accessToken) {
+    status.textContent = 'Autenticando…'
+    const { error: err } = await sb.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken || ''
+    })
+    if (err) {
+      fail('Token inválido ou expirado.<br>Solicite um novo link.')
+      return
+    }
+    return routeByType(hashType)
+  }
+
+  // 4. Check if already has a valid session (e.g. page refresh)
+  const { data: { session } } = await sb.auth.getSession()
+  if (session) {
+    window.location.href = './index.html'
+    return
+  }
+
+  // 5. Nothing to process
+  fail('Nenhum token encontrado.<br>Use o link enviado por e-mail.')
+}
+
+function routeByType(type) {
+  // invite, recovery, magiclink → need to set/reset password
+  if (type === 'invite' || type === 'recovery') {
+    status.textContent = 'Redirecionando…'
+    window.location.href = './reset-password.html'
+  } else if (type === 'magiclink' || type === 'signup' || type === 'email') {
+    status.textContent = 'Acesso confirmado!'
+    window.location.href = './index.html'
+  } else {
+    // fallback — if type is unknown, go to index
+    window.location.href = './index.html'
+  }
+}
+
+handleCallback()
+</script>
+</body>
+</html>
