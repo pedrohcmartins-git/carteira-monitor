@@ -138,7 +138,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .modal-table{width:100%;border-collapse:collapse;font-size:13px}
 .modal-table th{font-size:10px;color:var(--text-2);font-weight:500;text-transform:uppercase;letter-spacing:.03em;padding:0 0 8px;border-bottom:1px solid var(--border)}
 .modal-table th.r{text-align:right}.modal-table td{padding:10px 0;border-bottom:1px solid var(--border)}
-.modal-table tr:last-child td{border-bottom:none;padding-top:12px;font-weight:600}
+.modal-table tr:last-child td{border-bottom:none}.modal-table tr.modal-total td{padding-top:12px;font-weight:600}
 .modal-table .current-port td{font-weight:600}.modal-table .other-port td{color:var(--text-2)}
 .spin{display:inline-block;width:11px;height:11px;border:1.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -825,7 +825,7 @@ window.sortPortfolio=function(name,col){
 }
 
 window.openTickerModal=function(ticker,currentPortfolio){
-  document.getElementById('modal-thead').innerHTML='<tr><th>Carteira</th><th class="r">Quantidade</th><th class="r">Peso</th></tr>'
+  document.getElementById('modal-thead').innerHTML='<tr><th>Carteira</th><th class="r" style="padding-right:12px">Quantidade</th><th class="r">Peso</th></tr>'
   const portRows=Object.entries(portfolios).map(([portName,positions])=>{
     const pos=positions.find(p=>p.ticker===ticker);if(!pos)return null
     const rows=computeRows(portName);const{netOntem}=computeSummary(rows)
@@ -838,9 +838,9 @@ window.openTickerModal=function(ticker,currentPortfolio){
   document.getElementById('modal-body').innerHTML=portRows.map(r=>`
     <tr class="${r.portName===currentPortfolio?'current-port':'other-port'}">
       <td style="padding:10px 0">${r.portName.toUpperCase()}</td>
-      <td style="padding:10px 0;text-align:right;font-variant-numeric:tabular-nums">${r.qty.toLocaleString('pt-BR')}</td>
+      <td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums">${r.qty.toLocaleString('pt-BR')}</td>
       <td style="padding:10px 0;text-align:right;font-variant-numeric:tabular-nums">${r.weight<0?'−':''}${Math.abs(r.weight).toFixed(1)}%</td>
-    </tr>`).join('')+(portRows.length>1?`<tr style="border-top:2px solid var(--border);font-weight:600"><td style="padding:12px 0">Total</td><td style="padding:12px 0;text-align:right;font-variant-numeric:tabular-nums">${total.toLocaleString('pt-BR')}</td><td></td></tr>`:'')
+    </tr>`).join('')+(portRows.length>1?`<tr class="modal-total" style="border-top:2px solid var(--border)"><td style="padding:12px 0">Total</td><td style="padding:12px 12px;text-align:right;font-variant-numeric:tabular-nums">${total.toLocaleString('pt-BR')}</td><td></td></tr>`:'')
   document.getElementById('modal').style.display='block';document.getElementById('modal-overlay').style.display='block'
 }
 window.closeModal=function(){document.getElementById('modal').style.display='none';document.getElementById('modal-overlay').style.display='none'}
