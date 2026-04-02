@@ -521,7 +521,7 @@ async function loadTodayPortfolios(){
   }
   for(const port of ports){
     const{data:pos}=await sb.from('positions').select('ticker,quantity,market,currency,prev_close,book,sector').eq('portfolio_id',port.id)
-    portfolios[port.portfolio_name]=(pos||[]).map(p=>({ticker:p.ticker,qty:p.quantity,market:p.market,currency:p.currency||p.market,prevClose:p.prev_close,book:p.book||'—',sector:p.sector||'—'}))
+    portfolios[port.portfolio_name]=(pos||[]).map(p=>{const tm=tickerMap[p.ticker];return{ticker:p.ticker,qty:p.quantity,market:p.market,currency:p.currency||p.market,prevClose:p.prev_close,book:p.book||tm?.book||'—',sector:p.sector||tm?.sector||'—'}})
     sortStates[port.portfolio_name]={col:'portVar',asc:false,bookSectorClicks:0}
   }
   buildPortfolioTabs(Object.keys(portfolios));updateChartSelector(Object.keys(portfolios))
