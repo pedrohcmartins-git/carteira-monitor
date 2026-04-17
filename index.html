@@ -198,6 +198,19 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .trade-type-sell{background:var(--red-bg);color:var(--red-text)}
 .trade-type-flow{background:var(--blue-bg);color:var(--blue-text)}
 .trades-empty{padding:32px 16px;text-align:center;color:var(--text-3);font-size:13px}
+.trades-edit-input{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:4px 6px;border-radius:5px;outline:none;width:100%;text-align:inherit;transition:border-color .15s}
+.trades-edit-input:focus{border-color:var(--green)}
+.trades-edit-input.changed{border-color:var(--blue);background:var(--blue-bg)}
+.trades-edit-select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:11px;padding:3px 6px;border-radius:5px;outline:none}
+.trades-edit-select:focus{border-color:var(--green)}
+.trades-header-actions{display:flex;gap:6px;align-items:center}
+.btn-edit-trades{font-family:var(--font);font-size:11px;font-weight:500;padding:5px 12px;background:transparent;color:var(--text-2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+.btn-edit-trades:hover{background:var(--surface2);color:var(--text)}
+.btn-apply-trades{font-family:var(--font);font-size:11px;font-weight:500;padding:5px 12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);cursor:pointer}
+.btn-apply-trades:hover{background:#15803d}
+.btn-cancel-trades{font-family:var(--font);font-size:11px;font-weight:500;padding:5px 12px;background:transparent;color:var(--text-2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer}
+.btn-cancel-trades:hover{background:var(--surface2)}
+.trades-tbl tr.edited td{background:var(--blue-bg)}
 .trades-impact{margin-top:16px}
 .trades-impact-title{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
 @media(max-width:900px){.trades-layout{grid-template-columns:1fr}}
@@ -298,7 +311,12 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
     <div class="trades-list-card">
       <div class="trades-list-header">
         <span class="trades-list-title">Trades de hoje</span>
-        <span class="trades-count" id="trades-count">0</span>
+        <div class="trades-header-actions">
+          <span class="trades-count" id="trades-count">0</span>
+          <button class="btn-edit-trades" id="btn-edit-trades" onclick="enterTradesEdit()" style="display:none">editar</button>
+          <button class="btn-apply-trades" id="btn-apply-trades" onclick="applyTradesEdit()" style="display:none">aplicar</button>
+          <button class="btn-cancel-trades" id="btn-cancel-trades" onclick="cancelTradesEdit()" style="display:none">cancelar</button>
+        </div>
       </div>
       <div id="trades-list-body">
         <div class="trades-empty" id="trades-empty">Nenhum trade registrado hoje.</div>
@@ -404,7 +422,7 @@ let tickerMap={},sortStates={},consolSortCol='gross',consolSortAsc=false
 let chartInstance=null,currencyMode='original',autoRefresh=false
 let lastRefresh=null,cooldownTimer=null,elapsedTimer=null,autoRefreshTimer=null,isRefreshing=false
 let selectedPortfolios=new Set()
-let todayTrades=[],tradeFormType='trade'
+let todayTrades=[],tradeFormType='trade',tradesEditMode=false
 const COOLDOWN_MS=1*60*1000,AUTO_REFRESH_MS=10*60*1000,MAX_MULTI=3,MULTI_MIN_WIDTH=1100,BRAPI_BATCH=20
 function safeid(s){return s.replace(/[^a-zA-Z0-9]/g,'_')}
 function formatDate(d){const[y,m,day]=d.split('-');return`${day}/${m}/${y}`}
@@ -497,11 +515,12 @@ async function resetTickerMapRow(ticker){
   await loadTickerMap();renderTickerMap();toast(`${ticker} voltou para automático`,'ok')
 }
 function renderTickerMap(){
-  const allTickers=[...new Set(Object.values(portfolios).flat().map(p=>({ticker:p.ticker,currency:p.currency})).filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i))].sort((a,b)=>a.ticker.localeCompare(b.ticker))
+  const adjAll=getAllAdjustedFlat().filter(p=>p.ticker!=='CASH_FLOW')
+  const allTickers=[...new Set(adjAll.map(p=>({ticker:p.ticker,currency:p.currency})).filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i))].sort((a,b)=>a.ticker.localeCompare(b.ticker))
   if(!allTickers.length){document.getElementById('tmap-body').innerHTML='<tr><td colspan="9" style="color:var(--text-3);padding:16px">Nenhum ativo carregado.</td></tr>';return}
   const isAdmin=role==='admin'
   // Get current book/sector from positions as fallback
-  const posInfo={};Object.values(portfolios).flat().forEach(p=>{if(!posInfo[p.ticker]||(p.book&&p.book!=='—'))posInfo[p.ticker]={book:p.book||'',sector:p.sector||''}})
+  const posInfo={};adjAll.forEach(p=>{if(!posInfo[p.ticker]||(p.book&&p.book!=='—'))posInfo[p.ticker]={book:p.book||'',sector:p.sector||''}})
   document.getElementById('tmap-body').innerHTML=allTickers.map(({ticker,currency})=>{
     const cfg=tickerMap[ticker];const source=cfg?.source||'auto';const sourceTicker=cfg?.sourceTicker||''
     const book=cfg?.book||posInfo[ticker]?.book||'';const sector=cfg?.sector||posInfo[ticker]?.sector||''
@@ -791,7 +810,7 @@ window.refreshAll=async function(){
   if(isRefreshing)return
   if(getRemainingCooldown()>0&&lastRefresh){toast(`Aguarde ${formatCooldown(getRemainingCooldown())} para atualizar`,'err');return}
   isRefreshing=true;document.getElementById('live-dot').className='dot updating';updateRefreshButton()
-  const all=Object.values(portfolios).flat()
+  const all=getAllAdjustedFlat().filter(p=>p.ticker!=='CASH_FLOW')
   const brlTickers=[...new Set(all.filter(p=>p.currency==='BRL').map(p=>p.ticker))]
   const usdTickers=[...new Set(all.filter(p=>p.currency==='USD').map(p=>p.ticker))]
   const brapiExtra=usdTickers.filter(t=>{const cfg=getTickerConfig(t,'USD');return cfg.source==='brapi'})
@@ -837,15 +856,15 @@ function getAdjustedPositions(name){
   const posMap={}
   original.forEach(p=>{posMap[p.ticker]={...p,_origQty:p.qty,_origPrevClose:p.prevClose}})
   // Find cash ticker for this portfolio
-  const cashTicker=findCashTicker(name)
+  const cashTicker=findCashTicker(name)||'CAIXA'
   // Apply trades sequentially
   for(const t of trades){
     if(t.trade_type==='cash_flow'){
       // Cash flow: just adjust cash qty
-      if(cashTicker&&posMap[cashTicker]){
+      if(posMap[cashTicker]){
         posMap[cashTicker].qty+=t.quantity // positive=aplicação, negative=resgate
-      } else if(cashTicker){
-        posMap[cashTicker]={ticker:cashTicker,qty:t.quantity,market:'BR',currency:'BRL',prevClose:1,book:'Caixa',sector:'—'}
+      } else {
+        posMap[cashTicker]={ticker:cashTicker,qty:t.quantity,market:'BR',currency:'BRL',prevClose:1,book:'Caixa',sector:'—',_origQty:0,_origPrevClose:1}
       }
       continue
     }
@@ -874,7 +893,7 @@ function getAdjustedPositions(name){
       if(posMap[cashTicker]){
         posMap[cashTicker].qty-=cashImpact
       } else {
-        posMap[cashTicker]={ticker:cashTicker,qty:-cashImpact,market:'BR',currency:'BRL',prevClose:1,book:'Caixa',sector:'—'}
+        posMap[cashTicker]={ticker:cashTicker,qty:-cashImpact,market:'BR',currency:'BRL',prevClose:1,book:'Caixa',sector:'—',_origQty:0,_origPrevClose:1}
       }
     }
   }
@@ -894,6 +913,14 @@ function findCashTicker(name){
     if(p.currency==='BRL'&&p.prevClose===1&&p.qty>10000)return p.ticker
   }
   return null
+}
+// Returns flat array of all adjusted positions (including trade-created) across all portfolios
+function getAllAdjustedFlat(){
+  const all=[]
+  for(const name of Object.keys(portfolios)){
+    getAdjustedPositions(name).forEach(p=>all.push(p))
+  }
+  return all
 }
 function computeRows(name){return getAdjustedPositions(name).map(p=>{
   // Handle zeroed positions with realized P&L
@@ -1172,7 +1199,17 @@ async function loadTodayTrades(){
   const{data}=await sb.from('trades').select('*').eq('group_id',groupId).eq('trade_date',today).order('created_at',{ascending:true})
   todayTrades=data||[]
   renderTradesList();populateTradeDropdowns()
-  if(Object.keys(portfolios).length){renderConsolidation();if(selectedPortfolios.size>0)renderPortfoliosGrid()}
+  // Fetch quotes for any trade-created tickers that don't have quotes yet
+  if(todayTrades.length&&Object.keys(portfolios).length){
+    const adjAll=getAllAdjustedFlat()
+    const newBrl=adjAll.filter(p=>p.currency==='BRL'&&!quotes[p.ticker]&&p.ticker!=='CASH_FLOW').map(p=>p.ticker)
+    const newUsd=adjAll.filter(p=>p.currency==='USD'&&!quotes[p.ticker]&&p.ticker!=='CASH_FLOW').map(p=>p.ticker)
+    if(newBrl.length||newUsd.length){
+      await Promise.all([newBrl.length?fetchBrapi(newBrl):null,newUsd.length?fetchFinnhub(newUsd):null].filter(Boolean))
+      await saveCachedQuotes()
+    }
+    renderConsolidation();if(selectedPortfolios.size>0)renderPortfoliosGrid()
+  }
 }
 function populateTradeDropdowns(){
   const names=Object.keys(portfolios)
@@ -1257,6 +1294,14 @@ function renderTradesList(){
   const today=new Date().toISOString().slice(0,10)
   const dayTrades=todayTrades.filter(t=>t.trade_date===today)
   document.getElementById('trades-count').textContent=dayTrades.length
+  const isAdmin=role==='admin'
+  // Show/hide edit button
+  const btnEdit=document.getElementById('btn-edit-trades')
+  const btnApply=document.getElementById('btn-apply-trades')
+  const btnCancel=document.getElementById('btn-cancel-trades')
+  if(btnEdit)btnEdit.style.display=isAdmin&&dayTrades.length&&!tradesEditMode?'inline-block':'none'
+  if(btnApply)btnApply.style.display=tradesEditMode?'inline-block':'none'
+  if(btnCancel)btnCancel.style.display=tradesEditMode?'inline-block':'none'
   if(!dayTrades.length){
     document.getElementById('trades-empty').style.display='block'
     document.getElementById('trades-table').style.display='none'
@@ -1264,27 +1309,116 @@ function renderTradesList(){
   }
   document.getElementById('trades-empty').style.display='none'
   document.getElementById('trades-table').style.display='table'
-  const isAdmin=role==='admin'
-  document.getElementById('trades-tbody').innerHTML=dayTrades.map(t=>{
-    const isCF=t.trade_type==='cash_flow'
-    const isBuy=t.quantity>0
-    let typeBadge,typeLabel
-    if(isCF){typeBadge='trade-type-flow';typeLabel=isBuy?'APLIC':'RESG'}
-    else{typeBadge=isBuy?'trade-type-buy':'trade-type-sell';typeLabel=isBuy?'C':'V'}
-    const fxRate=t.currency==='USD'?(usdBrl||5.8):1
-    const fin=Math.abs(t.quantity*t.price*fxRate)
-    const time=new Date(t.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
-    return`<tr>
-      <td><span class="trade-type-badge ${typeBadge}">${typeLabel}</span></td>
-      <td style="font-size:11px">${t.portfolio_name.toUpperCase()}</td>
-      <td><strong>${isCF?(t.notes||'Cash Flow'):t.ticker}</strong></td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:12px">${isCF?'—':t.quantity.toLocaleString('pt-BR')}</td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:12px">${isCF?'—':t.price.toFixed(2)}</td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:12px;${isBuy?'color:var(--green)':'color:var(--red)'}">R$ ${fmtBRL(fin)}</td>
-      <td style="font-size:11px;color:var(--text-2)">${time}</td>
-      <td style="text-align:right">${isAdmin?`<button class="btn-del" onclick="deleteTrade('${t.id}')">✕</button>`:''}</td>
-    </tr>`
-  }).join('')
+  if(tradesEditMode){
+    document.getElementById('trades-tbody').innerHTML=dayTrades.map(t=>{
+      const isCF=t.trade_type==='cash_flow'
+      const isBuy=t.quantity>0
+      let typeBadge,typeLabel
+      if(isCF){typeBadge='trade-type-flow';typeLabel=isBuy?'APLIC':'RESG'}
+      else{typeBadge=isBuy?'trade-type-buy':'trade-type-sell';typeLabel=isBuy?'C':'V'}
+      const fxRate=t.currency==='USD'?(usdBrl||5.8):1
+      const fin=Math.abs(t.quantity*t.price*fxRate)
+      const time=new Date(t.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
+      const tid=t.id
+      if(isCF){
+        return`<tr data-tid="${tid}">
+          <td><span class="trade-type-badge ${typeBadge}">${typeLabel}</span></td>
+          <td style="font-size:11px">${t.portfolio_name.toUpperCase()}</td>
+          <td><input class="trades-edit-input" data-field="notes" data-orig="${(t.notes||'Cash Flow').replace(/"/g,'&quot;')}" value="${(t.notes||'Cash Flow').replace(/"/g,'&quot;')}" style="width:100px;text-align:left" oninput="markTradeChanged(this)"/></td>
+          <td style="text-align:right"><input class="trades-edit-input" data-field="quantity" data-orig="${t.quantity}" type="number" step="any" value="${t.quantity}" style="width:90px;text-align:right" oninput="markTradeChanged(this)"/></td>
+          <td style="text-align:right;font-family:var(--font-mono);font-size:12px">—</td>
+          <td style="text-align:right;font-family:var(--font-mono);font-size:12px;${isBuy?'color:var(--green)':'color:var(--red)'}">R$ ${fmtBRL(Math.abs(t.quantity))}</td>
+          <td style="font-size:11px;color:var(--text-2)">${time}</td>
+          <td style="text-align:right"><button class="btn-del" onclick="deleteTrade('${tid}')">✕</button></td>
+        </tr>`
+      }
+      return`<tr data-tid="${tid}">
+        <td><span class="trade-type-badge ${typeBadge}">${typeLabel}</span></td>
+        <td style="font-size:11px">${t.portfolio_name.toUpperCase()}</td>
+        <td><input class="trades-edit-input" data-field="ticker" data-orig="${t.ticker}" value="${t.ticker}" style="width:80px;text-transform:uppercase;text-align:left" oninput="markTradeChanged(this)"/></td>
+        <td style="text-align:right"><input class="trades-edit-input" data-field="quantity" data-orig="${t.quantity}" type="number" step="any" value="${t.quantity}" style="width:80px;text-align:right" oninput="markTradeChanged(this)"/></td>
+        <td style="text-align:right"><input class="trades-edit-input" data-field="price" data-orig="${t.price}" type="number" step="any" value="${t.price}" style="width:80px;text-align:right" oninput="markTradeChanged(this)"/></td>
+        <td style="text-align:right">
+          <select class="trades-edit-select" data-field="currency" data-orig="${t.currency}" onchange="markTradeChanged(this)">
+            <option value="BRL" ${t.currency==='BRL'?'selected':''}>BRL</option>
+            <option value="USD" ${t.currency==='USD'?'selected':''}>USD</option>
+          </select>
+        </td>
+        <td style="font-size:11px;color:var(--text-2)">${time}</td>
+        <td style="text-align:right"><button class="btn-del" onclick="deleteTrade('${tid}')">✕</button></td>
+      </tr>`
+    }).join('')
+  } else {
+    document.getElementById('trades-tbody').innerHTML=dayTrades.map(t=>{
+      const isCF=t.trade_type==='cash_flow'
+      const isBuy=t.quantity>0
+      let typeBadge,typeLabel
+      if(isCF){typeBadge='trade-type-flow';typeLabel=isBuy?'APLIC':'RESG'}
+      else{typeBadge=isBuy?'trade-type-buy':'trade-type-sell';typeLabel=isBuy?'C':'V'}
+      const fxRate=t.currency==='USD'?(usdBrl||5.8):1
+      const fin=Math.abs(t.quantity*t.price*fxRate)
+      const time=new Date(t.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
+      return`<tr>
+        <td><span class="trade-type-badge ${typeBadge}">${typeLabel}</span></td>
+        <td style="font-size:11px">${t.portfolio_name.toUpperCase()}</td>
+        <td><strong>${isCF?(t.notes||'Cash Flow'):t.ticker}</strong></td>
+        <td style="text-align:right;font-family:var(--font-mono);font-size:12px">${isCF?'—':t.quantity.toLocaleString('pt-BR')}</td>
+        <td style="text-align:right;font-family:var(--font-mono);font-size:12px">${isCF?'—':t.price.toFixed(2)}</td>
+        <td style="text-align:right;font-family:var(--font-mono);font-size:12px;${isBuy?'color:var(--green)':'color:var(--red)'}">R$ ${fmtBRL(fin)}</td>
+        <td style="font-size:11px;color:var(--text-2)">${time}</td>
+        <td style="text-align:right">${isAdmin?`<button class="btn-del" onclick="deleteTrade('${t.id}')">✕</button>`:''}</td>
+      </tr>`
+    }).join('')
+  }
+}
+window.markTradeChanged=function(el){
+  const orig=el.dataset.orig
+  const current=el.value
+  const changed=String(current)!==String(orig)
+  el.classList.toggle('changed',changed)
+  const row=el.closest('tr')
+  if(row)row.classList.toggle('edited',row.querySelector('.changed')!==null)
+}
+window.enterTradesEdit=function(){
+  tradesEditMode=true;renderTradesList()
+}
+window.cancelTradesEdit=function(){
+  tradesEditMode=false;renderTradesList()
+}
+window.applyTradesEdit=async function(){
+  const rows=document.querySelectorAll('#trades-tbody tr[data-tid]')
+  const updates=[]
+  rows.forEach(row=>{
+    const tid=row.dataset.tid
+    if(!row.querySelector('.changed'))return
+    const fields={}
+    row.querySelectorAll('[data-field]').forEach(inp=>{
+      const field=inp.dataset.field
+      const orig=inp.dataset.orig
+      let val=inp.value
+      if(field==='quantity'||field==='price')val=parseFloat(val)
+      if(field==='ticker')val=val.trim().toUpperCase().replace(/[^A-Z0-9^]/g,'')
+      if(String(val)!==String(orig))fields[field]=val
+    })
+    if(Object.keys(fields).length)updates.push({id:tid,fields})
+  })
+  if(!updates.length){toast('Nenhuma alteração detectada.','err');tradesEditMode=false;renderTradesList();return}
+  // Validate
+  for(const u of updates){
+    if(u.fields.quantity!==undefined&&(isNaN(u.fields.quantity)||u.fields.quantity===0)){toast('Quantidade inválida em um dos trades.','err');return}
+    if(u.fields.price!==undefined&&(isNaN(u.fields.price)||u.fields.price<=0)){toast('Preço inválido em um dos trades.','err');return}
+    if(u.fields.ticker!==undefined&&!u.fields.ticker){toast('Ticker vazio em um dos trades.','err');return}
+  }
+  if(!confirm(`Salvar alterações em ${updates.length} trade(s)?`))return
+  let errors=0
+  for(const u of updates){
+    const{error}=await sb.from('trades').update(u.fields).eq('id',u.id)
+    if(error){errors++;console.error('Trade update error:',u.id,error)}
+  }
+  tradesEditMode=false
+  if(errors)toast(`${updates.length-errors} salvo(s), ${errors} erro(s).`,'err')
+  else toast(`${updates.length} trade(s) atualizado(s)!`,'ok')
+  await loadTodayTrades()
 }
 async function handleTradesFile(file){
   if(!file)return
