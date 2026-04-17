@@ -164,6 +164,44 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   .refresh-card{grid-column:1}
   .mini-cards{grid-template-columns:1fr 1fr}
 }
+/* ─── Trades ─────────────────────────────────────── */
+.trades-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.trades-form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
+.trades-type-toggle{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.trades-type-opt{flex:1;font-family:var(--font);font-size:11px;font-weight:500;padding:7px 12px;background:transparent;color:var(--text-2);border:none;cursor:pointer;transition:all .15s;text-align:center}
+.trades-type-opt.active{background:var(--nav);color:#fff}
+.trades-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.trades-form-grid.three-col{grid-template-columns:1fr 1fr 1fr}
+.trades-field label{display:block;font-size:10px;font-weight:500;color:var(--text-2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+.trades-field input,.trades-field select{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:7px 10px;border-radius:var(--radius);outline:none;transition:border-color .15s}
+.trades-field input:focus,.trades-field select:focus{border-color:var(--green)}
+.btn-trade{margin-top:12px;width:100%;font-family:var(--font);font-size:12px;font-weight:500;padding:9px 16px;background:var(--nav);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;transition:background .15s}
+.btn-trade:hover{background:#1f2937}
+.btn-trade:disabled{background:var(--surface2);color:var(--text-3);cursor:not-allowed}
+.trades-cash-hint{font-size:11px;color:var(--text-2);margin-top:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius);line-height:1.5}
+.trades-cash-hint strong{color:var(--text)}
+.trades-upload-mini{border:1.5px dashed var(--border-strong);padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);border-radius:var(--radius-lg);position:relative;margin-top:12px}
+.trades-upload-mini:hover,.trades-upload-mini.over{border-color:var(--green);background:var(--green-bg)}
+.trades-upload-mini input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.trades-upload-mini h4{font-size:12px;font-weight:600;margin-bottom:2px}.trades-upload-mini p{font-size:11px;color:var(--text-2)}
+.trades-list-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.trades-list-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.trades-list-title{font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em}
+.trades-count{font-size:11px;color:var(--text-3);background:var(--surface2);padding:2px 8px;border-radius:10px}
+.trades-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.trades-tbl th{padding:8px 10px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.03em}
+.trades-tbl td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.trades-tbl tr:last-child td{border-bottom:none}
+.trades-tbl tr:hover td{background:var(--bg)}
+.trade-type-badge{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:500;text-transform:uppercase}
+.trade-type-buy{background:var(--green-bg);color:var(--green-text)}
+.trade-type-sell{background:var(--red-bg);color:var(--red-text)}
+.trade-type-flow{background:var(--blue-bg);color:var(--blue-text)}
+.trades-empty{padding:32px 16px;text-align:center;color:var(--text-3);font-size:13px}
+.trades-impact{margin-top:16px}
+.trades-impact-title{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+@media(max-width:900px){.trades-layout{grid-template-columns:1fr}}
+@media(max-width:768px){.trades-form-grid{grid-template-columns:1fr}.trades-form-grid.three-col{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -181,6 +219,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 </nav>
 <div class="tabs" id="tabs-bar">
   <button class="tab active" id="tab-consolidacao" onclick="switchToConsolidacao(this)">consolidado</button>
+  <button class="tab tab-hist" id="tab-trades" onclick="switchTab('trades',this)">trades</button>
   <button class="tab tab-hist" id="tab-historico" onclick="switchTab('historico',this)">histórico</button>
 </div>
 <div class="panel active" id="panel-consolidacao">
@@ -216,6 +255,64 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   <div class="chart-box">
     <canvas id="chart-canvas" height="280"></canvas>
     <div class="empty-chart" id="empty-chart" style="display:none">Nenhum dado ainda para hoje.</div>
+  </div>
+</div>
+<div class="panel" id="panel-trades">
+  <div class="trades-layout">
+    <div class="trades-form-card">
+      <div class="form-section-title">Registrar movimentação</div>
+      <div class="trades-type-toggle">
+        <button class="trades-type-opt active" id="ttype-trade" onclick="setTradeFormType('trade')">Compra / Venda</button>
+        <button class="trades-type-opt" id="ttype-flow" onclick="setTradeFormType('cash_flow')">Aplicação / Resgate</button>
+      </div>
+      <div id="trade-form-trade">
+        <div class="trades-form-grid">
+          <div class="trades-field"><label>Carteira</label><select id="tr-portfolio"></select></div>
+          <div class="trades-field"><label>Ticker</label><input type="text" id="tr-ticker" placeholder="PETR4" style="text-transform:uppercase"/></div>
+        </div>
+        <div class="trades-form-grid three-col" style="margin-top:10px">
+          <div class="trades-field"><label>Quantidade</label><input type="number" id="tr-qty" placeholder="100 (neg=venda)" step="any"/></div>
+          <div class="trades-field"><label>Preço</label><input type="number" id="tr-price" placeholder="35.50" step="any"/></div>
+          <div class="trades-field"><label>Moeda</label><select id="tr-currency"><option value="BRL">BRL</option><option value="USD">USD</option></select></div>
+        </div>
+        <div class="trades-cash-hint" id="tr-cash-hint" style="display:none"></div>
+        <button class="btn-trade" id="btn-add-trade" onclick="addTrade()">+ registrar trade</button>
+      </div>
+      <div id="trade-form-flow" style="display:none">
+        <div class="trades-form-grid">
+          <div class="trades-field"><label>Carteira</label><select id="tr-flow-portfolio"></select></div>
+          <div class="trades-field"><label>Tipo</label><select id="tr-flow-type"><option value="aplicacao">Aplicação (entrada)</option><option value="resgate">Resgate (saída)</option></select></div>
+        </div>
+        <div class="trades-form-grid" style="margin-top:10px">
+          <div class="trades-field"><label>Valor (R$)</label><input type="number" id="tr-flow-value" placeholder="100000" step="any"/></div>
+          <div class="trades-field"><label>Observação</label><input type="text" id="tr-flow-notes" placeholder="Opcional"/></div>
+        </div>
+        <button class="btn-trade" onclick="addCashFlow()">+ registrar movimentação</button>
+      </div>
+      <div class="trades-upload-mini" id="trades-drop-zone">
+        <input type="file" id="trades-file-input" accept=".csv,.xlsx,.xls,.txt"/>
+        <h4>Upload de trades via CSV</h4>
+        <p>CARTEIRA, TICKER, QUANTIDADE, PREÇO, MOEDA</p>
+      </div>
+    </div>
+    <div class="trades-list-card">
+      <div class="trades-list-header">
+        <span class="trades-list-title">Trades de hoje</span>
+        <span class="trades-count" id="trades-count">0</span>
+      </div>
+      <div id="trades-list-body">
+        <div class="trades-empty" id="trades-empty">Nenhum trade registrado hoje.</div>
+        <div style="overflow-x:auto">
+          <table class="trades-tbl" id="trades-table" style="display:none">
+            <thead><tr>
+              <th>Tipo</th><th>Carteira</th><th>Ticker</th><th style="text-align:right">Qtd</th>
+              <th style="text-align:right">Preço</th><th style="text-align:right">Financeiro</th><th>Hora</th><th></th>
+            </tr></thead>
+            <tbody id="trades-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <div class="panel" id="panel-alertas">
@@ -307,6 +404,7 @@ let tickerMap={},sortStates={},consolSortCol='gross',consolSortAsc=false
 let chartInstance=null,currencyMode='original',autoRefresh=false
 let lastRefresh=null,cooldownTimer=null,elapsedTimer=null,autoRefreshTimer=null,isRefreshing=false
 let selectedPortfolios=new Set()
+let todayTrades=[],tradeFormType='trade'
 const COOLDOWN_MS=1*60*1000,AUTO_REFRESH_MS=10*60*1000,MAX_MULTI=3,MULTI_MIN_WIDTH=1100,BRAPI_BATCH=20
 function safeid(s){return s.replace(/[^a-zA-Z0-9]/g,'_')}
 function formatDate(d){const[y,m,day]=d.split('-');return`${day}/${m}/${y}`}
@@ -355,7 +453,7 @@ async function boot(){
   document.getElementById('role-badge').textContent=role
   if(role==='admin'){document.getElementById('nav-setup').style.display='block';document.getElementById('admin-api-section').style.display='block';document.getElementById('cfg-brapi').value=window._brapiToken;document.getElementById('cfg-finnhub').value=window._finnhubToken}
   else{document.getElementById('alert-admin-wrap').style.display='none'}
-  await loadPreferences();await loadTickerMap();await loadTodayPortfolios();loadAlerts()
+  await loadPreferences();await loadTickerMap();await loadTodayPortfolios();await loadTodayTrades();loadAlerts()
 }
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('pt-BR',{hour12:false})},1000)
 
@@ -449,6 +547,7 @@ window.switchTab=function(name,el){
   deactivateAll();el.classList.add('active');document.getElementById('panel-'+name).classList.add('active')
   selectedPortfolios.clear();updatePortfolioTabsUI()
   if(name==='historico')loadChart();if(name==='admin'){loadMembers();renderTickerMap()}
+  if(name==='trades'){populateTradeDropdowns();renderTradesList()}
 }
 window.switchToConsolidacao=function(el){deactivateAll();el.classList.add('active');document.getElementById('panel-consolidacao').classList.add('active');selectedPortfolios.clear();updatePortfolioTabsUI()}
 window.navTo=function(name){deactivateAll();document.getElementById('panel-'+name).classList.add('active');selectedPortfolios.clear();if(name==='admin'){loadMembers();renderTickerMap()}}
@@ -466,7 +565,7 @@ function updatePortfolioTabsUI(){
   if(isWideScreen()&&Object.keys(portfolios).length>1){
     const hint=document.createElement('span');hint.className='multi-hint'
     hint.textContent=selectedPortfolios.size>0?`${selectedPortfolios.size} selecionada(s)`:'clique para comparar'
-    document.getElementById('tabs-bar').insertBefore(hint,document.getElementById('tab-historico'))
+    document.getElementById('tabs-bar').insertBefore(hint,document.getElementById('tab-trades'))
   }
 }
 function renderPortfoliosGrid(){
@@ -563,10 +662,10 @@ function updateRefreshButton(){
 
 function buildPortfolioTabs(names){
   document.querySelectorAll('.tab.port-tab').forEach(t=>t.remove())
-  const bar=document.getElementById('tabs-bar'),histTab=document.getElementById('tab-historico')
+  const bar=document.getElementById('tabs-bar'),tradesTab=document.getElementById('tab-trades')
   names.forEach(name=>{
     const btn=document.createElement('button');btn.className='tab port-tab';btn.textContent=name.toUpperCase();btn.dataset.portname=name
-    btn.onclick=function(){handlePortfolioTabClick(name)};bar.insertBefore(btn,histTab)
+    btn.onclick=function(){handlePortfolioTabClick(name)};bar.insertBefore(btn,tradesTab)
   });updatePortfolioTabsUI()
 }
 function buildUploadZone(){
@@ -730,7 +829,86 @@ function computeRowVar(p){
   if(currencyMode==='brl')return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:varPctBrl,hasQuote:true,hasPrevClose:!!p.prevClose,isUSD:true}
   return{price:priceBrl,valueBrl,valueBrlOntem:valueBrlOntemUSD,varBrl,varPct:stockVarPctUsd,hasQuote:true,hasPrevClose:!!p.prevClose,isUSD:true}
 }
-function computeRows(name){return(portfolios[name]||[]).map(p=>({...p,...computeRowVar(p)}))}
+function getAdjustedPositions(name){
+  const original=(portfolios[name]||[]).map(p=>({...p}))
+  const trades=todayTrades.filter(t=>t.portfolio_name===name&&t.trade_date===new Date().toISOString().slice(0,10))
+  if(!trades.length)return original
+  // Build position map: ticker -> {qty, prevClose, currency, ...}
+  const posMap={}
+  original.forEach(p=>{posMap[p.ticker]={...p,_origQty:p.qty,_origPrevClose:p.prevClose}})
+  // Find cash ticker for this portfolio
+  const cashTicker=findCashTicker(name)
+  // Apply trades sequentially
+  for(const t of trades){
+    if(t.trade_type==='cash_flow'){
+      // Cash flow: just adjust cash qty
+      if(cashTicker&&posMap[cashTicker]){
+        posMap[cashTicker].qty+=t.quantity // positive=aplicação, negative=resgate
+      } else if(cashTicker){
+        posMap[cashTicker]={ticker:cashTicker,qty:t.quantity,market:'BR',currency:'BRL',prevClose:1,book:'Caixa',sector:'—'}
+      }
+      continue
+    }
+    // Regular trade
+    const tk=t.ticker
+    if(posMap[tk]){
+      const old=posMap[tk]
+      const oldQty=old.qty,oldPrev=old.prevClose||0
+      const newQty=oldQty+t.quantity
+      if(newQty!==0){
+        const costBasis=oldQty*oldPrev+t.quantity*t.price
+        old.prevClose=costBasis/newQty
+      } else {
+        // Zeroed out — store realized P&L info
+        old._realizedCostBasis=oldQty*oldPrev+t.quantity*t.price
+      }
+      old.qty=newQty
+    } else {
+      // New position from trade
+      posMap[tk]={ticker:tk,qty:t.quantity,market:t.currency==='USD'?'US':'BR',currency:t.currency,prevClose:t.price,book:tickerMap[tk]?.book||'—',sector:tickerMap[tk]?.sector||'—'}
+    }
+    // Impact CASH: cash -= qty * price * fxRate
+    if(cashTicker){
+      const fxRate=t.currency==='USD'?(usdBrl||5.8):1
+      const cashImpact=t.quantity*t.price*fxRate
+      if(posMap[cashTicker]){
+        posMap[cashTicker].qty-=cashImpact
+      } else {
+        posMap[cashTicker]={ticker:cashTicker,qty:-cashImpact,market:'BR',currency:'BRL',prevClose:1,book:'Caixa',sector:'—'}
+      }
+    }
+  }
+  return Object.values(posMap)
+}
+function findCashTicker(name){
+  const positions=portfolios[name]||[]
+  // Look for common cash patterns
+  const cashPatterns=[/^caixa$/i,/^cash$/i,/^disp/i,/^cxa$/i]
+  for(const p of positions){
+    for(const pat of cashPatterns){
+      if(pat.test(p.ticker))return p.ticker
+    }
+  }
+  // Fallback: look for BRL position with prevClose === 1
+  for(const p of positions){
+    if(p.currency==='BRL'&&p.prevClose===1&&p.qty>10000)return p.ticker
+  }
+  return null
+}
+function computeRows(name){return getAdjustedPositions(name).map(p=>{
+  // Handle zeroed positions with realized P&L
+  if(p.qty===0&&p._realizedCostBasis!=null){
+    const realizedPnl=-p._realizedCostBasis
+    // Preserve original yesterday value for proper portfolio % denominator
+    const isUSD=p.currency==='USD'
+    const usdNow=usdBrl||5.8;const usdYest=usdNow/(1+(usdVarPct/100)||1)
+    const origPrev=p._origPrevClose||0;const origQty=p._origQty||0
+    const fxYest=isUSD?usdYest:1
+    const valueBrlOntem=origQty*origPrev*fxYest
+    return{...p,price:0,valueBrl:0,valueBrlOntem,varBrl:realizedPnl,varPct:0,hasQuote:true,hasPrevClose:true,isZeroed:true}
+  }
+  return{...p,...computeRowVar(p)}
+})}
 function computeSummary(rows){
   let gross=0,net=0,totalVarBrl=0,grossOntem=0,netOntem=0
   rows.forEach(r=>{gross+=Math.abs(r.valueBrl);net+=r.valueBrl;totalVarBrl+=r.varBrl;grossOntem+=Math.abs(r.valueBrlOntem||0);netOntem+=(r.valueBrlOntem||0)})
@@ -758,10 +936,14 @@ function renderPortfolio(name){
   })
   const tbody=document.getElementById('tbl-'+sid);if(!tbody)return
   tbody.innerHTML=sorted.map(row=>{
-    const{ticker,qty,currency,book,sector,price,varPct,hasQuote,hasPrevClose,isIgnored,portVar,weightAbs}=row
+    const{ticker,qty,currency,book,sector,price,varPct,hasQuote,hasPrevClose,isIgnored,isZeroed,portVar,weightAbs}=row
     const isUSD=currency==='USD';const isPos=varPct>=0;const q=quotes[ticker]
     let priceCell,varCell
-    if(isIgnored){
+    if(isZeroed){
+      priceCell=`<span class="err-lbl">zerada</span>`
+      const rlzPnl=row.varBrl
+      varCell=`<span class="${rlzPnl>=0?'var-pos':'var-neg'}">${(rlzPnl>=0?'+':'')}${fmtBRL(rlzPnl)}</span>`
+    } else if(isIgnored){
       priceCell=price>0?`${fmtBRL(price)}<span class="prev-tag">prev</span>`:`<span class="err-lbl">sem preço</span>`
       varCell=`<span class="var-zero">—</span>`
     } else if(hasQuote){
@@ -826,8 +1008,9 @@ window.sortPortfolio=function(name,col){
 
 window.openTickerModal=function(ticker,currentPortfolio){
   document.getElementById('modal-thead').innerHTML='<tr><th>Carteira</th><th class="r" style="padding-right:12px">Quantidade</th><th class="r">Peso</th></tr>'
-  const portRows=Object.entries(portfolios).map(([portName,positions])=>{
-    const pos=positions.find(p=>p.ticker===ticker);if(!pos)return null
+  const portRows=Object.keys(portfolios).map(portName=>{
+    const adjPositions=getAdjustedPositions(portName)
+    const pos=adjPositions.find(p=>p.ticker===ticker);if(!pos)return null
     const rows=computeRows(portName);const{netOntem}=computeSummary(rows)
     const row=rows.find(r=>r.ticker===ticker);const weight=netOntem!==0?(row?.valueBrlOntem||0)/netOntem*100:0
     return{portName,qty:pos.qty,weight}
@@ -983,6 +1166,164 @@ window.openBookModal=function(book,portName){
   document.getElementById('modal-overlay').style.display='block'
 }
   
+// ─── Trades ────────────────────────────────────────────
+async function loadTodayTrades(){
+  const today=new Date().toISOString().slice(0,10)
+  const{data}=await sb.from('trades').select('*').eq('group_id',groupId).eq('trade_date',today).order('created_at',{ascending:true})
+  todayTrades=data||[]
+  renderTradesList();populateTradeDropdowns()
+  if(Object.keys(portfolios).length){renderConsolidation();if(selectedPortfolios.size>0)renderPortfoliosGrid()}
+}
+function populateTradeDropdowns(){
+  const names=Object.keys(portfolios)
+  const selTrade=document.getElementById('tr-portfolio')
+  const selFlow=document.getElementById('tr-flow-portfolio')
+  if(selTrade){selTrade.innerHTML=names.map(n=>`<option value="${n}">${n.toUpperCase()}</option>`).join('')}
+  if(selFlow){selFlow.innerHTML=names.map(n=>`<option value="${n}">${n.toUpperCase()}</option>`).join('')}
+  updateCashHint()
+  // Hide form for non-admin
+  if(role!=='admin'){
+    const fc=document.querySelector('.trades-form-card');if(fc)fc.style.display='none'
+    const layout=document.querySelector('.trades-layout');if(layout)layout.style.gridTemplateColumns='1fr'
+  }
+}
+function updateCashHint(){
+  const hint=document.getElementById('tr-cash-hint')
+  if(!hint)return
+  const portName=document.getElementById('tr-portfolio')?.value
+  if(!portName){hint.style.display='none';return}
+  const cashTk=findCashTicker(portName)
+  if(cashTk){
+    hint.style.display='block'
+    hint.innerHTML=`<strong>CASH detectado:</strong> ${cashTk} — trades impactarão automaticamente esta posição.`
+  } else {
+    hint.style.display='block'
+    hint.innerHTML=`⚠ Nenhuma posição CASH encontrada nesta carteira. Trades <u>não</u> impactarão o caixa.`
+  }
+}
+window.setTradeFormType=function(type){
+  tradeFormType=type
+  document.getElementById('ttype-trade').classList.toggle('active',type==='trade')
+  document.getElementById('ttype-flow').classList.toggle('active',type==='cash_flow')
+  document.getElementById('trade-form-trade').style.display=type==='trade'?'block':'none'
+  document.getElementById('trade-form-flow').style.display=type==='cash_flow'?'block':'none'
+}
+window.addTrade=async function(){
+  const portName=document.getElementById('tr-portfolio').value
+  const ticker=document.getElementById('tr-ticker').value.trim().toUpperCase().replace(/[^A-Z0-9^]/g,'')
+  const qty=parseFloat(document.getElementById('tr-qty').value)
+  const price=parseFloat(document.getElementById('tr-price').value)
+  const currency=document.getElementById('tr-currency').value
+  if(!portName){toast('Selecione uma carteira.','err');return}
+  if(!ticker){toast('Informe o ticker.','err');return}
+  if(isNaN(qty)||qty===0){toast('Quantidade inválida.','err');return}
+  if(isNaN(price)||price<=0){toast('Preço inválido.','err');return}
+  const today=new Date().toISOString().slice(0,10)
+  const fxRate=currency==='USD'?(usdBrl||5.8):1
+  const fin=Math.abs(qty*price*fxRate)
+  const desc=qty>0?'Compra':'Venda'
+  if(!confirm(`${desc} de ${Math.abs(qty)} ${ticker} @ ${price.toFixed(2)} ${currency}\nFinanceiro: R$ ${fmtBRL(fin)}\n\nConfirmar?`))return
+  const{error}=await sb.from('trades').insert({group_id:groupId,portfolio_name:portName,ticker,quantity:qty,price,currency,trade_type:'trade',trade_date:today,created_by:user.id})
+  if(error){toast('Erro: '+error.message,'err');return}
+  document.getElementById('tr-ticker').value='';document.getElementById('tr-qty').value='';document.getElementById('tr-price').value=''
+  toast(`${desc} registrada: ${Math.abs(qty)} ${ticker}`,'ok')
+  await loadTodayTrades()
+}
+window.addCashFlow=async function(){
+  const portName=document.getElementById('tr-flow-portfolio').value
+  const flowType=document.getElementById('tr-flow-type').value
+  const value=parseFloat(document.getElementById('tr-flow-value').value)
+  const notes=document.getElementById('tr-flow-notes').value.trim()
+  if(!portName){toast('Selecione uma carteira.','err');return}
+  if(isNaN(value)||value<=0){toast('Valor inválido.','err');return}
+  const qty=flowType==='aplicacao'?value:-value
+  const label=flowType==='aplicacao'?'Aplicação':'Resgate'
+  if(!confirm(`${label} de R$ ${fmtBRL(value)} na carteira ${portName.toUpperCase()}\n\nConfirmar?`))return
+  const today=new Date().toISOString().slice(0,10)
+  const{error}=await sb.from('trades').insert({group_id:groupId,portfolio_name:portName,ticker:'CASH_FLOW',quantity:qty,price:1,currency:'BRL',trade_type:'cash_flow',trade_date:today,notes:notes||label,created_by:user.id})
+  if(error){toast('Erro: '+error.message,'err');return}
+  document.getElementById('tr-flow-value').value='';document.getElementById('tr-flow-notes').value=''
+  toast(`${label} registrada: R$ ${fmtBRL(value)}`,'ok')
+  await loadTodayTrades()
+}
+window.deleteTrade=async function(id){
+  if(!confirm('Remover este trade?'))return
+  const{error}=await sb.from('trades').delete().eq('id',id)
+  if(error){toast('Erro: '+error.message,'err');return}
+  toast('Trade removido','ok')
+  await loadTodayTrades()
+}
+function renderTradesList(){
+  const today=new Date().toISOString().slice(0,10)
+  const dayTrades=todayTrades.filter(t=>t.trade_date===today)
+  document.getElementById('trades-count').textContent=dayTrades.length
+  if(!dayTrades.length){
+    document.getElementById('trades-empty').style.display='block'
+    document.getElementById('trades-table').style.display='none'
+    return
+  }
+  document.getElementById('trades-empty').style.display='none'
+  document.getElementById('trades-table').style.display='table'
+  const isAdmin=role==='admin'
+  document.getElementById('trades-tbody').innerHTML=dayTrades.map(t=>{
+    const isCF=t.trade_type==='cash_flow'
+    const isBuy=t.quantity>0
+    let typeBadge,typeLabel
+    if(isCF){typeBadge='trade-type-flow';typeLabel=isBuy?'APLIC':'RESG'}
+    else{typeBadge=isBuy?'trade-type-buy':'trade-type-sell';typeLabel=isBuy?'C':'V'}
+    const fxRate=t.currency==='USD'?(usdBrl||5.8):1
+    const fin=Math.abs(t.quantity*t.price*fxRate)
+    const time=new Date(t.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
+    return`<tr>
+      <td><span class="trade-type-badge ${typeBadge}">${typeLabel}</span></td>
+      <td style="font-size:11px">${t.portfolio_name.toUpperCase()}</td>
+      <td><strong>${isCF?(t.notes||'Cash Flow'):t.ticker}</strong></td>
+      <td style="text-align:right;font-family:var(--font-mono);font-size:12px">${isCF?'—':t.quantity.toLocaleString('pt-BR')}</td>
+      <td style="text-align:right;font-family:var(--font-mono);font-size:12px">${isCF?'—':t.price.toFixed(2)}</td>
+      <td style="text-align:right;font-family:var(--font-mono);font-size:12px;${isBuy?'color:var(--green)':'color:var(--red)'}">R$ ${fmtBRL(fin)}</td>
+      <td style="font-size:11px;color:var(--text-2)">${time}</td>
+      <td style="text-align:right">${isAdmin?`<button class="btn-del" onclick="deleteTrade('${t.id}')">✕</button>`:''}</td>
+    </tr>`
+  }).join('')
+}
+async function handleTradesFile(file){
+  if(!file)return
+  const ext=file.name.split('.').pop().toLowerCase();let rows
+  if(['xlsx','xls'].includes(ext)){const buf=await file.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1})}
+  else{const txt=await file.text();rows=txt.split('\n').map(l=>{const sep=l.includes(';')?';':',';return l.split(sep)})}
+  const validTrades=[]
+  for(const row of rows){
+    if(!row||row.length<4)continue
+    const portName=String(row[0]).trim()
+    const ticker=String(row[1]).trim().toUpperCase().replace(/[^A-Z0-9^]/g,'')
+    const qty=parseFloat(String(row[2]).replace(',','.'))
+    const price=parseFloat(String(row[3]).replace(',','.'))
+    const currency=row[4]?String(row[4]).trim().toUpperCase():'BRL'
+    if(!portName||portName==='CARTEIRA'||!ticker||ticker==='TICKER'||isNaN(qty)||qty===0||isNaN(price)||price<=0)continue
+    if(!portfolios[portName]){toast(`Carteira "${portName}" não encontrada, linha ignorada.`,'err');continue}
+    validTrades.push({group_id:groupId,portfolio_name:portName,ticker,quantity:qty,price,currency:['USD','BRL'].includes(currency)?currency:'BRL',trade_type:'trade',trade_date:new Date().toISOString().slice(0,10),created_by:user.id})
+  }
+  if(!validTrades.length){toast('Nenhum trade válido encontrado.','err');return}
+  if(!confirm(`${validTrades.length} trade(s) encontrados. Confirmar upload?`))return
+  const{error}=await sb.from('trades').insert(validTrades)
+  if(error){toast('Erro: '+error.message,'err');return}
+  toast(`${validTrades.length} trades importados!`,'ok')
+  await loadTodayTrades()
+}
+// Wire up trades file upload after DOM ready
+setTimeout(()=>{
+  const zone=document.getElementById('trades-drop-zone')
+  if(zone){
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('over')})
+    zone.addEventListener('dragleave',()=>zone.classList.remove('over'))
+    zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('over');handleTradesFile(e.dataTransfer.files[0])})
+  }
+  const inp=document.getElementById('trades-file-input')
+  if(inp)inp.addEventListener('change',e=>{if(e.target.files[0])handleTradesFile(e.target.files[0])})
+  const trPort=document.getElementById('tr-portfolio')
+  if(trPort)trPort.addEventListener('change',updateCashHint)
+},100)
+
 boot()
 </script>
 </body>
