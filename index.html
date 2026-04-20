@@ -77,6 +77,10 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .err-lbl{font-size:11px;color:var(--text-3)}
 .last-upd{font-size:11px;color:var(--text-3);text-align:right;margin-top:8px}
 .book-summary{margin-top:12px}
+.book-toggle{display:inline-flex;background:var(--surface-2,#e5e7eb);border-radius:6px;overflow:hidden;font-size:11px;font-weight:600;margin-left:0}
+.book-toggle button{border:none;background:transparent;padding:3px 10px;cursor:pointer;color:var(--text-2);font-size:11px;font-weight:600;font-family:inherit;transition:all .15s}
+.book-toggle button.active{background:var(--green);color:#fff;border-radius:5px}
+.book-summary-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .upload-zone{border:1.5px dashed var(--border-strong);padding:24px 32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative;margin-top:20px;border-radius:var(--radius-lg)}
 .upload-zone:hover,.upload-zone.over{border-color:var(--green);background:var(--green-bg)}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -418,7 +422,7 @@ import{SUPABASE_URL,SUPABASE_ANON_KEY}from'./config.js'
 const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
 let user=null,groupId=null,groupName=null,role=null
 let portfolios={},quotes={},usdBrl=null,usdVarPct=0,ibovPct=null,ibovVal=null
-let tickerMap={},sortStates={},consolSortCol='gross',consolSortAsc=false
+let tickerMap={},sortStates={},consolSortCol='gross',consolSortAsc=false,bookGroupMode={}
 let chartInstance=null,currencyMode='original',autoRefresh=false
 let lastRefresh=null,cooldownTimer=null,elapsedTimer=null,autoRefreshTimer=null,isRefreshing=false
 let selectedPortfolios=new Set()
@@ -1002,14 +1006,18 @@ function renderPortfolio(name){
 
 function renderBookSummary(name,rows,netOntem){
   const sid=safeid(name);const existing=document.getElementById('book-tbl-'+sid);if(existing)existing.remove()
-  const books={}
-  rows.forEach(r=>{const b=r.book||'—';if(!books[b])books[b]={weightSum:0,portVarSum:0};books[b].weightSum+=r.weightAbs;books[b].portVarSum+=r.portVar})
-  const bookList=Object.entries(books).map(([book,v])=>({book,weightPct:v.weightSum*100,portVarPct:v.portVarSum*100,pnlDia:v.weightSum!==0?(v.portVarSum/v.weightSum)*100:0})).sort((a,b)=>b.weightPct-a.weightPct)
+  const mode=bookGroupMode[name]||'book'
+  const groups={}
+  rows.forEach(r=>{const key=mode==='sector'?(r.sector||'—'):(r.book||'—');if(!groups[key])groups[key]={weightSum:0,portVarSum:0};groups[key].weightSum+=r.weightAbs;groups[key].portVarSum+=r.portVar})
+  const groupList=Object.entries(groups).map(([label,v])=>({label,weightPct:v.weightSum*100,portVarPct:v.portVarSum*100,pnlDia:v.weightSum!==0?(v.portVarSum/v.weightSum)*100:0})).sort((a,b)=>b.weightPct-a.weightPct)
   const wrap=document.createElement('div');wrap.id='book-tbl-'+sid;wrap.className='book-summary'
-  wrap.innerHTML=`<div class="tbl-wrap"><div class="tbl-scroll"><table>
-    <thead><tr><th>Book</th><th class="r">% Dia</th><th class="r">P&L Carteira</th><th class="r">Peso</th></tr></thead>
-    <tbody>${bookList.map(r=>`<tr>
-      <td style="font-weight:500;cursor:pointer;" onclick="openBookModal('${r.book}','${name}')">${r.book}</td>
+  const colLabel=mode==='sector'?'Setor':'Book'
+  const bookActive=mode==='book'?'active':''
+  const sectorActive=mode==='sector'?'active':''
+  wrap.innerHTML=`<div class="book-summary-header"><div class="book-toggle"><button class="${bookActive}" onclick="setBookGroupMode('${name}','book')">Book</button><button class="${sectorActive}" onclick="setBookGroupMode('${name}','sector')">Setor</button></div></div><div class="tbl-wrap"><div class="tbl-scroll"><table>
+    <thead><tr><th>${colLabel}</th><th class="r">% Dia</th><th class="r">P&L Carteira</th><th class="r">Peso</th></tr></thead>
+    <tbody>${groupList.map(r=>`<tr>
+      <td style="font-weight:500;cursor:pointer;" onclick="openBookModal('${r.label.replace(/'/g,"\\'")}','${name}','${mode}')">${r.label}</td>
       <td class="r"><span class="${r.pnlDia>=0?'var-pos':'var-neg'}">${fmtPct(r.pnlDia)}</span></td>
       <td class="r"><span class="${r.portVarPct>=0?'var-pos':'var-neg'}">${fmtPct(r.portVarPct)}</span></td>
       <td class="r"><div class="bar-wrap"><span class="num ${r.weightPct<0?'neg':''}">${r.weightPct<0?'−':''}${Math.abs(r.weightPct).toFixed(1)}%</span>
@@ -1019,6 +1027,7 @@ function renderBookSummary(name,rows,netOntem){
   </table></div></div>`
   const portInner=document.getElementById('inner-'+sid);if(portInner)portInner.appendChild(wrap)
 }
+window.setBookGroupMode=function(name,mode){bookGroupMode[name]=mode;renderPortfolio(name)}
 
 window.sortPortfolio=function(name,col){
   const ss=sortStates[name]||{col:'portVar',asc:false,bookSectorClicks:0}
@@ -1163,14 +1172,15 @@ window.saveApiKeys=async function(){
 window.doLogout=async function(){await sb.auth.signOut();window.location.href='./login.html'}
 window.toast=function(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',3200)}
   
-window.openBookModal=function(book,portName){
+window.openBookModal=function(label,portName,mode){
+  mode=mode||'book'
   const rows=computeRows(portName)
   const{netOntem}=computeSummary(rows)
   const bookRows=[...rows]
-    .filter(r=>r.book===book)
+    .filter(r=>mode==='sector'?(r.sector||'—')===label:(r.book||'—')===label)
     .map(r=>({...r,weightAbs:netOntem!==0?r.valueBrlOntem/netOntem:0,portVar:netOntem!==0?r.varBrl/netOntem:0}))
     .sort((a,b)=>Math.abs(b.weightAbs)-Math.abs(a.weightAbs))
-  document.getElementById('modal-ticker').textContent=book
+  document.getElementById('modal-ticker').textContent=label
   document.getElementById('modal-thead').innerHTML=
   '<tr><th>Ativo</th><th class="r">Preço</th><th class="r">% Dia</th><th class="r">P&L Carteira</th><th class="r">Peso</th></tr>'
   document.getElementById('modal-body').innerHTML=bookRows.map(r=>{
