@@ -371,10 +371,24 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   <div class="admin-section">
     <div class="form-section-title">Mapeamento de ativos</div>
     <p style="font-size:12px;color:var(--text-2);margin-bottom:14px">Define como cada ativo é buscado, seu book e setor. Admins podem editar.</p>
+    <div id="tmap-bulk-bar" style="display:none;background:var(--nav);color:#fff;padding:10px 14px;border-radius:var(--radius) var(--radius) 0 0;font-size:12px;align-items:center;gap:10px;flex-wrap:wrap">
+      <span id="tmap-bulk-count" style="font-weight:600;min-width:90px">0 selecionados</span>
+      <select id="tmap-bulk-source" class="tmap-select" style="background:var(--nav-surface);color:#fff;border-color:#374151;font-size:12px;padding:5px 8px">
+        <option value="">— fonte —</option>
+        <option value="auto">Auto</option>
+        <option value="brapi">brapi</option>
+        <option value="finnhub">Finnhub</option>
+        <option value="bloomberg">Bloomberg</option>
+        <option value="ignore">Ignorar</option>
+        <option value="manual">Manual</option>
+      </select>
+      <button onclick="applyBulkSource()" style="font-family:var(--font);font-size:11px;font-weight:500;padding:5px 14px;background:var(--green);color:#fff;border:none;border-radius:5px;cursor:pointer">Aplicar</button>
+      <button onclick="clearBulkSelection()" style="font-family:var(--font);font-size:11px;padding:5px 10px;background:transparent;color:var(--nav-muted);border:1px solid #374151;border-radius:5px;cursor:pointer">Limpar seleção</button>
+    </div>
     <div style="overflow-x:auto">
       <table class="tmap-table">
-        <thead><tr><th>Ticker</th><th>Moeda</th><th>Fonte</th><th>Ticker na fonte</th><th>Preço manual</th><th>Book</th><th>Setor</th><th>Status</th><th style="text-align:right">Ação</th></tr></thead>
-        <tbody id="tmap-body"><tr><td colspan="9" style="color:var(--text-3);padding:16px 10px">Carregando...</td></tr></tbody>
+        <thead><tr><th style="width:30px"><input type="checkbox" id="tmap-check-all" onchange="toggleAllTmapChecks(this.checked)" title="Selecionar todos"/></th><th>Ticker</th><th>Moeda</th><th>Fonte</th><th>Ticker na fonte</th><th>Preço manual</th><th>Book</th><th>Setor</th><th>Status</th><th style="text-align:right">Ação</th></tr></thead>
+        <tbody id="tmap-body"><tr><td colspan="10" style="color:var(--text-3);padding:16px 10px">Carregando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -521,7 +535,7 @@ async function resetTickerMapRow(ticker){
 function renderTickerMap(){
   const adjAll=getAllAdjustedFlat().filter(p=>p.ticker!=='CASH_FLOW')
   const allTickers=[...new Set(adjAll.map(p=>({ticker:p.ticker,currency:p.currency})).filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i))].sort((a,b)=>a.ticker.localeCompare(b.ticker))
-  if(!allTickers.length){document.getElementById('tmap-body').innerHTML='<tr><td colspan="9" style="color:var(--text-3);padding:16px">Nenhum ativo carregado.</td></tr>';return}
+  if(!allTickers.length){document.getElementById('tmap-body').innerHTML='<tr><td colspan="10" style="color:var(--text-3);padding:16px">Nenhum ativo carregado.</td></tr>';return}
   const isAdmin=role==='admin'
   // Get current book/sector from positions as fallback
   const posInfo={};adjAll.forEach(p=>{if(!posInfo[p.ticker]||(p.book&&p.book!=='—'))posInfo[p.ticker]={book:p.book||'',sector:p.sector||''}})
@@ -531,9 +545,10 @@ function renderTickerMap(){
     const manualPrice=cfg?.manualPrice||''
     const sb2={auto:`<span class="status-badge status-auto">auto</span>`,brapi:`<span class="status-badge status-brapi">brapi</span>`,finnhub:`<span class="status-badge status-finnhub">finnhub</span>`,bloomberg:`<span class="status-badge status-bbg">bbg</span>`,ignore:`<span class="status-badge status-ignore">ign</span>`,manual:`<span class="status-badge status-manual">manual</span>`}[source]||`<span class="status-badge status-auto">auto</span>`
     const cb=currency==='USD'?`<span style="font-size:10px;font-weight:600;color:var(--blue-text)">USD</span>`:`<span style="font-size:10px;font-weight:600;color:var(--green-text)">BRL</span>`
-    if(!isAdmin){const ec=getTickerConfig(ticker,currency);return`<tr><td><strong>${ticker}</strong></td><td>${cb}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td class="meta-cell">${source==='manual'&&manualPrice?manualPrice:'—'}</td><td class="meta-cell">${book||'—'}</td><td class="meta-cell">${sector||'—'}</td><td>${sb2}</td><td></td></tr>`}
-    return`<tr><td><strong>${ticker}</strong></td><td>${cb}</td>
-      <td><select class="tmap-select" id="tmap-src-${safeid(ticker)}" onchange="onTickerSourceChange('${ticker}')">
+    const chk=isAdmin?`<td><input type="checkbox" class="tmap-chk" data-ticker="${ticker}" data-currency="${currency}" onchange="updateBulkBar()"/></td>`:`<td></td>`
+    if(!isAdmin){const ec=getTickerConfig(ticker,currency);return`<tr>${chk}<td><strong>${ticker}</strong></td><td>${cb}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td class="meta-cell">${source==='manual'&&manualPrice?manualPrice:'—'}</td><td class="meta-cell">${book||'—'}</td><td class="meta-cell">${sector||'—'}</td><td>${sb2}</td><td></td></tr>`}
+    return`<tr data-ticker="${ticker}" data-currency="${currency}">${chk}<td><strong>${ticker}</strong></td><td>${cb}</td>
+      <td><select class="tmap-select" id="tmap-src-${safeid(ticker)}" onchange="onTickerSourceChange('${ticker}','${currency}')">
         <option value="auto" ${source==='auto'?'selected':''}>Auto</option>
         <option value="brapi" ${source==='brapi'?'selected':''}>brapi</option>
         <option value="finnhub" ${source==='finnhub'?'selected':''}>Finnhub</option>
@@ -548,13 +563,62 @@ function renderTickerMap(){
       <td>${sb2}</td>
       <td style="text-align:right"><button class="btn-save-map" onclick="saveTickerRow('${ticker}')">Salvar</button>${cfg?`<button class="btn-reset-map" onclick="resetTickerMapRow('${ticker}')">Reset</button>`:''}</td></tr>`
   }).join('')
+  updateBulkBar()
 }
-window.onTickerSourceChange=function(ticker){
+window.onTickerSourceChange=function(ticker,currency){
   const src=document.getElementById('tmap-src-'+safeid(ticker))?.value
   const inp=document.getElementById('tmap-sticker-'+safeid(ticker))
   const priceInp=document.getElementById('tmap-mprice-'+safeid(ticker))
-  if(inp){inp.disabled=(src==='auto'||src==='ignore'||src==='manual');if(inp.disabled)inp.value=''}
+  if(inp){
+    inp.disabled=(src==='auto'||src==='ignore'||src==='manual')
+    if(src==='bloomberg'){
+      inp.disabled=true
+      inp.value=ticker+(currency==='USD'?' US Equity':' BZ Equity')
+    }else if(inp.disabled){inp.value=''}
+  }
   if(priceInp){priceInp.disabled=(src!=='manual');if(src!=='manual')priceInp.value=''}
+}
+function bbgSourceTicker(ticker,currency){return ticker+(currency==='USD'?' US Equity':' BZ Equity')}
+window.updateBulkBar=function(){
+  const checks=document.querySelectorAll('.tmap-chk:checked')
+  const bar=document.getElementById('tmap-bulk-bar')
+  const countEl=document.getElementById('tmap-bulk-count')
+  if(!bar)return
+  if(checks.length>0){bar.style.display='flex';countEl.textContent=checks.length+' selecionado'+(checks.length>1?'s':'')}
+  else{bar.style.display='none'}
+  const allChecks=document.querySelectorAll('.tmap-chk')
+  const checkAll=document.getElementById('tmap-check-all')
+  if(checkAll)checkAll.checked=allChecks.length>0&&checks.length===allChecks.length
+}
+window.toggleAllTmapChecks=function(checked){
+  document.querySelectorAll('.tmap-chk').forEach(c=>{c.checked=checked})
+  updateBulkBar()
+}
+window.clearBulkSelection=function(){
+  document.querySelectorAll('.tmap-chk').forEach(c=>{c.checked=false})
+  const checkAll=document.getElementById('tmap-check-all');if(checkAll)checkAll.checked=false
+  updateBulkBar()
+}
+window.applyBulkSource=async function(){
+  const newSrc=document.getElementById('tmap-bulk-source')?.value
+  if(!newSrc){toast('Selecione uma fonte primeiro','err');return}
+  const checks=[...document.querySelectorAll('.tmap-chk:checked')]
+  if(!checks.length){toast('Nenhum ativo selecionado','err');return}
+  const items=checks.map(c=>({ticker:c.dataset.ticker,currency:c.dataset.currency}))
+  if(!confirm(`Mudar ${items.length} ativo(s) para "${newSrc}"?`))return
+  let ok=0,errs=0
+  for(const{ticker,currency}of items){
+    const sticker=newSrc==='bloomberg'?bbgSourceTicker(ticker,currency):ticker
+    const book=document.getElementById('tmap-book-'+safeid(ticker))?.value.trim()||tickerMap[ticker]?.book||''
+    const sector=document.getElementById('tmap-sector-'+safeid(ticker))?.value.trim()||tickerMap[ticker]?.sector||''
+    const manualPrice=newSrc==='manual'?tickerMap[ticker]?.manualPrice||null:null
+    try{await saveTickerMapRow(ticker,newSrc,sticker,book,sector,manualPrice);await sb.from('quote_cache').delete().eq('group_id',groupId).eq('ticker',ticker);delete quotes[ticker];ok++}
+    catch(e){console.error(ticker,e);errs++}
+  }
+  renderTickerMap()
+  if(errs)toast(`${ok} salvo(s), ${errs} erro(s)`,'err')
+  else toast(`${ok} ativo(s) → ${newSrc}`,'ok')
+  clearBulkSelection()
 }
 window.saveTickerRow=async function(ticker){
   const src=document.getElementById('tmap-src-'+safeid(ticker))?.value||'auto'
