@@ -534,8 +534,11 @@ function renderTickerMap(){
     if(!isAdmin){const ec=getTickerConfig(ticker,currency);return`<tr><td><strong>${ticker}</strong></td><td>${cb}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td class="meta-cell">${source==='manual'&&manualPrice?manualPrice:'—'}</td><td class="meta-cell">${book||'—'}</td><td class="meta-cell">${sector||'—'}</td><td>${sb2}</td><td></td></tr>`}
     return`<tr><td><strong>${ticker}</strong></td><td>${cb}</td>
       <td><select class="tmap-select" id="tmap-src-${safeid(ticker)}" onchange="onTickerSourceChange('${ticker}')">
-        <option value="auto" ${source==='auto'?'selected':''}>Auto</option><option value="brapi" ${source==='brapi'?'selected':''}>brapi</option>
-        <option value="finnhub" ${source==='finnhub'?'selected':''}>Finnhub</option><option value="ignore" ${source==='ignore'?'selected':''}>Ignorar</option>
+        <option value="auto" ${source==='auto'?'selected':''}>Auto</option>
+        <option value="brapi" ${source==='brapi'?'selected':''}>brapi</option>
+        <option value="finnhub" ${source==='finnhub'?'selected':''}>Finnhub</option>
+        <option value="bloomberg">bloomberg</option>
+        <option value="ignore" ${source==='ignore'?'selected':''}>Ignorar</option>
         <option value="manual" ${source==='manual'?'selected':''}>Manual</option>
       </select></td>
       <td><input class="tmap-input" id="tmap-sticker-${safeid(ticker)}" value="${sourceTicker}" placeholder="${ticker}" style="width:90px" ${source==='ignore'||source==='manual'||source==='auto'?'disabled':''}/></td>
