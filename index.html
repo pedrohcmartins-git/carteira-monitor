@@ -889,6 +889,12 @@ window.refreshAll=async function(){
   const brapiExtra=usdTickers.filter(t=>{const cfg=getTickerConfig(t,'USD');return cfg.source==='brapi'})
   const finnhubExtra=brlTickers.filter(t=>{const cfg=getTickerConfig(t,'BRL');return cfg.source==='finnhub'})
   await Promise.all([fetchUsdBrl(),fetchIbov(),fetchBrapi([...brlTickers,...brapiExtra]),fetchFinnhub([...usdTickers,...finnhubExtra])])
+  // Reler preços Bloomberg do cache (atualizados pelo bloomberg_bridge.py)
+  const bbgTickers=all.map(p=>p.ticker).filter(t=>{const cfg=getTickerConfig(t,all.find(p=>p.ticker===t)?.currency||'BRL');return cfg.source==='bloomberg'})
+  if(bbgTickers.length){
+    const{data:bbgQ}=await sb.from('quote_cache').select('ticker,price,change,change_pct,currency').eq('group_id',groupId).in('ticker',bbgTickers)
+    if(bbgQ)bbgQ.forEach(q=>{quotes[q.ticker]={price:q.price||0,change:q.change||0,changePct:q.change_pct||0,currency:q.currency||'BRL',error:false}})
+  }
   await saveCachedQuotes();renderConsolidation()
   if(selectedPortfolios.size>0){updateTopBar();renderPortfoliosGrid()}
   await saveSnapshots()
