@@ -253,7 +253,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   <div class="tbl-wrap"><div class="tbl-scroll">
     <table>
       <thead><tr>
-        <th onclick="consolSort('name')">Carteira <span id="csort-name"></span></th>
+        <th class="sticky" onclick="consolSort('name')">Carteira <span id="csort-name"></span></th>
         <th class="r" onclick="consolSort('gross')">Gross [R$] <span id="csort-gross"></span></th>
         <th class="r" onclick="consolSort('net')">Net [R$] <span id="csort-net"></span></th>
         <th class="r" onclick="consolSort('varPct')">% Dia <span id="csort-varPct"></span></th>
@@ -1161,14 +1161,14 @@ function renderConsolidation(){
   document.getElementById('consol-body').innerHTML=sorted.map(r=>{
     const vs=ibovPct!=null?r.varPct-ibovPct:null;const vsStr=vs!=null?`<span class="${vs>=0?'var-pos':'var-neg'}">${fmtPct(vs)}</span>`:'—'
     return`<tr>
-      <td style="font-weight:500">${r.name.toUpperCase()}</td>
+      <td class="sticky" style="font-weight:500">${r.name.toUpperCase()}</td>
       <td class="r num">${fmtBRL(r.gross)}</td>
       <td class="r num" style="${r.net<0?'color:var(--red)':''}">${fmtBRL(r.net)}</td>
       <td class="r"><span class="${r.varPct>=0?'var-pos':'var-neg'}">${fmtPct(r.varPct)}</span></td>
       <td class="r num"><span class="${r.varBrl>=0?'var-pos':'var-neg'}">${r.varBrl>=0?'+':''}${fmtBRL(r.varBrl)}</span></td>
       <td class="r">${r.count}</td><td class="r">${vsStr}</td>
     </tr>`
-  }).join('')+`<tr class="total-row"><td>Total</td><td class="r num">${fmtBRL(tG)}</td><td class="r num" style="${tN<0?'color:var(--red)':''}">${fmtBRL(tN)}</td><td class="r"><span class="${tP>=0?'var-pos':'var-neg'}">${fmtPct(tP)}</span></td><td class="r num"><span class="${tC>=0?'var-pos':'var-neg'}">${tC>=0?'+':''}${fmtBRL(tC)}</span></td><td class="r">${tCnt}</td><td class="r">${ibovStr}</td></tr>`
+  }).join('')+`<tr class="total-row"><td class="sticky">Total</td><td class="r num">${fmtBRL(tG)}</td><td class="r num" style="${tN<0?'color:var(--red)':''}">${fmtBRL(tN)}</td><td class="r"><span class="${tP>=0?'var-pos':'var-neg'}">${fmtPct(tP)}</span></td><td class="r num"><span class="${tC>=0?'var-pos':'var-neg'}">${tC>=0?'+':''}${fmtBRL(tC)}</span></td><td class="r">${tCnt}</td><td class="r">${ibovStr}</td></tr>`
 }
 window.consolSort=function(col){
   consolSortAsc=consolSortCol===col?!consolSortAsc:false;consolSortCol=col
