@@ -157,16 +157,27 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   .bar-wrap{min-width:44px}
   .bar{width:36px}
   .num{font-size:11px}
-  .top-bar{grid-template-columns:1fr 1fr}
+  .top-bar{grid-template-columns:1fr 1fr;gap:8px}
   .refresh-card{grid-column:span 2}
-  .mini-cards{grid-template-columns:1fr 1fr}
-  .card-main{font-size:15px}
+  .mkt-card{padding:10px 12px}
+  .mkt-main{font-size:17px}
+  .mkt-sub{font-size:11px}
+  .mini-cards{grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .card{padding:10px 10px}
+  .card-lbl{font-size:9px;margin-bottom:3px}
+  .card-main{font-size:14px;letter-spacing:-.3px}
+  .card-sub{font-size:10px;margin-top:2px}
+  .card-counts{gap:3px}
+  .count-lbl{font-size:9px}
+  .count-val{font-size:12px}
   .form-grid{grid-template-columns:1fr}
 }
 @media(max-width:600px){
-  .top-bar{grid-template-columns:1fr}
-  .refresh-card{grid-column:1}
-  .mini-cards{grid-template-columns:1fr 1fr}
+  .top-bar{grid-template-columns:1fr 1fr;gap:8px}
+  .refresh-card{grid-column:span 2}
+  .card-main{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .card-lbl-unit{display:none}
+  .card-sub{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
 /* ─── Trades ─────────────────────────────────────── */
 .trades-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
