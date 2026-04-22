@@ -176,7 +176,6 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   .top-bar{grid-template-columns:1fr 1fr;gap:8px}
   .refresh-card{grid-column:span 2}
   .card-main{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .card-lbl-unit{display:none}
   .card-sub{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
 /* ─── Trades ─────────────────────────────────────── */
@@ -251,7 +250,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   <button class="tab tab-hist" id="tab-historico" onclick="switchTab('historico',this)">histórico</button>
 </div>
 <div class="panel active" id="panel-consolidacao">
-  <div class="tbl-wrap">
+  <div class="tbl-wrap"><div class="tbl-scroll">
     <table>
       <thead><tr>
         <th onclick="consolSort('name')">Carteira <span id="csort-name"></span></th>
@@ -264,7 +263,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
       </tr></thead>
       <tbody id="consol-body"><tr><td colspan="7" style="padding:32px;color:var(--text-3);text-align:center">Carregando...</td></tr></tbody>
     </table>
-  </div>
+  </div></div>
 </div>
 <div class="panel" id="panel-portfolios">
   <div class="top-bar">
@@ -458,6 +457,7 @@ function formatDate(d){const[y,m,day]=d.split('-');return`${day}/${m}/${y}`}
 
 // ─── Formatting ────────────────────────────────────────────
 function fmtBRL(v){return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmtBRLInt(v){return Math.round(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0})}
 function fmtUSD(v){return v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function fmtPct(v,isUSD=false){
   const abs=Math.abs(v),sign=v>=0?'+':'-'
@@ -1035,10 +1035,10 @@ function computeSummary(rows){
 
 function renderPortfolio(name){
   const sid=safeid(name);const rows=computeRows(name);const{gross,net,varPct,varBrl,netOntem}=computeSummary(rows)
-  const vgEl=document.getElementById('v-gross-'+sid);if(vgEl)vgEl.textContent=fmtBRL(gross)
-  const ne=document.getElementById('v-net-'+sid);if(ne){ne.textContent='Net '+fmtBRL(net);ne.className='card-sub '+(net>=0?'muted':'neg')}
+  const vgEl=document.getElementById('v-gross-'+sid);if(vgEl)vgEl.textContent=fmtBRLInt(gross)
+  const ne=document.getElementById('v-net-'+sid);if(ne){ne.textContent='Net '+fmtBRLInt(net);ne.className='card-sub '+(net>=0?'muted':'neg')}
   const vp=document.getElementById('v-varpct-'+sid);if(vp){vp.textContent=fmtPct(varPct);vp.className='card-main '+(varPct>=0?'pos':'neg')}
-  const vb=document.getElementById('v-varbrl-'+sid);if(vb){vb.textContent=(varBrl>=0?'+':'')+fmtBRL(varBrl);vb.className='card-sub '+(varBrl>=0?'pos':'neg')}
+  const vb=document.getElementById('v-varbrl-'+sid);if(vb){vb.textContent=(varBrl>=0?'+':'')+fmtBRLInt(varBrl);vb.className='card-sub '+(varBrl>=0?'pos':'neg')}
   const lg=document.getElementById('v-longs-'+sid);if(lg)lg.textContent=rows.filter(r=>r.qty>0).length
   const sh=document.getElementById('v-shorts-'+sid);if(sh)sh.textContent=rows.filter(r=>r.qty<0).length
   const tot=document.getElementById('v-total-'+sid);if(tot)tot.textContent=rows.length
