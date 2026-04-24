@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research — Carteira Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f9fafb;
+  color: #1a1a1a;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; font-size: 13px; }
+
+/* ============================================================
+   TOP NAV
+   ============================================================ */
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.top-nav .logo {
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  font-size: 14px;
+  color: #16a34a;
+  white-space: nowrap;
+}
+.top-nav .sep { color: #d1d5db; }
+.nav-links { display: flex; gap: 4px; }
+.nav-link {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  border: none;
+  background: none;
+  transition: all 0.15s;
+}
+.nav-link:hover { background: #f3f4f6; color: #374151; }
+.nav-link.active {
+  background: #f0fdf4;
+  color: #16a34a;
+  font-weight: 500;
+}
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-user {
+  font-size: 12px;
+  color: #9ca3af;
+  font-family: 'DM Mono', monospace;
+}
+.nav-time {
+  font-size: 11px;
+  color: #9ca3af;
+  font-family: 'DM Mono', monospace;
+}
+.btn-logout {
+  font-size: 12px;
+  color: #9ca3af;
+  background: none;
+  border: 1px solid #e5e7eb;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+.btn-logout:hover { background: #f3f4f6; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container { max-width: 960px; margin: 0 auto; padding: 24px 20px; }
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+.dash-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.dash-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+}
+.dash-search {
+  flex: 1;
+  min-width: 180px;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fff;
+  outline: none;
+}
+.dash-search:focus { border-color: #16a34a; }
+.btn-primary {
+  padding: 8px 16px;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: #15803d; }
+.btn-secondary {
+  padding: 8px 16px;
+  background: #fff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+.btn-secondary:hover { background: #f3f4f6; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-danger { color: #dc2626; border-color: #fca5a5; }
+.btn-danger:hover { background: #fef2f2; }
+
+/* Filters */
+.filters { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-chip:hover { background: #e5e7eb; }
+.filter-chip.active {
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
+  font-weight: 500;
+}
+
+/* Coverage grid */
+.coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.cov-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.cov-card:hover { border-color: #16a34a; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+.cov-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.cov-ticker {
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  font-size: 16px;
+}
+.cov-company { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+.cov-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.cov-stats { font-size: 11px; color: #9ca3af; margin-top: 8px; }
+.cov-card-new {
+  border-style: dashed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  color: #9ca3af;
+  font-size: 13px;
+}
+.cov-card-new:hover { color: #16a34a; border-color: #16a34a; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.badge-conv { background: #ede9fe; color: #5b21b6; }
+.badge-oport { background: #fef3c7; color: #92400e; }
+.badge-bull { background: #dcfce7; color: #166534; }
+.badge-bear { background: #fee2e2; color: #991b1b; }
+.badge-neut { background: #f3f4f6; color: #6b7280; }
+.badge-active { background: #dcfce7; color: #166534; }
+.badge-watch { background: #dbeafe; color: #1e40af; }
+.badge-archived { background: #f3f4f6; color: #9ca3af; }
+
+/* Source type badges */
+.src-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+
+/* ============================================================
+   WORKSPACE
+   ============================================================ */
+.ws-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 12px;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+.ws-back:hover { color: #16a34a; }
+.ws-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
+.ws-ticker { font-family: 'DM Mono', monospace; font-weight: 600; font-size: 22px; }
+.ws-subtitle { font-size: 12px; color: #9ca3af; margin-bottom: 16px; }
+
+.ws-tabs { display: flex; gap: 0; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px; }
+.ws-tab {
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #6b7280;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.ws-tab:hover { color: #374151; }
+.ws-tab.active { color: #16a34a; border-bottom-color: #16a34a; font-weight: 500; }
+.ws-panel { display: none; }
+.ws-panel.active { display: block; }
+
+/* ============================================================
+   NOTES
+   ============================================================ */
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.note-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.note-card:hover { border-color: #d1d5db; }
+.note-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.note-date { font-size: 11px; color: #9ca3af; font-family: 'DM Mono', monospace; }
+.note-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.note-content {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+}
+.note-content.collapsed {
+  max-height: 60px;
+  overflow: hidden;
+  position: relative;
+}
+.note-content.collapsed::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(transparent, #fff);
+}
+.note-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.note-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.note-btn {
+  font-size: 11px;
+  color: #9ca3af;
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.note-btn:hover { color: #374151; background: #f3f4f6; }
+.note-btn.delete:hover { color: #dc2626; background: #fef2f2; }
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.form-group { margin-bottom: 14px; }
+.form-label {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.form-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-input:focus { border-color: #16a34a; }
+textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.form-hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: #9ca3af;
+}
+.empty-state p { font-size: 14px; margin-bottom: 12px; }
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+.spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #16a34a;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-center { display: flex; justify-content: center; padding: 40px; }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #fff;
+  background: #1a1a1a;
+  animation: toast-in 0.3s ease;
+  max-width: 320px;
+}
+.toast.error { background: #dc2626; }
+.toast.success { background: #16a34a; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 640px) {
+  .container { padding: 16px 12px; }
+  .top-nav { padding: 8px 12px; gap: 8px; }
+  .nav-user, .nav-time { display: none; }
+  .coverage-grid { grid-template-columns: 1fr; }
+  .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .ws-ticker { font-size: 18px; }
+  .modal { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <span class="logo">Carteira Monitor</span>
+  <span class="sep">|</span>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">portfólio</a>
+    <a href="research.html" class="nav-link active">research</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-user" id="nav-user"></span>
+    <span class="nav-time" id="nav-time"></span>
+    <button class="btn-logout" onclick="logout()">sair</button>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+  <!-- ===================== DASHBOARD VIEW ===================== -->
+  <div id="view-dashboard">
+    <div class="dash-header">
+      <h1 class="dash-title">Cobertura</h1>
+      <input type="text" class="dash-search" id="search-input" placeholder="Buscar ticker ou empresa..." oninput="filterCoverages()">
+      <button class="btn-primary" onclick="openCoverageModal()">+ nova cobertura</button>
+    </div>
+
+    <div class="filters" id="filters">
+      <button class="filter-chip active" data-filter="all" onclick="setFilter('all', this)">todas</button>
+      <button class="filter-chip" data-filter="conviction" onclick="setFilter('conviction', this)">conviction</button>
+      <button class="filter-chip" data-filter="oportunistico" onclick="setFilter('oportunistico', this)">oportunístico</button>
+      <button class="filter-chip" data-filter="active" onclick="setFilter('active', this)">ativas</button>
+      <button class="filter-chip" data-filter="watchlist" onclick="setFilter('watchlist', this)">watchlist</button>
+      <button class="filter-chip" data-filter="archived" onclick="setFilter('archived', this)">arquivadas</button>
+    </div>
+
+    <div id="coverage-grid" class="coverage-grid">
+      <div class="loading-center"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== WORKSPACE VIEW ===================== -->
+  <div id="view-workspace" style="display:none;">
+    <button class="ws-back" onclick="showDashboard()">← voltar para cobertura</button>
+
+    <div class="ws-header">
+      <span class="ws-ticker" id="ws-ticker"></span>
+      <span id="ws-badge"></span>
+      <span style="font-size:13px;color:#6b7280;" id="ws-name"></span>
+    </div>
+    <div class="ws-subtitle" id="ws-subtitle"></div>
+
+    <div class="ws-tabs">
+      <button class="ws-tab active" onclick="showTab('notes', this)">Notas</button>
+      <button class="ws-tab" onclick="showTab('onepager', this)">One-pager</button>
+      <button class="ws-tab" onclick="showTab('files', this)">Arquivos</button>
+      <button class="ws-tab" onclick="showTab('timeline', this)">Timeline</button>
+      <button class="ws-tab" onclick="showTab('checklist', this)">Checklist</button>
+    </div>
+
+    <!-- NOTES TAB -->
+    <div id="tab-notes" class="ws-panel active">
+      <div class="notes-header">
+        <div class="filters" id="note-filters" style="margin-bottom:0;">
+          <button class="filter-chip active" data-filter="all" onclick="setNoteFilter('all', this)">todas</button>
+          <button class="filter-chip" data-filter="earnings_call" onclick="setNoteFilter('earnings_call', this)">earnings</button>
+          <button class="filter-chip" data-filter="sellside_research" onclick="setNoteFilter('sellside_research', this)">sell-side</button>
+          <button class="filter-chip" data-filter="own_analysis" onclick="setNoteFilter('own_analysis', this)">análise</button>
+          <button class="filter-chip" data-filter="channel_check" onclick="setNoteFilter('channel_check', this)">channel check</button>
+        </div>
+        <button class="btn-primary btn-sm" onclick="openNoteModal()">+ nota</button>
+      </div>
+      <div id="notes-list">
+        <div class="loading-center"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- ONE-PAGER TAB (placeholder) -->
+    <div id="tab-onepager" class="ws-panel">
+      <div class="empty-state"><p>One-pager — em breve</p></div>
+    </div>
+
+    <!-- FILES TAB (placeholder) -->
+    <div id="tab-files" class="ws-panel">
+      <div class="empty-state"><p>Arquivos e modelo — em breve</p></div>
+    </div>
+
+    <!-- TIMELINE TAB (placeholder) -->
+    <div id="tab-timeline" class="ws-panel">
+      <div class="empty-state"><p>Timeline — em breve</p></div>
+    </div>
+
+    <!-- CHECKLIST TAB (placeholder) -->
+    <div id="tab-checklist" class="ws-panel">
+      <div class="empty-state"><p>Checklist de 16 itens — em breve</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== MODAL: COVERAGE ===================== -->
+<div class="modal-overlay" id="modal-coverage">
+  <div class="modal">
+    <h2 class="modal-title" id="modal-cov-title">Nova cobertura</h2>
+    <input type="hidden" id="cov-id">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Ticker</label>
+        <input type="text" class="form-input" id="cov-ticker" placeholder="NVDA" style="text-transform:uppercase;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome da empresa</label>
+        <input type="text" class="form-input" id="cov-name" placeholder="NVIDIA Corporation">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Setor</label>
+      <input type="text" class="form-input" id="cov-sector" placeholder="Semicondutores / AI Accelerators">
+    </div>
+
+    <div class="form-row-3">
+      <div class="form-group">
+        <label class="form-label">Classificação</label>
+        <select class="form-input" id="cov-classification">
+          <option value="conviction">Conviction</option>
+          <option value="oportunistico">Oportunístico</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-input" id="cov-status">
+          <option value="active">Ativa</option>
+          <option value="watchlist">Watchlist</option>
+          <option value="archived">Arquivada</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sentimento</label>
+        <select class="form-input" id="cov-sentiment">
+          <option value="neutro">Neutro</option>
+          <option value="bullish">Bullish</option>
+          <option value="bearish">Bearish</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-coverage')">cancelar</button>
+      <button class="btn-primary" onclick="saveCoverage()">salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: NOTE ===================== -->
+<div class="modal-overlay" id="modal-note">
+  <div class="modal">
+    <h2 class="modal-title" id="modal-note-title">Nova nota</h2>
+    <input type="hidden" id="note-id">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo de fonte</label>
+        <select class="form-input" id="note-source">
+          <option value="earnings_call">Earnings call</option>
+          <option value="company_meeting">Reunião com empresa</option>
+          <option value="sellside_research">Sell-side research</option>
+          <option value="own_analysis">Análise própria</option>
+          <option value="news_article">Notícia / artigo</option>
+          <option value="conference">Conference / evento</option>
+          <option value="channel_check">Channel check</option>
+          <option value="market_data">Dados de mercado</option>
+          <option value="other">Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data do evento</label>
+        <input type="date" class="form-input" id="note-date">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Título</label>
+      <input type="text" class="form-input" id="note-title-input" placeholder="Ex: Q1 2026 Earnings — beat em revenue">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Takeaways</label>
+      <textarea class="form-input" id="note-content" rows="5" placeholder="O que importa desse input? Resumo com os pontos relevantes para a tese..."></textarea>
+    </div>
+
+    <div class="form-row-3">
+      <div class="form-group">
+        <label class="form-label">Sentimento</label>
+        <select class="form-input" id="note-sentiment">
+          <option value="neutro">Neutro</option>
+          <option value="bullish">Bullish</option>
+          <option value="bearish">Bearish</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags</label>
+        <input type="text" class="form-input" id="note-tags" placeholder="margem, guidance">
+        <span class="form-hint">separadas por vírgula</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link externo</label>
+        <input type="text" class="form-input" id="note-link" placeholder="URL (opcional)">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-note')">cancelar</button>
+      <button class="btn-primary" onclick="saveNote()">salvar nota</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: CONFIRM DELETE ===================== -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal" style="max-width:400px;">
+    <h2 class="modal-title">Confirmar exclusão</h2>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:20px;" id="confirm-text"></p>
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-confirm')">cancelar</button>
+      <button class="btn-primary" style="background:#dc2626;" id="confirm-btn">excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="config.js"></script>
+<script>
+// ============================================================
+// INIT
+// ============================================================
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+let currentGroup = null;
+let currentRole = null;
+let coverages = [];
+let currentCoverage = null;
+let notes = [];
+let activeFilter = 'all';
+let activeNoteFilter = 'all';
+
+const SOURCE_LABELS = {
+  earnings_call: 'earnings call',
+  company_meeting: 'reunião',
+  sellside_research: 'sell-side',
+  own_analysis: 'análise própria',
+  news_article: 'notícia',
+  conference: 'conference',
+  channel_check: 'channel check',
+  market_data: 'dados de mercado',
+  other: 'outro'
+};
+
+// ============================================================
+// AUTH
+// ============================================================
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+
+  currentUser = session.user;
+  document.getElementById('nav-user').textContent = currentUser.email;
+
+  // Get group membership
+  const { data: membership } = await sb.from('group_members')
+    .select('group_id, role')
+    .eq('user_id', currentUser.id)
+    .limit(1)
+    .single();
+
+  if (!membership) {
+    showToast('Usuário não pertence a nenhum grupo', 'error');
+    return;
+  }
+
+  currentGroup = membership.group_id;
+  currentRole = membership.role;
+
+  // Update clock
+  updateClock();
+  setInterval(updateClock, 60000);
+
+  // Load coverages
+  await loadCoverages();
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('nav-time').textContent =
+    now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
+
+// ============================================================
+// COVERAGES — CRUD
+// ============================================================
+async function loadCoverages() {
+  const { data, error } = await sb.from('coverages')
+    .select('*, research_notes(count)')
+    .eq('group_id', currentGroup)
+    .order('updated_at', { ascending: false });
+
+  if (error) { showToast('Erro ao carregar coberturas: ' + error.message, 'error'); return; }
+  coverages = data || [];
+  renderCoverages();
+}
+
+function renderCoverages() {
+  const grid = document.getElementById('coverage-grid');
+  const search = document.getElementById('search-input').value.toLowerCase();
+
+  let filtered = coverages.filter(c => {
+    // Search filter
+    if (search && !c.ticker.toLowerCase().includes(search) && !c.name.toLowerCase().includes(search)) return false;
+    // Category filter
+    if (activeFilter === 'all') return c.status !== 'archived';
+    if (activeFilter === 'conviction' || activeFilter === 'oportunistico') return c.classification === activeFilter && c.status !== 'archived';
+    if (activeFilter === 'active') return c.status === 'active';
+    if (activeFilter === 'watchlist') return c.status === 'watchlist';
+    if (activeFilter === 'archived') return c.status === 'archived';
+    return true;
+  });
+
+  let html = filtered.map(c => {
+    const noteCount = c.research_notes?.[0]?.count || 0;
+    const classLabel = c.classification === 'conviction' ? 'conviction' : 'oportunístico';
+    const classBadge = c.classification === 'conviction' ? 'badge-conv' : 'badge-oport';
+    const sentBadge = c.sentiment === 'bullish' ? 'badge-bull' : c.sentiment === 'bearish' ? 'badge-bear' : 'badge-neut';
+    const statusBadge = c.status === 'active' ? '' : c.status === 'watchlist' ? '<span class="badge badge-watch">watchlist</span>' : '<span class="badge badge-archived">arquivada</span>';
+    const ago = timeAgo(c.updated_at);
+
+    return `
+      <div class="cov-card" onclick="openWorkspace('${c.id}')">
+        <div class="cov-card-header">
+          <span class="cov-ticker">${c.ticker}</span>
+          <span class="badge ${classBadge}">${classLabel}</span>
+        </div>
+        <div class="cov-company">${c.name}</div>
+        <div class="cov-meta">
+          <span class="badge ${sentBadge}">${c.sentiment}</span>
+          ${statusBadge}
+        </div>
+        <div class="cov-stats">${noteCount} nota${noteCount !== 1 ? 's' : ''} · atualizado ${ago}</div>
+      </div>`;
+  }).join('');
+
+  // Add "new" card if user can edit
+  if (currentRole === 'admin' || currentRole === 'analyst') {
+    html += `<div class="cov-card cov-card-new" onclick="openCoverageModal()">+ nova cobertura</div>`;
+  }
+
+  if (!filtered.length && !html) {
+    html = '<div class="empty-state"><p>Nenhuma cobertura encontrada</p></div>';
+  }
+
+  grid.innerHTML = html;
+}
+
+function filterCoverages() { renderCoverages(); }
+
+function setFilter(filter, el) {
+  activeFilter = filter;
+  document.querySelectorAll('#filters .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderCoverages();
+}
+
+function openCoverageModal(id) {
+  const modal = document.getElementById('modal-coverage');
+  if (id) {
+    const c = coverages.find(x => x.id === id);
+    document.getElementById('modal-cov-title').textContent = 'Editar cobertura';
+    document.getElementById('cov-id').value = c.id;
+    document.getElementById('cov-ticker').value = c.ticker;
+    document.getElementById('cov-name').value = c.name;
+    document.getElementById('cov-sector').value = c.sector || '';
+    document.getElementById('cov-classification').value = c.classification;
+    document.getElementById('cov-status').value = c.status;
+    document.getElementById('cov-sentiment').value = c.sentiment;
+  } else {
+    document.getElementById('modal-cov-title').textContent = 'Nova cobertura';
+    document.getElementById('cov-id').value = '';
+    document.getElementById('cov-ticker').value = '';
+    document.getElementById('cov-name').value = '';
+    document.getElementById('cov-sector').value = '';
+    document.getElementById('cov-classification').value = 'conviction';
+    document.getElementById('cov-status').value = 'active';
+    document.getElementById('cov-sentiment').value = 'neutro';
+  }
+  modal.classList.add('active');
+}
+
+async function saveCoverage() {
+  const id = document.getElementById('cov-id').value;
+  const ticker = document.getElementById('cov-ticker').value.trim().toUpperCase();
+  const name = document.getElementById('cov-name').value.trim();
+
+  if (!ticker || !name) { showToast('Ticker e nome são obrigatórios', 'error'); return; }
+
+  const payload = {
+    ticker,
+    name,
+    sector: document.getElementById('cov-sector').value.trim() || null,
+    classification: document.getElementById('cov-classification').value,
+    status: document.getElementById('cov-status').value,
+    sentiment: document.getElementById('cov-sentiment').value,
+    group_id: currentGroup
+  };
+
+  let error;
+  if (id) {
+    ({ error } = await sb.from('coverages').update(payload).eq('id', id));
+  } else {
+    payload.created_by = currentUser.id;
+    ({ error } = await sb.from('coverages').insert(payload));
+  }
+
+  if (error) {
+    if (error.message.includes('idx_coverages_ticker_group')) {
+      showToast('Já existe uma cobertura para esse ticker', 'error');
+    } else {
+      showToast('Erro ao salvar: ' + error.message, 'error');
+    }
+    return;
+  }
+
+  closeModal('modal-coverage');
+  showToast(id ? 'Cobertura atualizada' : 'Cobertura criada', 'success');
+  await loadCoverages();
+}
+
+// ============================================================
+// WORKSPACE
+// ============================================================
+async function openWorkspace(covId) {
+  currentCoverage = coverages.find(c => c.id === covId);
+  if (!currentCoverage) return;
+
+  // Update header
+  document.getElementById('ws-ticker').textContent = currentCoverage.ticker;
+  document.getElementById('ws-name').textContent =
+    `${currentCoverage.name}${currentCoverage.sector ? ' · ' + currentCoverage.sector : ''}`;
+
+  const classBadge = currentCoverage.classification === 'conviction' ? 'badge-conv' : 'badge-oport';
+  const classLabel = currentCoverage.classification === 'conviction' ? 'conviction' : 'oportunístico';
+  document.getElementById('ws-badge').innerHTML = `<span class="badge ${classBadge}">${classLabel}</span>`;
+  document.getElementById('ws-subtitle').textContent =
+    `Status: ${currentCoverage.status} · Sentimento: ${currentCoverage.sentiment} · Criada em ${formatDate(currentCoverage.created_at)}`;
+
+  // Show workspace, hide dashboard
+  document.getElementById('view-dashboard').style.display = 'none';
+  document.getElementById('view-workspace').style.display = 'block';
+
+  // Reset to notes tab
+  showTab('notes', document.querySelector('.ws-tab'));
+
+  // Load notes
+  await loadNotes();
+}
+
+function showDashboard() {
+  document.getElementById('view-workspace').style.display = 'none';
+  document.getElementById('view-dashboard').style.display = 'block';
+  currentCoverage = null;
+}
+
+function showTab(tab, el) {
+  document.querySelectorAll('.ws-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ws-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ============================================================
+// NOTES — CRUD
+// ============================================================
+async function loadNotes() {
+  document.getElementById('notes-list').innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+  const { data, error } = await sb.from('research_notes')
+    .select('*')
+    .eq('coverage_id', currentCoverage.id)
+    .order('event_date', { ascending: false });
+
+  if (error) { showToast('Erro ao carregar notas: ' + error.message, 'error'); return; }
+  notes = data || [];
+  renderNotes();
+}
+
+function renderNotes() {
+  const container = document.getElementById('notes-list');
+  let filtered = notes;
+
+  if (activeNoteFilter !== 'all') {
+    filtered = notes.filter(n => n.source_type === activeNoteFilter);
+  }
+
+  if (!filtered.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <p>${activeNoteFilter !== 'all' ? 'Nenhuma nota com esse filtro' : 'Nenhuma nota ainda'}</p>
+        <button class="btn-primary btn-sm" onclick="openNoteModal()">criar primeira nota</button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(n => {
+    const tags = (n.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+    const sentBadge = n.sentiment === 'bullish' ? 'badge-bull' : n.sentiment === 'bearish' ? 'badge-bear' : 'badge-neut';
+    const canEdit = currentRole === 'admin' || currentRole === 'analyst';
+
+    return `
+      <div class="note-card">
+        <div class="note-top">
+          <span class="note-date">${formatDate(n.event_date)}</span>
+          <span class="src-badge">${SOURCE_LABELS[n.source_type] || n.source_type}</span>
+          <span class="badge ${sentBadge}" style="font-size:9px;">${n.sentiment}</span>
+          ${n.external_link ? `<a href="${n.external_link}" target="_blank" class="src-badge" style="color:#2563eb;">link ↗</a>` : ''}
+        </div>
+        <div class="note-title">${esc(n.title)}</div>
+        <div class="note-content collapsed" onclick="this.classList.toggle('collapsed')">${esc(n.content)}</div>
+        ${tags ? `<div class="note-tags">${tags}</div>` : ''}
+        ${canEdit ? `
+          <div class="note-actions">
+            <button class="note-btn" onclick="event.stopPropagation();openNoteModal('${n.id}')">editar</button>
+            <button class="note-btn delete" onclick="event.stopPropagation();confirmDeleteNote('${n.id}')">excluir</button>
+          </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function setNoteFilter(filter, el) {
+  activeNoteFilter = filter;
+  document.querySelectorAll('#note-filters .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderNotes();
+}
+
+function openNoteModal(id) {
+  const modal = document.getElementById('modal-note');
+  if (id) {
+    const n = notes.find(x => x.id === id);
+    document.getElementById('modal-note-title').textContent = 'Editar nota';
+    document.getElementById('note-id').value = n.id;
+    document.getElementById('note-source').value = n.source_type;
+    document.getElementById('note-date').value = n.event_date;
+    document.getElementById('note-title-input').value = n.title;
+    document.getElementById('note-content').value = n.content;
+    document.getElementById('note-sentiment').value = n.sentiment;
+    document.getElementById('note-tags').value = (n.tags || []).join(', ');
+    document.getElementById('note-link').value = n.external_link || '';
+  } else {
+    document.getElementById('modal-note-title').textContent = 'Nova nota';
+    document.getElementById('note-id').value = '';
+    document.getElementById('note-source').value = 'own_analysis';
+    document.getElementById('note-date').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('note-title-input').value = '';
+    document.getElementById('note-content').value = '';
+    document.getElementById('note-sentiment').value = 'neutro';
+    document.getElementById('note-tags').value = '';
+    document.getElementById('note-link').value = '';
+  }
+  modal.classList.add('active');
+}
+
+async function saveNote() {
+  const id = document.getElementById('note-id').value;
+  const title = document.getElementById('note-title-input').value.trim();
+  const content = document.getElementById('note-content').value.trim();
+
+  if (!title) { showToast('Título é obrigatório', 'error'); return; }
+  if (!content) { showToast('Conteúdo é obrigatório', 'error'); return; }
+
+  const rawTags = document.getElementById('note-tags').value;
+  const tags = rawTags ? rawTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+
+  const payload = {
+    coverage_id: currentCoverage.id,
+    group_id: currentGroup,
+    source_type: document.getElementById('note-source').value,
+    title,
+    content,
+    sentiment: document.getElementById('note-sentiment').value,
+    tags,
+    external_link: document.getElementById('note-link').value.trim() || null,
+    event_date: document.getElementById('note-date').value
+  };
+
+  let error;
+  if (id) {
+    ({ error } = await sb.from('research_notes').update(payload).eq('id', id));
+  } else {
+    payload.created_by = currentUser.id;
+    ({ error } = await sb.from('research_notes').insert(payload));
+  }
+
+  if (error) { showToast('Erro ao salvar nota: ' + error.message, 'error'); return; }
+
+  // Update coverage timestamp
+  await sb.from('coverages').update({ updated_at: new Date().toISOString() }).eq('id', currentCoverage.id);
+
+  closeModal('modal-note');
+  showToast(id ? 'Nota atualizada' : 'Nota criada', 'success');
+  await loadNotes();
+}
+
+function confirmDeleteNote(noteId) {
+  document.getElementById('confirm-text').textContent = 'Tem certeza que deseja excluir esta nota? Essa ação não pode ser desfeita.';
+  document.getElementById('confirm-btn').onclick = async () => {
+    const { error } = await sb.from('research_notes').delete().eq('id', noteId);
+    if (error) { showToast('Erro ao excluir: ' + error.message, 'error'); return; }
+    closeModal('modal-confirm');
+    showToast('Nota excluída', 'success');
+    await loadNotes();
+  };
+  document.getElementById('modal-confirm').classList.add('active');
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+});
+
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+function esc(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function timeAgo(dateStr) {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return 'agora';
+  if (diff < 3600) return `há ${Math.floor(diff / 60)} min`;
+  if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`;
+  const days = Math.floor(diff / 86400);
+  if (days === 1) return 'há 1 dia';
+  if (days < 7) return `há ${days} dias`;
+  if (days < 30) return `há ${Math.floor(days / 7)} semana${Math.floor(days / 7) > 1 ? 's' : ''}`;
+  return `há ${Math.floor(days / 30)} mês${Math.floor(days / 30) > 1 ? 'es' : ''}`;
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+  }
+});
+
+// ============================================================
+// START
+// ============================================================
+init();
+</script>
+</body>
+</html>
