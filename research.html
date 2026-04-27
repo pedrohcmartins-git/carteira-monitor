@@ -492,6 +492,7 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
       <span class="ws-ticker" id="ws-ticker"></span>
       <span id="ws-badge"></span>
       <span style="font-size:13px;color:#6b7280;" id="ws-name"></span>
+      <button class="btn-secondary btn-sm" onclick="openEditCoverageModal()" id="ws-edit-btn" style="margin-left:auto;">editar</button>
     </div>
     <div class="ws-subtitle" id="ws-subtitle"></div>
 
@@ -543,10 +544,10 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
 
 </div>
 
-<!-- ===================== MODAL: COVERAGE ===================== -->
+<!-- ===================== MODAL: COVERAGE (criar) ===================== -->
 <div class="modal-overlay" id="modal-coverage">
   <div class="modal">
-    <h2 class="modal-title" id="modal-cov-title">Nova cobertura</h2>
+    <h2 class="modal-title">Nova cobertura</h2>
     <input type="hidden" id="cov-id">
 
     <div class="form-row">
@@ -565,17 +566,46 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
       <input type="text" class="form-input" id="cov-sector" placeholder="Semicondutores / AI Accelerators">
     </div>
 
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-coverage')">cancelar</button>
+      <button class="btn-primary" onclick="saveCoverage()">salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: COVERAGE (editar) ===================== -->
+<div class="modal-overlay" id="modal-coverage-edit">
+  <div class="modal">
+    <h2 class="modal-title">Editar cobertura</h2>
+    <input type="hidden" id="edit-cov-id">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Ticker</label>
+        <input type="text" class="form-input" id="edit-cov-ticker" style="text-transform:uppercase;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome da empresa</label>
+        <input type="text" class="form-input" id="edit-cov-name">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Setor</label>
+      <input type="text" class="form-input" id="edit-cov-sector">
+    </div>
+
     <div class="form-row-3">
       <div class="form-group">
         <label class="form-label">Classificação</label>
-        <select class="form-input" id="cov-classification">
+        <select class="form-input" id="edit-cov-classification">
           <option value="conviction">Conviction</option>
           <option value="oportunistico">Oportunístico</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Status</label>
-        <select class="form-input" id="cov-status">
+        <select class="form-input" id="edit-cov-status">
           <option value="active">Ativa</option>
           <option value="watchlist">Watchlist</option>
           <option value="archived">Arquivada</option>
@@ -583,7 +613,7 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
       </div>
       <div class="form-group">
         <label class="form-label">Sentimento</label>
-        <select class="form-input" id="cov-sentiment">
+        <select class="form-input" id="edit-cov-sentiment">
           <option value="neutro">Neutro</option>
           <option value="bullish">Bullish</option>
           <option value="bearish">Bearish</option>
@@ -592,8 +622,9 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
     </div>
 
     <div class="form-actions">
-      <button class="btn-secondary" onclick="closeModal('modal-coverage')">cancelar</button>
-      <button class="btn-primary" onclick="saveCoverage()">salvar</button>
+      <button class="btn-secondary btn-danger" onclick="confirmDeleteCoverage()" style="margin-right:auto;">excluir</button>
+      <button class="btn-secondary" onclick="closeModal('modal-coverage-edit')">cancelar</button>
+      <button class="btn-primary" onclick="saveEditCoverage()">salvar</button>
     </div>
   </div>
 </div>
@@ -752,14 +783,34 @@ async function logout() {
 // COVERAGES — CRUD
 // ============================================================
 async function loadCoverages() {
-  const { data, error } = await sb.from('coverages')
-    .select('*, research_notes(count)')
-    .eq('group_id', currentGroup)
-    .order('updated_at', { ascending: false });
+  try {
+    // Load coverages
+    const { data, error } = await sb.from('coverages')
+      .select('*')
+      .eq('group_id', currentGroup)
+      .order('updated_at', { ascending: false });
 
-  if (error) { showToast('Erro ao carregar coberturas: ' + error.message, 'error'); return; }
-  coverages = data || [];
-  renderCoverages();
+    if (error) { showToast('Erro ao carregar coberturas: ' + error.message, 'error'); return; }
+    coverages = data || [];
+
+    // Load note counts separately (more reliable)
+    if (coverages.length) {
+      const { data: counts } = await sb.from('research_notes')
+        .select('coverage_id')
+        .eq('group_id', currentGroup);
+
+      const countMap = {};
+      (counts || []).forEach(n => {
+        countMap[n.coverage_id] = (countMap[n.coverage_id] || 0) + 1;
+      });
+      coverages.forEach(c => c._noteCount = countMap[c.id] || 0);
+    }
+
+    renderCoverages();
+  } catch (e) {
+    console.error('loadCoverages error:', e);
+    showToast('Erro ao carregar coberturas', 'error');
+  }
 }
 
 function renderCoverages() {
@@ -779,7 +830,7 @@ function renderCoverages() {
   });
 
   let html = filtered.map(c => {
-    const noteCount = c.research_notes?.[0]?.count || 0;
+    const noteCount = c._noteCount || 0;
     const classLabel = c.classification === 'conviction' ? 'conviction' : 'oportunístico';
     const classBadge = c.classification === 'conviction' ? 'badge-conv' : 'badge-oport';
     const sentBadge = c.sentiment === 'bullish' ? 'badge-bull' : c.sentiment === 'bearish' ? 'badge-bear' : 'badge-neut';
@@ -822,33 +873,15 @@ function setFilter(filter, el) {
   renderCoverages();
 }
 
-function openCoverageModal(id) {
-  const modal = document.getElementById('modal-coverage');
-  if (id) {
-    const c = coverages.find(x => x.id === id);
-    document.getElementById('modal-cov-title').textContent = 'Editar cobertura';
-    document.getElementById('cov-id').value = c.id;
-    document.getElementById('cov-ticker').value = c.ticker;
-    document.getElementById('cov-name').value = c.name;
-    document.getElementById('cov-sector').value = c.sector || '';
-    document.getElementById('cov-classification').value = c.classification;
-    document.getElementById('cov-status').value = c.status;
-    document.getElementById('cov-sentiment').value = c.sentiment;
-  } else {
-    document.getElementById('modal-cov-title').textContent = 'Nova cobertura';
-    document.getElementById('cov-id').value = '';
-    document.getElementById('cov-ticker').value = '';
-    document.getElementById('cov-name').value = '';
-    document.getElementById('cov-sector').value = '';
-    document.getElementById('cov-classification').value = 'conviction';
-    document.getElementById('cov-status').value = 'active';
-    document.getElementById('cov-sentiment').value = 'neutro';
-  }
-  modal.classList.add('active');
+function openCoverageModal() {
+  document.getElementById('cov-id').value = '';
+  document.getElementById('cov-ticker').value = '';
+  document.getElementById('cov-name').value = '';
+  document.getElementById('cov-sector').value = '';
+  document.getElementById('modal-coverage').classList.add('active');
 }
 
 async function saveCoverage() {
-  const id = document.getElementById('cov-id').value;
   const ticker = document.getElementById('cov-ticker').value.trim().toUpperCase();
   const name = document.getElementById('cov-name').value.trim();
 
@@ -858,22 +891,17 @@ async function saveCoverage() {
     ticker,
     name,
     sector: document.getElementById('cov-sector').value.trim() || null,
-    classification: document.getElementById('cov-classification').value,
-    status: document.getElementById('cov-status').value,
-    sentiment: document.getElementById('cov-sentiment').value,
-    group_id: currentGroup
+    classification: 'conviction',
+    status: 'active',
+    sentiment: 'neutro',
+    group_id: currentGroup,
+    created_by: currentUser.id
   };
 
-  let error;
-  if (id) {
-    ({ error } = await sb.from('coverages').update(payload).eq('id', id));
-  } else {
-    payload.created_by = currentUser.id;
-    ({ error } = await sb.from('coverages').insert(payload));
-  }
+  const { error } = await sb.from('coverages').insert(payload);
 
   if (error) {
-    if (error.message.includes('idx_coverages_ticker_group')) {
+    if (error.message.includes('idx_coverages_ticker_group') || error.code === '23505') {
       showToast('Já existe uma cobertura para esse ticker', 'error');
     } else {
       showToast('Erro ao salvar: ' + error.message, 'error');
@@ -882,8 +910,75 @@ async function saveCoverage() {
   }
 
   closeModal('modal-coverage');
-  showToast(id ? 'Cobertura atualizada' : 'Cobertura criada', 'success');
+  showToast('Cobertura criada', 'success');
   await loadCoverages();
+}
+
+function openEditCoverageModal() {
+  if (!currentCoverage) return;
+  const c = currentCoverage;
+  document.getElementById('edit-cov-id').value = c.id;
+  document.getElementById('edit-cov-ticker').value = c.ticker;
+  document.getElementById('edit-cov-name').value = c.name;
+  document.getElementById('edit-cov-sector').value = c.sector || '';
+  document.getElementById('edit-cov-classification').value = c.classification;
+  document.getElementById('edit-cov-status').value = c.status;
+  document.getElementById('edit-cov-sentiment').value = c.sentiment;
+  document.getElementById('modal-coverage-edit').classList.add('active');
+}
+
+async function saveEditCoverage() {
+  const id = document.getElementById('edit-cov-id').value;
+  const ticker = document.getElementById('edit-cov-ticker').value.trim().toUpperCase();
+  const name = document.getElementById('edit-cov-name').value.trim();
+
+  if (!ticker || !name) { showToast('Ticker e nome são obrigatórios', 'error'); return; }
+
+  const payload = {
+    ticker,
+    name,
+    sector: document.getElementById('edit-cov-sector').value.trim() || null,
+    classification: document.getElementById('edit-cov-classification').value,
+    status: document.getElementById('edit-cov-status').value,
+    sentiment: document.getElementById('edit-cov-sentiment').value
+  };
+
+  const { error } = await sb.from('coverages').update(payload).eq('id', id);
+
+  if (error) { showToast('Erro ao salvar: ' + error.message, 'error'); return; }
+
+  closeModal('modal-coverage-edit');
+  showToast('Cobertura atualizada', 'success');
+
+  // Reload and reopen workspace
+  await loadCoverages();
+  currentCoverage = coverages.find(c => c.id === id);
+  if (currentCoverage) {
+    document.getElementById('ws-ticker').textContent = currentCoverage.ticker;
+    document.getElementById('ws-name').textContent =
+      `${currentCoverage.name}${currentCoverage.sector ? ' · ' + currentCoverage.sector : ''}`;
+    const classBadge = currentCoverage.classification === 'conviction' ? 'badge-conv' : 'badge-oport';
+    const classLabel = currentCoverage.classification === 'conviction' ? 'conviction' : 'oportunístico';
+    document.getElementById('ws-badge').innerHTML = `<span class="badge ${classBadge}">${classLabel}</span>`;
+    document.getElementById('ws-subtitle').textContent =
+      `Status: ${currentCoverage.status} · Sentimento: ${currentCoverage.sentiment} · Criada em ${formatDate(currentCoverage.created_at)}`;
+  }
+}
+
+function confirmDeleteCoverage() {
+  if (!currentCoverage) return;
+  closeModal('modal-coverage-edit');
+  document.getElementById('confirm-text').textContent =
+    `Excluir a cobertura ${currentCoverage.ticker}? Todas as notas e arquivos vinculados também serão excluídos. Essa ação não pode ser desfeita.`;
+  document.getElementById('confirm-btn').onclick = async () => {
+    const { error } = await sb.from('coverages').delete().eq('id', currentCoverage.id);
+    if (error) { showToast('Erro ao excluir: ' + error.message, 'error'); return; }
+    closeModal('modal-confirm');
+    showToast('Cobertura excluída', 'success');
+    showDashboard();
+    await loadCoverages();
+  };
+  document.getElementById('modal-confirm').classList.add('active');
 }
 
 // ============================================================
@@ -903,6 +998,10 @@ async function openWorkspace(covId) {
   document.getElementById('ws-badge').innerHTML = `<span class="badge ${classBadge}">${classLabel}</span>`;
   document.getElementById('ws-subtitle').textContent =
     `Status: ${currentCoverage.status} · Sentimento: ${currentCoverage.sentiment} · Criada em ${formatDate(currentCoverage.created_at)}`;
+
+  // Show/hide edit button based on role
+  document.getElementById('ws-edit-btn').style.display =
+    (currentRole === 'admin' || currentRole === 'analyst') ? '' : 'none';
 
   // Show workspace, hide dashboard
   document.getElementById('view-dashboard').style.display = 'none';
