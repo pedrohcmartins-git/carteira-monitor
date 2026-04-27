@@ -6,7 +6,7 @@
 <title>Research — Carteira Monitor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- supabase loaded as ES module below -->
 <style>
 /* ============================================================
    RESET & BASE
@@ -708,12 +708,14 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toast-container"></div>
 
-<script src="config.js"></script>
-<script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js'
+
 // ============================================================
 // INIT
 // ============================================================
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 let currentGroup = null;
 let currentRole = null;
@@ -1227,6 +1229,26 @@ document.addEventListener('keydown', (e) => {
     document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
   }
 });
+
+// ============================================================
+// EXPOSE FUNCTIONS TO HTML (modules are scoped)
+// ============================================================
+window.openCoverageModal = openCoverageModal;
+window.saveCoverage = saveCoverage;
+window.openEditCoverageModal = openEditCoverageModal;
+window.saveEditCoverage = saveEditCoverage;
+window.confirmDeleteCoverage = confirmDeleteCoverage;
+window.openWorkspace = openWorkspace;
+window.showDashboard = showDashboard;
+window.showTab = showTab;
+window.openNoteModal = openNoteModal;
+window.saveNote = saveNote;
+window.confirmDeleteNote = confirmDeleteNote;
+window.setFilter = setFilter;
+window.setNoteFilter = setNoteFilter;
+window.filterCoverages = filterCoverages;
+window.closeModal = closeModal;
+window.logout = logout;
 
 // ============================================================
 // START
