@@ -101,9 +101,9 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .mw-port-line-vs{font-size:10px;font-weight:500;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;padding-left:6px;min-width:48px}
 .mw-grid{columns:320px 4;column-gap:14px}
 .mw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;break-inside:avoid;margin-bottom:14px}
-.mw-card-header{padding:10px 14px 8px;border-bottom:1px solid var(--border);background:var(--surface2)}
-.mw-card-book{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
-.mw-card-sector{font-size:10px;font-weight:500;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em}
+.mw-card-header{padding:8px 14px;border-bottom:1px solid var(--border);background:var(--surface2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mw-card-sector{font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.03em;display:inline}
+.mw-card-book{font-size:10px;font-weight:400;color:var(--text-2);display:inline;margin-left:6px}
 .mw-card-body{padding:0}
 .mw-row{display:grid;grid-template-columns:1fr auto auto auto;gap:0;padding:7px 14px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s}
 .mw-row:last-child{border-bottom:none}
@@ -1478,8 +1478,7 @@ function renderMarketWatch(){
   for(const group of sortedGroups){
     html+=`<div class="mw-card">
       <div class="mw-card-header">
-        <div class="mw-card-book">${group.book}</div>
-        <div class="mw-card-sector">${group.sector}</div>
+        <span class="mw-card-sector">${group.sector}</span><span class="mw-card-book">${group.book}</span>
       </div>
       <div class="mw-card-body">`
     for(const t of group.tickers){
