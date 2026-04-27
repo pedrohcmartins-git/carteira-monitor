@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Carteira Monitor</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#f9fafb;--surface:#fff;--surface2:#f3f4f6;--border:#e5e7eb;--border-strong:#d1d5db;--nav:#0f1117;--nav-muted:#6b7280;--nav-surface:#1f2937;--green:#16a34a;--green-bg:#f0fdf4;--green-text:#166634;--red:#dc2626;--red-bg:#fef2f2;--red-text:#991b1b;--blue:#1d4ed8;--blue-bg:#eff6ff;--blue-text:#1e40af;--text:#111827;--text-2:#6b7280;--text-3:#9ca3af;--font:'Inter',system-ui,sans-serif;--font-mono:'DM Mono',monospace;--radius:8px;--radius-lg:10px}
@@ -85,13 +85,44 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .upload-zone:hover,.upload-zone.over{border-color:var(--green);background:var(--green-bg)}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-zone h3{font-size:14px;font-weight:600;margin-bottom:4px}.upload-zone p{font-size:12px;color:var(--text-2)}
-.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-.chart-title{font-size:13px;font-weight:600}
-.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
-.chart-sel{font-family:var(--font);font-size:12px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:var(--radius);outline:none}
-.chart-sel:focus{border-color:var(--green)}
-.empty-chart{display:flex;align-items:center;justify-content:center;height:200px;color:var(--text-3);font-size:13px}
-.alert-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:18px}
+/* ─── MarketWatch ────────────────────────────────────── */
+.mw-controls{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.mw-search{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px;border-radius:var(--radius);outline:none;width:220px;transition:border-color .15s}
+.mw-search:focus{border-color:var(--green)}
+.mw-status{font-size:11px;color:var(--text-3);margin-left:auto}
+.mw-group-header{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;padding:10px 6px 6px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.mw-group-header .mw-book-label{color:var(--text);font-size:12px;margin-right:6px}
+.mw-table{width:100%;border-collapse:collapse;font-size:13px}
+.mw-table th{padding:9px 6px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;white-space:nowrap;letter-spacing:.03em;text-transform:uppercase;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1}
+.mw-table th.r{text-align:right}
+.mw-table td{padding:8px 6px;white-space:nowrap;border-bottom:1px solid var(--border)}
+.mw-table tbody tr:hover{background:var(--bg)}
+.mw-table tbody tr:last-child td{border-bottom:none}
+.mw-ticker{font-weight:600;font-size:13px}
+.mw-refresh{font-family:var(--font);font-size:11px;font-weight:500;padding:7px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;transition:background .15s;white-space:nowrap}
+.mw-refresh:hover:not(:disabled){background:#15803d}
+.mw-refresh:disabled{background:var(--surface2);color:var(--text-3);border:1px solid var(--border);cursor:not-allowed}
+.mw-top-bar{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;margin-bottom:16px;align-items:stretch}
+.mw-scroll{max-height:calc(100vh - 200px);overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface)}
+.setup-add-ticker{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px}
+.setup-add-ticker .form-grid{grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;align-items:end;gap:8px}
+.setup-add-ticker .form-field input,.setup-add-ticker .form-field select{font-size:12px;padding:6px 10px}
+.setup-add-ticker .btn-add{margin-top:0;font-size:11px;padding:7px 14px;white-space:nowrap}
+.tmap-filter{display:flex;gap:4px;margin-bottom:10px}
+.tmap-filter button{font-family:var(--font);font-size:11px;font-weight:500;padding:5px 12px;background:transparent;color:var(--text-2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+.tmap-filter button.active{background:var(--nav);color:#fff;border-color:var(--nav)}
+.tmap-filter button:hover:not(.active){background:var(--surface2)}
+.coverage-toggle{width:28px;height:16px;border-radius:8px;background:var(--border-strong);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.coverage-toggle.on{background:var(--green)}
+.coverage-toggle::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .2s}
+.coverage-toggle.on::after{transform:translateX(12px)}
+@media(max-width:768px){
+  .mw-controls{gap:8px}
+  .mw-search{width:100%}
+  .mw-table td{padding:6px 4px;font-size:12px}
+  .mw-table th{padding:7px 4px;font-size:9px}
+  .setup-add-ticker .form-grid{grid-template-columns:1fr 1fr}
+}
 .form-section-title{font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .form-field label{display:block;font-size:10px;font-weight:500;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em}
@@ -99,8 +130,6 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .form-field input:focus,.form-field select:focus{border-color:var(--green)}
 .btn-add{margin-top:12px;font-family:var(--font);font-size:12px;font-weight:500;padding:8px 16px;background:var(--nav);color:#fff;border:none;border-radius:var(--radius);cursor:pointer}
 .btn-add:hover{background:#1f2937}
-.alert-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);margin-bottom:8px;gap:12px;flex-wrap:wrap}
-.alert-info{font-size:13px}.alert-info strong{color:var(--text)}.alert-info span{color:var(--text-2);margin-left:8px}
 .toggle-active{width:32px;height:18px;border-radius:9px;background:var(--border-strong);border:none;cursor:pointer;position:relative;transition:background .2s}
 .toggle-active.on{background:var(--green)}
 .toggle-active::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s}
@@ -238,7 +267,6 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
     <span class="group-badge" id="group-name">—</span>
     <span class="role-badge" id="role-badge">—</span>
     <a href="research.html" class="nav-btn" style="text-decoration:none;">research</a>
-    <button class="nav-btn" onclick="navTo('alertas')">alertas</button>
     <button class="nav-btn" id="nav-setup" onclick="navTo('admin')" style="display:none">setup</button>
     <span class="dot" id="live-dot" style="margin:0 4px"></span>
     <span class="nav-time" id="clock">--:--:--</span>
@@ -248,7 +276,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 <div class="tabs" id="tabs-bar">
   <button class="tab active" id="tab-consolidacao" onclick="switchToConsolidacao(this)">consolidado</button>
   <button class="tab tab-hist" id="tab-trades" onclick="switchTab('trades',this)">trades</button>
-  <button class="tab tab-hist" id="tab-historico" onclick="switchTab('historico',this)">histórico</button>
+  <button class="tab tab-hist" id="tab-marketwatch" onclick="switchTab('marketwatch',this)">marketwatch</button>
 </div>
 <div class="panel active" id="panel-consolidacao">
   <div class="tbl-wrap"><div class="tbl-scroll">
@@ -275,15 +303,29 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   <div class="port-grid count-1" id="port-grid"></div>
   <div class="last-upd" id="last-upd-shared"></div>
 </div>
-<div class="panel" id="panel-historico">
-  <div class="chart-header">
-    <span class="chart-title">Performance intraday</span>
-    <select id="chart-port-sel" class="chart-sel" onchange="loadChart()"><option value="__all__">Todas as carteiras (Gross)</option></select>
+<div class="panel" id="panel-marketwatch">
+  <div class="mw-top-bar">
+    <div class="mkt-card"><div class="mkt-lbl">IBOVESPA</div><div class="mkt-main" id="mw-ibov-pct">—</div><div class="mkt-sub" id="mw-ibov-val">—</div></div>
+    <div class="mkt-card"><div class="mkt-lbl">BRL / USD</div><div class="mkt-main" id="mw-usd-pct">—</div><div class="mkt-sub" id="mw-usd-val">—</div></div>
+    <button class="mw-refresh" id="btn-refresh-mw" onclick="refreshMarketWatch()"><span id="refresh-label-mw">↻ atualizar</span></button>
   </div>
-  <div class="chart-box">
-    <canvas id="chart-canvas" height="280"></canvas>
-    <div class="empty-chart" id="empty-chart" style="display:none">Nenhum dado ainda para hoje.</div>
+  <div class="mw-controls">
+    <input type="text" class="mw-search" id="mw-search" placeholder="Buscar ticker..." oninput="renderMarketWatch()"/>
+    <span class="mw-status" id="mw-status"></span>
   </div>
+  <div class="mw-scroll" id="mw-scroll">
+    <table class="mw-table">
+      <thead><tr>
+        <th>Ticker</th>
+        <th>Setor</th>
+        <th class="r">Último</th>
+        <th class="r">% Dia</th>
+        <th class="r">% Ano</th>
+      </tr></thead>
+      <tbody id="mw-body"><tr><td colspan="5" style="padding:32px;color:var(--text-3);text-align:center">Carregando...</td></tr></tbody>
+    </table>
+  </div>
+  <div class="last-upd" id="mw-last-upd"></div>
 </div>
 <div class="panel" id="panel-trades">
   <div class="trades-layout">
@@ -348,22 +390,6 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
     </div>
   </div>
 </div>
-<div class="panel" id="panel-alertas">
-  <div id="alert-admin-wrap">
-    <div class="alert-form">
-      <div class="form-section-title">Novo alerta</div>
-      <div class="form-grid">
-        <div class="form-field"><label>Tipo</label><select id="al-type"><option value="email">E-mail</option><option value="whatsapp">WhatsApp</option></select></div>
-        <div class="form-field"><label>Destino</label><input type="text" id="al-dest" placeholder="email ou +55119..."/></div>
-        <div class="form-field"><label>Condição</label><select id="al-trigger"><option value="change_pct">P&L % no dia</option><option value="value_below">Gross abaixo de (R$)</option><option value="value_above">Gross acima de (R$)</option></select></div>
-        <div class="form-field"><label>Limite</label><input type="number" id="al-threshold" placeholder="Ex: -3"/></div>
-      </div>
-      <button class="btn-add" onclick="addAlert()">+ adicionar alerta</button>
-    </div>
-  </div>
-  <div id="alerts-list"></div>
-  <div id="no-alerts" style="color:var(--text-3);font-size:13px;display:none;padding:20px 0">Nenhum alerta configurado.</div>
-</div>
 <div class="panel" id="panel-admin">
   <div class="admin-section">
     <div class="form-section-title">Minhas preferências</div>
@@ -381,7 +407,23 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   </div>
   <div class="admin-section">
     <div class="form-section-title">Mapeamento de ativos</div>
-    <p style="font-size:12px;color:var(--text-2);margin-bottom:14px">Define como cada ativo é buscado, seu book e setor. Admins podem editar.</p>
+    <p style="font-size:12px;color:var(--text-2);margin-bottom:14px">Define como cada ativo é buscado, seu book e setor. O toggle "MW" controla se aparece no MarketWatch.</p>
+    <div class="setup-add-ticker" id="setup-add-ticker" style="display:none">
+      <div style="font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Adicionar ativo à cobertura</div>
+      <div class="form-grid">
+        <div class="form-field"><label>Ticker</label><input type="text" id="add-cov-ticker" placeholder="PETR4" style="text-transform:uppercase"/></div>
+        <div class="form-field"><label>Moeda</label><select id="add-cov-currency"><option value="BRL">BRL</option><option value="USD">USD</option></select></div>
+        <div class="form-field"><label>Fonte</label><select id="add-cov-source"><option value="auto">Auto</option><option value="brapi">brapi</option><option value="finnhub">Finnhub</option><option value="bloomberg">Bloomberg</option></select></div>
+        <div class="form-field"><label>Book</label><input type="text" id="add-cov-book" placeholder="Book"/></div>
+        <div class="form-field"><label>Setor</label><input type="text" id="add-cov-sector" placeholder="Setor"/></div>
+        <button class="btn-add" onclick="addCoverageTicker()">+ adicionar</button>
+      </div>
+    </div>
+    <div class="tmap-filter" id="tmap-filter">
+      <button class="active" onclick="setTmapFilter('all',this)">Todos</button>
+      <button onclick="setTmapFilter('portfolio',this)">Na carteira</button>
+      <button onclick="setTmapFilter('coverage',this)">Só cobertura</button>
+    </div>
     <div id="tmap-bulk-bar" style="display:none;background:var(--nav);color:#fff;padding:10px 14px;border-radius:var(--radius) var(--radius) 0 0;font-size:12px;align-items:center;gap:10px;flex-wrap:wrap">
       <span id="tmap-bulk-count" style="font-weight:600;min-width:90px">0 selecionados</span>
       <select id="tmap-bulk-source" class="tmap-select" style="background:var(--nav-surface);color:#fff;border-color:#374151;font-size:12px;padding:5px 8px">
@@ -398,8 +440,8 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
     </div>
     <div style="overflow-x:auto">
       <table class="tmap-table">
-        <thead><tr><th style="width:30px"><input type="checkbox" id="tmap-check-all" onchange="toggleAllTmapChecks(this.checked)" title="Selecionar todos"/></th><th>Ticker</th><th>Moeda</th><th>Fonte</th><th>Ticker na fonte</th><th>Preço manual</th><th>Book</th><th>Setor</th><th>Status</th><th style="text-align:right">Ação</th></tr></thead>
-        <tbody id="tmap-body"><tr><td colspan="10" style="color:var(--text-3);padding:16px 10px">Carregando...</td></tr></tbody>
+        <thead><tr><th style="width:30px"><input type="checkbox" id="tmap-check-all" onchange="toggleAllTmapChecks(this.checked)" title="Selecionar todos"/></th><th>Ticker</th><th>Moeda</th><th>Fonte</th><th>Ticker na fonte</th><th>Preço manual</th><th>Book</th><th>Setor</th><th>Status</th><th style="text-align:center;width:40px" title="MarketWatch">MW</th><th style="text-align:right">Ação</th></tr></thead>
+        <tbody id="tmap-body"><tr><td colspan="11" style="color:var(--text-3);padding:16px 10px">Carregando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -448,10 +490,11 @@ const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
 let user=null,groupId=null,groupName=null,role=null
 let portfolios={},quotes={},usdBrl=null,usdVarPct=0,ibovPct=null,ibovVal=null
 let tickerMap={},sortStates={},consolSortCol='gross',consolSortAsc=false,bookGroupMode={}
-let chartInstance=null,currencyMode='original',autoRefresh=false
+let currencyMode='original',autoRefresh=false
 let lastRefresh=null,cooldownTimer=null,elapsedTimer=null,autoRefreshTimer=null,isRefreshing=false
 let selectedPortfolios=new Set()
 let todayTrades=[],tradeFormType='trade',tradesEditMode=false
+let tmapFilter='all',mwQuotes={},mwRefPrices={},isMwRefreshing=false
 const COOLDOWN_MS=1*60*1000,AUTO_REFRESH_MS=10*60*1000,MAX_MULTI=3,MULTI_MIN_WIDTH=1100,BRAPI_BATCH=20
 function safeid(s){return s.replace(/[^a-zA-Z0-9]/g,'_')}
 function formatDate(d){const[y,m,day]=d.split('-');return`${day}/${m}/${y}`}
@@ -499,9 +542,8 @@ async function boot(){
   window._finnhubToken=mem.groups.finnhub_token||''
   document.getElementById('group-name').textContent=groupName.toUpperCase()
   document.getElementById('role-badge').textContent=role
-  if(role==='admin'){document.getElementById('nav-setup').style.display='block';document.getElementById('admin-api-section').style.display='block';document.getElementById('cfg-brapi').value=window._brapiToken;document.getElementById('cfg-finnhub').value=window._finnhubToken}
-  else{document.getElementById('alert-admin-wrap').style.display='none'}
-  await loadPreferences();await loadTickerMap();await loadTodayPortfolios();await loadTodayTrades();loadAlerts()
+  if(role==='admin'){document.getElementById('nav-setup').style.display='block';document.getElementById('admin-api-section').style.display='block';document.getElementById('setup-add-ticker').style.display='block';document.getElementById('cfg-brapi').value=window._brapiToken;document.getElementById('cfg-finnhub').value=window._finnhubToken}
+  await loadPreferences();await loadTickerMap();await loadTodayPortfolios();await loadTodayTrades()
 }
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('pt-BR',{hour12:false})},1000)
 
@@ -528,16 +570,19 @@ function stopAutoRefreshTimer(){if(autoRefreshTimer)clearInterval(autoRefreshTim
 
 async function loadTickerMap(){
   const{data}=await sb.from('ticker_map').select('*').eq('group_id',groupId)
-  tickerMap={};(data||[]).forEach(r=>{tickerMap[r.ticker]={id:r.id,source:r.source,sourceTicker:r.source_ticker,book:r.book||'',sector:r.sector||'',manualPrice:r.manual_price||null}})
+  tickerMap={};(data||[]).forEach(r=>{tickerMap[r.ticker]={id:r.id,source:r.source,sourceTicker:r.source_ticker,book:r.book||'',sector:r.sector||'',manualPrice:r.manual_price||null,inCoverage:r.in_coverage||false,coverageCurrency:r.coverage_currency||null,prevCloseRef:r.prev_close_ref||null,yearStartPrice:r.year_start_price||null,refDate:r.ref_date||null}})
 }
 function getTickerConfig(ticker,currency){
   const cfg=tickerMap[ticker];if(cfg)return{source:cfg.source,sourceTicker:cfg.sourceTicker||ticker}
   return{source:currency==='USD'?'finnhub':'brapi',sourceTicker:ticker}
 }
-async function saveTickerMapRow(ticker,source,sourceTicker,book,sector,manualPrice){
+async function saveTickerMapRow(ticker,source,sourceTicker,book,sector,manualPrice,inCoverage,coverageCurrency){
   const existing=tickerMap[ticker]
-  if(existing)await sb.from('ticker_map').update({source,source_ticker:sourceTicker||null,book:book||null,sector:sector||null,manual_price:manualPrice||null,updated_at:new Date().toISOString()}).eq('id',existing.id)
-  else await sb.from('ticker_map').insert({group_id:groupId,ticker,source,source_ticker:sourceTicker||null,book:book||null,sector:sector||null,manual_price:manualPrice||null})
+  const updates={source,source_ticker:sourceTicker||null,book:book||null,sector:sector||null,manual_price:manualPrice||null,updated_at:new Date().toISOString()}
+  if(inCoverage!==undefined)updates.in_coverage=inCoverage
+  if(coverageCurrency!==undefined)updates.coverage_currency=coverageCurrency
+  if(existing)await sb.from('ticker_map').update(updates).eq('id',existing.id)
+  else await sb.from('ticker_map').insert({group_id:groupId,ticker,...updates,in_coverage:inCoverage||false,coverage_currency:coverageCurrency||null})
   await loadTickerMap()
 }
 async function resetTickerMapRow(ticker){
@@ -546,20 +591,30 @@ async function resetTickerMapRow(ticker){
 }
 function renderTickerMap(){
   const adjAll=getAllAdjustedFlat().filter(p=>p.ticker!=='CASH_FLOW')
-  const allTickers=[...new Set(adjAll.map(p=>({ticker:p.ticker,currency:p.currency})).filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i))].sort((a,b)=>a.ticker.localeCompare(b.ticker))
-  if(!allTickers.length){document.getElementById('tmap-body').innerHTML='<tr><td colspan="10" style="color:var(--text-3);padding:16px">Nenhum ativo carregado.</td></tr>';return}
+  // Portfolio tickers
+  const portTickers=[...new Set(adjAll.map(p=>({ticker:p.ticker,currency:p.currency})).filter((v,i,a)=>a.findIndex(x=>x.ticker===v.ticker)===i))]
+  const portTickerSet=new Set(portTickers.map(t=>t.ticker))
+  // Coverage-only tickers (in ticker_map but not in portfolio)
+  const covOnlyTickers=Object.entries(tickerMap).filter(([tk,cfg])=>!portTickerSet.has(tk)).map(([tk,cfg])=>({ticker:tk,currency:cfg.coverageCurrency||(cfg.source==='finnhub'?'USD':'BRL')}))
+  let allTickers=[...portTickers,...covOnlyTickers].sort((a,b)=>a.ticker.localeCompare(b.ticker))
+  // Apply filter
+  if(tmapFilter==='portfolio')allTickers=allTickers.filter(t=>portTickerSet.has(t.ticker))
+  else if(tmapFilter==='coverage')allTickers=allTickers.filter(t=>tickerMap[t.ticker]?.inCoverage)
+  if(!allTickers.length){document.getElementById('tmap-body').innerHTML='<tr><td colspan="11" style="color:var(--text-3);padding:16px">Nenhum ativo encontrado.</td></tr>';return}
   const isAdmin=role==='admin'
-  // Get current book/sector from positions as fallback
   const posInfo={};adjAll.forEach(p=>{if(!posInfo[p.ticker]||(p.book&&p.book!=='—'))posInfo[p.ticker]={book:p.book||'',sector:p.sector||''}})
   document.getElementById('tmap-body').innerHTML=allTickers.map(({ticker,currency})=>{
     const cfg=tickerMap[ticker];const source=cfg?.source||'auto';const sourceTicker=cfg?.sourceTicker||''
     const book=cfg?.book||posInfo[ticker]?.book||'';const sector=cfg?.sector||posInfo[ticker]?.sector||''
     const manualPrice=cfg?.manualPrice||''
+    const inCov=cfg?.inCoverage||false
+    const inPort=portTickerSet.has(ticker)
     const sb2={auto:`<span class="status-badge status-auto">auto</span>`,brapi:`<span class="status-badge status-brapi">brapi</span>`,finnhub:`<span class="status-badge status-finnhub">finnhub</span>`,bloomberg:`<span class="status-badge status-bbg">bbg</span>`,ignore:`<span class="status-badge status-ignore">ign</span>`,manual:`<span class="status-badge status-manual">manual</span>`}[source]||`<span class="status-badge status-auto">auto</span>`
     const cb=currency==='USD'?`<span style="font-size:10px;font-weight:600;color:var(--blue-text)">USD</span>`:`<span style="font-size:10px;font-weight:600;color:var(--green-text)">BRL</span>`
     const chk=isAdmin?`<td><input type="checkbox" class="tmap-chk" data-ticker="${ticker}" data-currency="${currency}" onchange="updateBulkBar()"/></td>`:`<td></td>`
-    if(!isAdmin){const ec=getTickerConfig(ticker,currency);return`<tr>${chk}<td><strong>${ticker}</strong></td><td>${cb}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td class="meta-cell">${source==='manual'&&manualPrice?manualPrice:'—'}</td><td class="meta-cell">${book||'—'}</td><td class="meta-cell">${sector||'—'}</td><td>${sb2}</td><td></td></tr>`}
-    return`<tr data-ticker="${ticker}" data-currency="${currency}">${chk}<td><strong>${ticker}</strong></td><td>${cb}</td>
+    const covToggle=isAdmin?`<td style="text-align:center"><button class="coverage-toggle ${inCov?'on':''}" onclick="toggleCoverage('${ticker}',${!inCov})" title="${inCov?'Remover do MarketWatch':'Adicionar ao MarketWatch'}"></button></td>`:`<td style="text-align:center">${inCov?'✓':'—'}</td>`
+    if(!isAdmin){const ec=getTickerConfig(ticker,currency);return`<tr>${chk}<td><strong>${ticker}</strong>${!inPort?' <span style="font-size:9px;color:var(--text-3)">(cob)</span>':''}</td><td>${cb}</td><td class="meta-cell">${ec.source}</td><td class="meta-cell">${ec.sourceTicker}</td><td class="meta-cell">${source==='manual'&&manualPrice?manualPrice:'—'}</td><td class="meta-cell">${book||'—'}</td><td class="meta-cell">${sector||'—'}</td><td>${sb2}</td>${covToggle}<td></td></tr>`}
+    return`<tr data-ticker="${ticker}" data-currency="${currency}">${chk}<td><strong>${ticker}</strong>${!inPort?' <span style="font-size:9px;color:var(--text-3)">(cob)</span>':''}</td><td>${cb}</td>
       <td><select class="tmap-select" id="tmap-src-${safeid(ticker)}" onchange="onTickerSourceChange('${ticker}','${currency}')">
         <option value="auto" ${source==='auto'?'selected':''}>Auto</option>
         <option value="brapi" ${source==='brapi'?'selected':''}>brapi</option>
@@ -573,6 +628,7 @@ function renderTickerMap(){
       <td><input class="tmap-input" id="tmap-book-${safeid(ticker)}" value="${book}" placeholder="Book" style="width:80px"/></td>
       <td><input class="tmap-input" id="tmap-sector-${safeid(ticker)}" value="${sector}" placeholder="Setor" style="width:80px"/></td>
       <td>${sb2}</td>
+      ${covToggle}
       <td style="text-align:right"><button class="btn-save-map" onclick="saveTickerRow('${ticker}')">Salvar</button>${cfg?`<button class="btn-reset-map" onclick="resetTickerMapRow('${ticker}')">Reset</button>`:''}</td></tr>`
   }).join('')
   updateBulkBar()
@@ -648,7 +704,7 @@ function isWideScreen(){return window.innerWidth>=MULTI_MIN_WIDTH}
 window.switchTab=function(name,el){
   deactivateAll();el.classList.add('active');document.getElementById('panel-'+name).classList.add('active')
   selectedPortfolios.clear();updatePortfolioTabsUI()
-  if(name==='historico')loadChart();if(name==='admin'){loadMembers();renderTickerMap()}
+  if(name==='marketwatch')loadMarketWatchData();if(name==='admin'){loadMembers();renderTickerMap()}
   if(name==='trades'){populateTradeDropdowns();renderTradesList()}
 }
 window.switchToConsolidacao=function(el){deactivateAll();el.classList.add('active');document.getElementById('panel-consolidacao').classList.add('active');selectedPortfolios.clear();updatePortfolioTabsUI()}
@@ -725,7 +781,7 @@ async function loadTodayPortfolios(){
     portfolios[port.portfolio_name]=(pos||[]).map(p=>{const tm=tickerMap[p.ticker];return{ticker:p.ticker,qty:p.quantity,market:p.market,currency:p.currency||p.market,prevClose:p.prev_close,book:p.book||tm?.book||'—',sector:p.sector||tm?.sector||'—'}})
     sortStates[port.portfolio_name]={col:'portVar',asc:false,bookSectorClicks:0}
   }
-  buildPortfolioTabs(Object.keys(portfolios));updateChartSelector(Object.keys(portfolios))
+  buildPortfolioTabs(Object.keys(portfolios))
   if(role==='admin')buildUploadZone();await loadCachedQuotes()
 }
 
@@ -842,7 +898,7 @@ async function handleFile(file){
     }
   }
   await loadTickerMap()
-  selectedPortfolios.clear();buildPortfolioTabs(Object.keys(portfolios));updateChartSelector(Object.keys(portfolios));lastRefresh=null;await refreshAll()
+  selectedPortfolios.clear();buildPortfolioTabs(Object.keys(portfolios));lastRefresh=null;await refreshAll()
 }
 
 async function fetchUsdBrl(){
@@ -1187,47 +1243,246 @@ async function saveSnapshots(){
   }
 }
 
-function updateChartSelector(names){
-  const sel=document.getElementById('chart-port-sel');while(sel.options.length>1)sel.remove(1)
-  names.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n.toUpperCase();sel.appendChild(o)})
+// ─── MarketWatch ────────────────────────────────────────────
+window.setTmapFilter=function(filter,el){
+  tmapFilter=filter
+  document.querySelectorAll('.tmap-filter button').forEach(b=>b.classList.remove('active'))
+  el.classList.add('active')
+  renderTickerMap()
 }
-window.loadChart=async function(){
-  const sel=document.getElementById('chart-port-sel').value;const today=new Date().toISOString().slice(0,10);const since=new Date(today+'T00:00:00').toISOString()
-  let portIds=[]
-  if(sel==='__all__'){const{data:ports}=await sb.from('portfolios').select('id').eq('group_id',groupId).eq('date',today);portIds=(ports||[]).map(p=>p.id)}
-  else{const{data:port}=await sb.from('portfolios').select('id').eq('group_id',groupId).eq('date',today).eq('portfolio_name',sel).single();if(port)portIds=[port.id]}
-  if(!portIds.length){showEmptyChart();return}
-  const{data:snaps}=await sb.from('quote_snapshots').select('captured_at,total_brl,day_change_pct,snapshot_data').in('portfolio_id',portIds).gte('captured_at',since).order('captured_at',{ascending:true})
-  if(!snaps?.length){showEmptyChart();return}
-  let chartData
-  if(sel==='__all__'&&portIds.length>1){
-    const byMin={};snaps.forEach(s=>{const min=new Date(s.captured_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});if(!byMin[min])byMin[min]={gross:0,varBrl:0};byMin[min].gross+=parseFloat(s.total_brl||0);byMin[min].varBrl+=parseFloat(s.snapshot_data?.varBrl||0)})
-    chartData=Object.entries(byMin).map(([label,v])=>{const prev=v.gross-v.varBrl;return{label,gross:v.gross.toFixed(2),varPct:prev>0?((v.varBrl/prev)*100).toFixed(2):'0'}})
-  } else{chartData=snaps.map(s=>({label:new Date(s.captured_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),gross:parseFloat(s.total_brl||0).toFixed(2),varPct:parseFloat(s.day_change_pct||0).toFixed(2)}))}
-  document.getElementById('empty-chart').style.display='none';document.getElementById('chart-canvas').style.display='block'
-  if(chartInstance)chartInstance.destroy()
-  chartInstance=new Chart(document.getElementById('chart-canvas'),{type:'line',data:{labels:chartData.map(d=>d.label),datasets:[{label:'Gross',data:chartData.map(d=>d.gross),borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.06)',borderWidth:1.5,pointRadius:2,fill:true,tension:0.3,yAxisID:'y'},{label:'%Dia',data:chartData.map(d=>d.varPct),borderColor:'#2563eb',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,borderDash:[4,3],tension:0.3,yAxisID:'y2'}]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#6b7280',font:{family:'Inter',size:11}}},tooltip:{backgroundColor:'#fff',borderColor:'#e5e7eb',borderWidth:1,titleColor:'#6b7280',bodyColor:'#111827',titleFont:{family:'Inter',size:10},bodyFont:{family:'Inter',size:12},callbacks:{label:ctx=>ctx.datasetIndex===0?` R$ ${parseFloat(ctx.raw).toLocaleString('pt-BR',{minimumFractionDigits:2})}`:` ${parseFloat(ctx.raw)>=0?'+':''}${ctx.raw}%`}}},scales:{x:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10}},grid:{color:'#f3f4f6'}},y:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10},callback:v=>parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})},grid:{color:'#f3f4f6'},position:'left'},y2:{ticks:{color:'#9ca3af',font:{family:'Inter',size:10},callback:v=>v+'%'},grid:{display:false},position:'right'}}}})
+window.toggleCoverage=async function(ticker,val){
+  const cfg=tickerMap[ticker]
+  if(cfg?.id){
+    await sb.from('ticker_map').update({in_coverage:val,updated_at:new Date().toISOString()}).eq('id',cfg.id)
+  } else {
+    await sb.from('ticker_map').insert({group_id:groupId,ticker,source:'auto',in_coverage:val})
+  }
+  await loadTickerMap();renderTickerMap();toast(`${ticker} ${val?'adicionado ao':'removido do'} MarketWatch`,'ok')
 }
-function showEmptyChart(){document.getElementById('empty-chart').style.display='flex';document.getElementById('chart-canvas').style.display='none'}
+window.addCoverageTicker=async function(){
+  const ticker=document.getElementById('add-cov-ticker').value.trim().toUpperCase().replace(/[^A-Z0-9^]/g,'')
+  const currency=document.getElementById('add-cov-currency').value
+  const source=document.getElementById('add-cov-source').value
+  const book=document.getElementById('add-cov-book').value.trim()
+  const sector=document.getElementById('add-cov-sector').value.trim()
+  if(!ticker){toast('Digite um ticker','err');return}
+  if(tickerMap[ticker]){toast(`${ticker} já existe no mapeamento`,'err');return}
+  const sticker=source==='bloomberg'?bbgSourceTicker(ticker,currency):ticker
+  await sb.from('ticker_map').insert({group_id:groupId,ticker,source,source_ticker:source==='auto'?null:sticker,book:book||null,sector:sector||null,in_coverage:true,coverage_currency:currency})
+  await loadTickerMap();renderTickerMap()
+  document.getElementById('add-cov-ticker').value='';document.getElementById('add-cov-book').value='';document.getElementById('add-cov-sector').value=''
+  toast(`${ticker} adicionado à cobertura`,'ok')
+}
 
-async function loadAlerts(){const{data}=await sb.from('alerts').select('*').eq('group_id',groupId);renderAlerts(data||[])}
-function renderAlerts(list){
-  document.getElementById('no-alerts').style.display=list.length?'none':'block'
-  document.getElementById('alerts-list').innerHTML=list.map(a=>{
-    const tl={change_pct:`P&L ≤ ${a.threshold}%`,value_below:`Gross < ${fmtBRL(a.threshold)}`,value_above:`Gross > ${fmtBRL(a.threshold)}`}[a.trigger_type]||''
-    return`<div class="alert-item"><div class="alert-info"><strong>${a.type.toUpperCase()}</strong> → ${a.destination}<span>${tl}</span></div><div style="display:flex;gap:10px;align-items:center">${role==='admin'?`<button class="toggle-active ${a.active?'on':''}" onclick="toggleAlert('${a.id}',${!a.active})"></button><button class="btn-del" onclick="deleteAlert('${a.id}')">remover</button>`:''}</div></div>`
-  }).join('')
+function getCoverageTickers(){
+  return Object.entries(tickerMap).filter(([tk,cfg])=>cfg.inCoverage).map(([tk,cfg])=>{
+    const adjAll=getAllAdjustedFlat()
+    const pos=adjAll.find(p=>p.ticker===tk)
+    const currency=pos?.currency||cfg.coverageCurrency||(cfg.source==='finnhub'?'USD':'BRL')
+    return{ticker:tk,currency,source:cfg.source,sourceTicker:cfg.sourceTicker,book:cfg.book||'—',sector:cfg.sector||'—',prevCloseRef:cfg.prevCloseRef,yearStartPrice:cfg.yearStartPrice,refDate:cfg.refDate}
+  })
 }
-window.addAlert=async function(){
-  const type=document.getElementById('al-type').value,dest=document.getElementById('al-dest').value.trim(),trigger=document.getElementById('al-trigger').value,threshold=parseFloat(document.getElementById('al-threshold').value)
-  if(!dest||isNaN(threshold)){toast('Preencha todos os campos.','err');return}
-  const{error}=await sb.from('alerts').insert({group_id:groupId,created_by:user.id,type,destination:dest,trigger_type:trigger,threshold,active:true})
-  if(error){toast('Erro: '+error.message,'err');return}
-  toast('Alerta criado!','ok');document.getElementById('al-dest').value='';document.getElementById('al-threshold').value='';loadAlerts()
-}
-window.toggleAlert=async function(id,active){await sb.from('alerts').update({active}).eq('id',id);loadAlerts()}
-window.deleteAlert=async function(id){await sb.from('alerts').delete().eq('id',id);loadAlerts()}
 
+async function fetchMwRefPrices(tickers){
+  const today=new Date().toISOString().slice(0,10)
+  const needsRef=tickers.filter(t=>t.refDate!==today)
+  if(!needsRef.length)return
+  const token=window._brapiToken
+  const fhToken=window._finnhubToken
+  // BRL tickers via brapi
+  const brlRef=needsRef.filter(t=>{const s=t.source==='auto'?(t.currency==='BRL'?'brapi':'finnhub'):t.source;return s==='brapi'})
+  for(let i=0;i<brlRef.length;i+=BRAPI_BATCH){
+    const batch=brlRef.slice(i,i+BRAPI_BATCH)
+    const symbols=batch.map(t=>t.sourceTicker||t.ticker).join(',')
+    try{
+      const r=await fetch(`https://brapi.dev/api/quote/${symbols}?token=${token}`)
+      const d=await r.json();const results=d.results||[]
+      for(const t of batch){
+        const q=results.find(r=>r.symbol===(t.sourceTicker||t.ticker)||r.symbol===t.ticker)
+        if(!q)continue
+        const prevClose=q.regularMarketPreviousClose||null
+        // Year start: try historicalDataPrice
+        let yearStart=null
+        try{
+          const yr=await fetch(`https://brapi.dev/api/quote/${t.sourceTicker||t.ticker}?range=1y&interval=1mo&token=${token}`)
+          const yd=await yr.json();const hist=yd.results?.[0]?.historicalDataPrice
+          if(hist&&hist.length)yearStart=hist[0].close||hist[0].open||null
+        }catch{}
+        if(prevClose||yearStart){
+          const updates={ref_date:today,updated_at:new Date().toISOString()}
+          if(prevClose)updates.prev_close_ref=prevClose
+          if(yearStart)updates.year_start_price=yearStart
+          const cfg=tickerMap[t.ticker]
+          if(cfg?.id)await sb.from('ticker_map').update(updates).eq('id',cfg.id)
+        }
+      }
+    }catch(e){console.error('brapi ref error:',e)}
+    if(i+BRAPI_BATCH<brlRef.length)await new Promise(r=>setTimeout(r,300))
+  }
+  // USD tickers via finnhub
+  const usdRef=needsRef.filter(t=>{const s=t.source==='auto'?(t.currency==='USD'?'finnhub':'brapi'):t.source;return s==='finnhub'})
+  for(const t of usdRef){
+    try{
+      const ft=t.sourceTicker||t.ticker
+      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${ft}&token=${fhToken}`)
+      const d=await r.json()
+      const prevClose=d.pc||null
+      // Year start: candle endpoint
+      let yearStart=null
+      try{
+        const yearStartDate=new Date(new Date().getFullYear()-1,11,20)
+        const yearEndDate=new Date(new Date().getFullYear(),0,5)
+        const cr=await fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${ft}&resolution=D&from=${Math.floor(yearStartDate.getTime()/1000)}&to=${Math.floor(yearEndDate.getTime()/1000)}&token=${fhToken}`)
+        const cd=await cr.json()
+        if(cd.c&&cd.c.length)yearStart=cd.c[cd.c.length-1]
+      }catch{}
+      if(prevClose||yearStart){
+        const updates={ref_date:today,updated_at:new Date().toISOString()}
+        if(prevClose)updates.prev_close_ref=prevClose
+        if(yearStart)updates.year_start_price=yearStart
+        const cfg=tickerMap[t.ticker]
+        if(cfg?.id)await sb.from('ticker_map').update(updates).eq('id',cfg.id)
+      }
+    }catch(e){console.error('finnhub ref error:',e)}
+    await new Promise(r=>setTimeout(r,150))
+  }
+  // Bloomberg tickers: ref prices come from bloomberg_bridge.py, skip here
+  await loadTickerMap()
+}
+
+async function fetchMwQuotes(tickers){
+  const token=window._brapiToken
+  const fhToken=window._finnhubToken
+  const brlTickers=tickers.filter(t=>{const s=t.source==='auto'?(t.currency==='BRL'?'brapi':'finnhub'):t.source;return s==='brapi'&&s!=='ignore'&&s!=='manual'&&s!=='bloomberg'})
+  const usdTickers=tickers.filter(t=>{const s=t.source==='auto'?(t.currency==='USD'?'finnhub':'brapi'):t.source;return s==='finnhub'&&s!=='ignore'&&s!=='manual'&&s!=='bloomberg'})
+  // brapi
+  for(let i=0;i<brlTickers.length;i+=BRAPI_BATCH){
+    const batch=brlTickers.slice(i,i+BRAPI_BATCH)
+    const symbols=batch.map(t=>t.sourceTicker||t.ticker).join(',')
+    try{
+      const r=await fetch(`https://brapi.dev/api/quote/${symbols}?token=${token}`)
+      const d=await r.json();const results=d.results||[]
+      batch.forEach(t=>{const q=results.find(r=>r.symbol===(t.sourceTicker||t.ticker)||r.symbol===t.ticker);if(q?.regularMarketPrice)mwQuotes[t.ticker]={price:q.regularMarketPrice,currency:'BRL'}})
+    }catch{}
+    if(i+BRAPI_BATCH<brlTickers.length)await new Promise(r=>setTimeout(r,300))
+  }
+  // finnhub
+  for(const t of usdTickers){
+    try{
+      const ft=t.sourceTicker||t.ticker
+      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${ft}&token=${fhToken}`)
+      const d=await r.json();if(d.c>0)mwQuotes[t.ticker]={price:d.c,currency:'USD'}
+    }catch{}
+    await new Promise(r=>setTimeout(r,120))
+  }
+  // Bloomberg: read from quote_cache
+  const bbgTickers=tickers.filter(t=>t.source==='bloomberg')
+  if(bbgTickers.length){
+    const{data:bbgQ}=await sb.from('quote_cache').select('ticker,price,currency').eq('group_id',groupId).in('ticker',bbgTickers.map(t=>t.ticker))
+    if(bbgQ)bbgQ.forEach(q=>{mwQuotes[q.ticker]={price:q.price||0,currency:q.currency||'BRL'}})
+  }
+  // Manual
+  tickers.filter(t=>t.source==='manual').forEach(t=>{const mp=tickerMap[t.ticker]?.manualPrice;if(mp>0)mwQuotes[t.ticker]={price:mp,currency:t.currency}})
+}
+
+async function loadMarketWatchData(){
+  const covTickers=getCoverageTickers()
+  if(!covTickers.length){
+    document.getElementById('mw-body').innerHTML='<tr><td colspan="5" style="padding:32px;color:var(--text-3);text-align:center">Nenhum ativo na cobertura. Ative ativos no Setup (coluna MW).</td></tr>'
+    document.getElementById('mw-status').textContent='0 ativos'
+    return
+  }
+  document.getElementById('mw-status').textContent=`${covTickers.length} ativos · carregando...`
+  // Fetch ref prices if needed
+  await fetchMwRefPrices(covTickers)
+  // Fetch current quotes
+  await fetchMwQuotes(getCoverageTickers())
+  // Update market data
+  updateMwTopBar()
+  renderMarketWatch()
+  document.getElementById('mw-status').textContent=`${covTickers.length} ativos`
+  document.getElementById('mw-last-upd').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR')
+}
+
+window.refreshMarketWatch=async function(){
+  if(isMwRefreshing)return
+  isMwRefreshing=true
+  const btn=document.getElementById('btn-refresh-mw')
+  if(btn)btn.disabled=true
+  document.getElementById('refresh-label-mw').innerHTML='<span class="spin"></span> atualizando...'
+  await Promise.all([fetchUsdBrl(),fetchIbov()])
+  const covTickers=getCoverageTickers()
+  await fetchMwQuotes(covTickers)
+  updateMwTopBar()
+  renderMarketWatch()
+  document.getElementById('mw-last-upd').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR')
+  document.getElementById('mw-status').textContent=`${covTickers.length} ativos`
+  isMwRefreshing=false
+  if(btn)btn.disabled=false
+  document.getElementById('refresh-label-mw').textContent='↻ atualizar'
+}
+
+function updateMwTopBar(){
+  const sign=usdVarPct>=0?'+':'-';const cls=usdVarPct>=0?'pos':'neg'
+  const ibovSign=ibovPct!=null?(ibovPct>=0?'+':'-'):'';const ibovCls=ibovPct!=null?(ibovPct>=0?'pos':'neg'):''
+  const ie=document.getElementById('mw-ibov-pct'),iv=document.getElementById('mw-ibov-val')
+  const ue=document.getElementById('mw-usd-pct'),uv=document.getElementById('mw-usd-val')
+  if(ie&&ibovPct!=null){ie.textContent=fmtPct(ibovPct);ie.className='mkt-main '+ibovCls}
+  if(iv&&ibovVal!=null)iv.textContent=ibovVal.toLocaleString('pt-BR',{maximumFractionDigits:0})
+  if(ue){ue.textContent=fmtPct(usdVarPct);ue.className='mkt-main '+cls}
+  if(uv&&usdBrl)uv.textContent=fmtBRL(usdBrl)
+}
+
+function renderMarketWatch(){
+  const covTickers=getCoverageTickers()
+  const search=(document.getElementById('mw-search')?.value||'').toUpperCase()
+  let filtered=covTickers
+  if(search)filtered=filtered.filter(t=>t.ticker.includes(search)||t.book.toUpperCase().includes(search)||t.sector.toUpperCase().includes(search))
+  // Group by Book → Sector, sorted alphabetically
+  const groups={}
+  filtered.forEach(t=>{
+    const bk=t.book||'—';const sc=t.sector||'—'
+    const key=bk+'|||'+sc
+    if(!groups[key])groups[key]={book:bk,sector:sc,tickers:[]}
+    groups[key].tickers.push(t)
+  })
+  // Sort groups: book alphabetical, then sector alphabetical
+  const sortedGroups=Object.values(groups).sort((a,b)=>{
+    const bc=a.book.localeCompare(b.book);if(bc!==0)return bc
+    return a.sector.localeCompare(b.sector)
+  })
+  // Sort tickers within each group alphabetically
+  sortedGroups.forEach(g=>g.tickers.sort((a,b)=>a.ticker.localeCompare(b.ticker)))
+  const tbody=document.getElementById('mw-body')
+  if(!filtered.length){
+    tbody.innerHTML='<tr><td colspan="5" style="padding:24px;color:var(--text-3);text-align:center">Nenhum ativo encontrado.</td></tr>'
+    return
+  }
+  let html=''
+  for(const group of sortedGroups){
+    html+=`<tr><td colspan="5" class="mw-group-header"><span class="mw-book-label">${group.book}</span> · ${group.sector}</td></tr>`
+    for(const t of group.tickers){
+      const mq=mwQuotes[t.ticker]
+      const cfg=tickerMap[t.ticker]
+      const isUSD=t.currency==='USD'
+      const price=mq?.price||0
+      const prevClose=cfg?.prevCloseRef||0
+      const yearStart=cfg?.yearStartPrice||0
+      const varDia=prevClose>0?((price-prevClose)/prevClose)*100:0
+      const varAno=yearStart>0?((price-yearStart)/yearStart)*100:0
+      const hasPrice=price>0
+      const currTag=isUSD?`<span class="curr-tag usd">U$</span>`:`<span class="curr-tag">R$</span>`
+      html+=`<tr>
+        <td>${currTag}<span class="mw-ticker">${t.ticker}</span></td>
+        <td class="meta-cell">${t.sector!=='—'?t.sector:''}</td>
+        <td class="r num">${hasPrice?fmtPrice(price,isUSD):'<span class="err-lbl">—</span>'}</td>
+        <td class="r">${hasPrice&&prevClose>0?`<span class="${varDia>=0?'var-pos':'var-neg'}">${fmtPct(varDia)}</span>`:'<span class="var-zero">—</span>'}</td>
+        <td class="r">${hasPrice&&yearStart>0?`<span class="${varAno>=0?'var-pos':'var-neg'}">${fmtPct(varAno)}</span>`:'<span class="var-zero">—</span>'}</td>
+      </tr>`
+    }
+  }
+  tbody.innerHTML=html
+}
 async function loadMembers(){
   const{data}=await sb.from('group_members').select('id,role,user_id').eq('group_id',groupId)
   if(!data?.length){document.getElementById('members-list').innerHTML='<span style="color:var(--text-3);font-size:13px">Nenhum membro.</span>';return}
