@@ -86,10 +86,6 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-zone h3{font-size:14px;font-weight:600;margin-bottom:4px}.upload-zone p{font-size:12px;color:var(--text-2)}
 /* ─── MarketWatch ────────────────────────────────────── */
-.mw-controls{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.mw-search{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px;border-radius:var(--radius);outline:none;width:220px;transition:border-color .15s}
-.mw-search:focus{border-color:var(--green)}
-.mw-status{font-size:11px;color:var(--text-3);margin-left:auto}
 .mw-refresh{font-family:var(--font);font-size:11px;font-weight:500;padding:7px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;transition:background .15s;white-space:nowrap}
 .mw-refresh:hover:not(:disabled){background:#15803d}
 .mw-refresh:disabled{background:var(--surface2);color:var(--text-3);border:1px solid var(--border);cursor:not-allowed}
@@ -322,10 +318,6 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
     <div class="mkt-card"><div class="mkt-lbl">BRL / USD</div><div class="mkt-main" id="mw-usd-pct">—</div><div class="mkt-sub" id="mw-usd-val">—</div></div>
     <div class="mkt-card mw-port-summary" id="mw-port-summary"><div class="mkt-lbl">Carteiras</div><div class="mw-port-line" style="margin-top:4px;margin-bottom:2px"><span class="mw-port-line-name" style="font-size:9px;color:var(--text-3);font-weight:500">&nbsp;</span><span class="mw-port-line-val" style="font-size:9px;color:var(--text-3);font-weight:500">% DIA</span><span class="mw-port-line-vs" style="font-size:9px;color:var(--text-3);font-weight:500">vs IBOV</span></div><div id="mw-port-lines"><span style="font-size:11px;color:var(--text-3)">—</span></div></div>
     <button class="mw-refresh" id="btn-refresh-mw" onclick="refreshMarketWatch()"><span id="refresh-label-mw">↻ atualizar</span></button>
-  </div>
-  <div class="mw-controls">
-    <input type="text" class="mw-search" id="mw-search" placeholder="Buscar ticker..." oninput="renderMarketWatch()"/>
-    <span class="mw-status" id="mw-status"></span>
   </div>
   <div class="mw-grid" id="mw-grid">
     <div class="mw-empty">Carregando...</div>
@@ -1453,9 +1445,7 @@ function updateMwTopBar(){
 
 function renderMarketWatch(){
   const covTickers=getCoverageTickers()
-  const search=(document.getElementById('mw-search')?.value||'').toUpperCase()
   let filtered=covTickers
-  if(search)filtered=filtered.filter(t=>t.ticker.includes(search)||t.book.toUpperCase().includes(search)||t.sector.toUpperCase().includes(search))
   // Group by Book → Sector, sorted alphabetically
   const groups={}
   filtered.forEach(t=>{
