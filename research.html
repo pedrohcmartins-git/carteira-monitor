@@ -429,6 +429,83 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
 
 /* ============================================================
+   ONE-PAGER
+   ============================================================ */
+.op-modes { display: flex; gap: 6px; margin-bottom: 16px; }
+.op-mode-btn {
+  padding: 6px 14px; font-size: 12px; border-radius: 6px;
+  border: 1px solid #e5e7eb; background: #fff; color: #6b7280; cursor: pointer;
+}
+.op-mode-btn.active { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; font-weight: 500; }
+.op-sub { font-size: 11px; color: #9ca3af; margin-bottom: 16px; }
+.op-sub a { color: #2563eb; cursor: pointer; }
+.op-sec { margin-bottom: 18px; }
+.op-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 500; }
+.op-text { font-size: 13px; line-height: 1.65; color: #1a1a1a; white-space: pre-wrap; }
+.op-premortem {
+  background: #fef2f2; border-radius: 8px; padding: 10px 12px;
+  font-size: 12px; color: #991b1b; margin-top: 8px; line-height: 1.5;
+}
+.op-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.op-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.op-card { background: #f3f4f6; border-radius: 8px; padding: 10px 12px; }
+.op-card-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; }
+.op-card-val { font-size: 13px; font-weight: 500; margin-top: 2px; }
+.op-cat-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12px; }
+.op-cat-dot { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; flex-shrink: 0; }
+.op-cat-date { font-size: 11px; color: #9ca3af; font-family: 'DM Mono', monospace; margin-left: auto; }
+.op-risk { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 4px; margin: 2px; }
+.op-risk-red { background: #fef2f2; color: #991b1b; }
+.op-risk-orange { background: #fef3c7; color: #92400e; }
+.op-risk-yellow { background: #fef9c3; color: #854d0e; }
+.op-risk-green { background: #dcfce7; color: #166534; }
+.op-fin { width: 100%; border-collapse: collapse; font-size: 12px; }
+.op-fin th { text-align: right; font-size: 10px; color: #9ca3af; font-weight: 500; text-transform: uppercase; padding: 6px 8px; border-bottom: 1px solid #e5e7eb; }
+.op-fin th:first-child { text-align: left; }
+.op-fin td { padding: 6px 8px; border-bottom: 1px solid #f3f4f6; text-align: right; font-family: 'DM Mono', monospace; font-size: 12px; }
+.op-fin td:first-child { font-family: 'Inter', sans-serif; text-align: left; }
+.op-fin tr.op-fin-input td:first-child { color: #111; font-weight: 500; }
+.op-fin tr.op-fin-calc td:first-child { color: #9ca3af; font-style: italic; }
+.op-fin tr.op-fin-calc td { color: #6b7280; }
+.op-fin tr.op-fin-sep td { border-bottom: 2px solid #e5e7eb; padding: 0; height: 1px; }
+.op-fin-val { background: #f3f4f6; padding: 3px 6px; border-radius: 4px; display: inline-block; min-width: 70px; text-align: right; }
+.op-fin input { width: 80px; padding: 4px 6px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px; font-family: 'DM Mono', monospace; text-align: right; }
+.op-fin input:focus { border-color: #16a34a; outline: none; }
+.op-price-bar {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+  padding: 10px 12px; background: #f3f4f6; border-radius: 8px; flex-wrap: wrap; font-size: 12px;
+}
+.op-price-bar input { width: 100px; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; font-family: 'DM Mono', monospace; text-align: right; }
+.op-price-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; }
+.op-price-src { font-size: 11px; color: #9ca3af; font-style: italic; }
+/* Edit mode dynamic lists */
+.op-edit-cat { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.op-edit-cat input[type=text] { flex: 1; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; }
+.op-edit-cat input[type=date] { width: 130px; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; }
+.op-edit-cat select { padding: 6px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 11px; width: 95px; }
+.op-edit-risk { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.op-edit-risk input { flex: 1; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; }
+.op-edit-risk select { padding: 6px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 11px; width: 90px; }
+.op-add-btn { font-size: 11px; color: #2563eb; background: none; border: none; cursor: pointer; padding: 4px 0; }
+.op-remove-btn { font-size: 14px; color: #d1d5db; background: none; border: none; cursor: pointer; padding: 0 4px; line-height: 1; }
+.op-remove-btn:hover { color: #dc2626; }
+.op-save-box {
+  background: #fef3c7; border-radius: 8px; padding: 12px; margin-top: 18px;
+}
+.op-save-box label { font-size: 12px; font-weight: 500; color: #92400e; display: block; margin-bottom: 4px; }
+.op-save-box textarea { width: 100%; padding: 8px; border: 1px solid #f59e0b; border-radius: 6px; font-size: 12px; min-height: 50px; resize: vertical; font-family: inherit; }
+/* Version history */
+.ver-item { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+.ver-item:last-child { border-bottom: none; }
+.ver-date { font-size: 11px; color: #9ca3af; font-family: 'DM Mono', monospace; }
+.ver-summary { font-size: 13px; margin-top: 4px; line-height: 1.5; }
+.ver-btn { font-size: 11px; color: #2563eb; background: none; border: none; cursor: pointer; padding: 0; margin-right: 12px; }
+.ver-current { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #dcfce7; color: #166534; }
+.diff-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 4px; margin: 2px; }
+.diff-changed { background: #fef3c7; color: #92400e; }
+.diff-added { background: #dcfce7; color: #166534; }
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 640px) {
@@ -439,6 +516,11 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
   .ws-ticker { font-size: 18px; }
   .modal { padding: 16px; }
+  .op-grid, .op-grid-3 { grid-template-columns: 1fr; }
+  .op-fin input { width: 65px; }
+  .op-edit-cat { flex-wrap: wrap; }
+  .op-edit-cat input[type=date] { width: 100%; }
+  .op-edit-cat select { width: 100%; }
 }
 </style>
 </head>
@@ -521,9 +603,167 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
       </div>
     </div>
 
-    <!-- ONE-PAGER TAB (placeholder) -->
+    <!-- ONE-PAGER TAB -->
     <div id="tab-onepager" class="ws-panel">
-      <div class="empty-state"><p>One-pager — em breve</p></div>
+      <!-- Mode buttons -->
+      <div class="op-modes" id="op-modes" style="display:none;">
+        <button class="op-mode-btn active" onclick="showOpMode('view')">visualização</button>
+        <button class="op-mode-btn" onclick="showOpMode('edit')">edição</button>
+        <button class="op-mode-btn" onclick="showOpMode('history')">histórico</button>
+      </div>
+
+      <!-- Loading -->
+      <div id="op-loading" class="loading-center"><div class="spinner"></div></div>
+
+      <!-- Empty state -->
+      <div id="op-empty" style="display:none;">
+        <div class="empty-state">
+          <p>Nenhum one-pager criado ainda</p>
+          <button class="btn-primary btn-sm" onclick="showOpMode('edit')">criar one-pager</button>
+        </div>
+      </div>
+
+      <!-- ===== VIEW MODE ===== -->
+      <div id="op-view" style="display:none;">
+        <div class="op-sub" id="op-view-sub"></div>
+
+        <div class="op-sec">
+          <div class="op-label">Tese de investimento</div>
+          <div class="op-text" id="op-v-thesis"></div>
+          <div class="op-premortem" id="op-v-premortem" style="display:none;"></div>
+        </div>
+
+        <div class="op-grid" id="op-v-valuation" style="margin-bottom:18px;"></div>
+
+        <div class="op-sec" id="op-v-catalysts-sec" style="display:none;">
+          <div class="op-label">Catalisadores</div>
+          <div id="op-v-catalysts"></div>
+        </div>
+
+        <div class="op-sec" id="op-v-fin-sec" style="display:none;">
+          <div class="op-label">Indicadores financeiros</div>
+          <table class="op-fin" id="op-v-fin"></table>
+        </div>
+
+        <div class="op-sec" id="op-v-risks-sec" style="display:none;">
+          <div class="op-label">Riscos</div>
+          <div id="op-v-risks"></div>
+        </div>
+
+        <div class="op-sec" id="op-v-position-sec" style="display:none;">
+          <div class="op-label">Posição</div>
+          <div class="op-grid-3" id="op-v-position"></div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-secondary btn-sm" onclick="exportOnePagerPrint()">exportar PDF</button>
+          <button class="btn-primary btn-sm" onclick="showOpMode('edit')">editar one-pager</button>
+        </div>
+      </div>
+
+      <!-- ===== EDIT MODE ===== -->
+      <div id="op-edit" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Tese de investimento</label>
+          <textarea class="form-input" id="op-e-thesis" rows="3" placeholder="Tese de investimento em 2–3 frases..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pre-mortem</label>
+          <textarea class="form-input" id="op-e-premortem" rows="2" placeholder="Cenário causal que mata a tese..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Target de saída</label><input class="form-input" id="op-e-target" placeholder="$950–1,050"></div>
+          <div class="form-group"><label class="form-label">Margem de segurança</label><input class="form-input" id="op-e-mos" placeholder="+12% upside via reverse DCF"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Reverse DCF</label><input class="form-input" id="op-e-rdcf" placeholder="O que o preço atual implica"></div>
+          <div class="form-group"><label class="form-label">Horizonte</label><input class="form-input" id="op-e-horizon" placeholder="12–18 meses"></div>
+        </div>
+
+        <!-- Catalysts -->
+        <div class="op-sec" style="margin-top:16px;">
+          <div class="op-label">Catalisadores</div>
+          <div id="op-e-catalysts"></div>
+          <button class="op-add-btn" onclick="addCatalystRow()">+ adicionar catalisador</button>
+        </div>
+
+        <!-- Financials -->
+        <div class="op-sec" style="margin-top:16px;">
+          <div class="op-label">Indicadores financeiros</div>
+          <div class="op-price-bar">
+            <span style="color:#6b7280;">Preço:</span>
+            <span class="op-price-val" id="op-e-price-display">—</span>
+            <span class="op-price-src" id="op-e-price-src"></span>
+            <span style="margin-left:auto;color:#6b7280;">manual:</span>
+            <input type="number" id="op-e-price-manual" placeholder="ex: 892" step="0.01" oninput="recalcFinancials()">
+          </div>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div></div>
+            <div style="display:flex;gap:4px;justify-content:flex-end;">
+              <input class="form-input" id="op-e-col0" value="FY24" style="width:70px;text-align:center;font-size:11px;padding:4px;">
+              <input class="form-input" id="op-e-col1" value="FY25" style="width:70px;text-align:center;font-size:11px;padding:4px;">
+              <input class="form-input" id="op-e-col2" value="FY26E" style="width:70px;text-align:center;font-size:11px;padding:4px;">
+              <input class="form-input" id="op-e-col3" value="FY27E" style="width:70px;text-align:center;font-size:11px;padding:4px;">
+            </div>
+          </div>
+          <table class="op-fin" id="op-e-fin">
+            <tbody>
+              <tr class="op-fin-input"><td style="font-weight:500;">Revenue ($B)</td><td><input id="op-fin-rev0" oninput="recalcFinancials()"></td><td><input id="op-fin-rev1" oninput="recalcFinancials()"></td><td><input id="op-fin-rev2" oninput="recalcFinancials()"></td><td><input id="op-fin-rev3" oninput="recalcFinancials()"></td></tr>
+              <tr class="op-fin-calc"><td>↳ rev growth</td><td><span class="op-fin-val" id="op-calc-rg0">—</span></td><td><span class="op-fin-val" id="op-calc-rg1">—</span></td><td><span class="op-fin-val" id="op-calc-rg2">—</span></td><td><span class="op-fin-val" id="op-calc-rg3">—</span></td></tr>
+              <tr class="op-fin-sep"><td colspan="5"></td></tr>
+              <tr class="op-fin-input"><td style="font-weight:500;">EBITDA ($B)</td><td><input id="op-fin-ebitda0" oninput="recalcFinancials()"></td><td><input id="op-fin-ebitda1" oninput="recalcFinancials()"></td><td><input id="op-fin-ebitda2" oninput="recalcFinancials()"></td><td><input id="op-fin-ebitda3" oninput="recalcFinancials()"></td></tr>
+              <tr class="op-fin-calc"><td>↳ ebitda margin</td><td><span class="op-fin-val" id="op-calc-em0">—</span></td><td><span class="op-fin-val" id="op-calc-em1">—</span></td><td><span class="op-fin-val" id="op-calc-em2">—</span></td><td><span class="op-fin-val" id="op-calc-em3">—</span></td></tr>
+              <tr class="op-fin-sep"><td colspan="5"></td></tr>
+              <tr class="op-fin-input"><td style="font-weight:500;">Net income ($B)</td><td><input id="op-fin-ni0" oninput="recalcFinancials()"></td><td><input id="op-fin-ni1" oninput="recalcFinancials()"></td><td><input id="op-fin-ni2" oninput="recalcFinancials()"></td><td><input id="op-fin-ni3" oninput="recalcFinancials()"></td></tr>
+              <tr class="op-fin-calc"><td>↳ EPS</td><td><span class="op-fin-val" id="op-calc-eps0">—</span></td><td><span class="op-fin-val" id="op-calc-eps1">—</span></td><td><span class="op-fin-val" id="op-calc-eps2">—</span></td><td><span class="op-fin-val" id="op-calc-eps3">—</span></td></tr>
+              <tr class="op-fin-calc"><td>↳ P/E</td><td><span class="op-fin-val" id="op-calc-pe0">—</span></td><td><span class="op-fin-val" id="op-calc-pe1">—</span></td><td><span class="op-fin-val" id="op-calc-pe2">—</span></td><td><span class="op-fin-val" id="op-calc-pe3">—</span></td></tr>
+              <tr class="op-fin-sep"><td colspan="5"></td></tr>
+              <tr class="op-fin-input"><td style="font-weight:500;">Shares out (B)</td><td><input id="op-fin-sh0" oninput="recalcFinancials()"></td><td><input id="op-fin-sh1" oninput="recalcFinancials()"></td><td><input id="op-fin-sh2" oninput="recalcFinancials()"></td><td><input id="op-fin-sh3" oninput="recalcFinancials()"></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Risks -->
+        <div class="op-sec" style="margin-top:16px;">
+          <div class="op-label">Riscos</div>
+          <div id="op-e-risks"></div>
+          <button class="op-add-btn" onclick="addRiskRow()">+ adicionar risco</button>
+        </div>
+
+        <!-- Position -->
+        <div class="form-row-3" style="margin-top:16px;">
+          <div class="form-group"><label class="form-label">Peso (%)</label><input class="form-input" id="op-e-weight" placeholder="18"></div>
+          <div class="form-group"><label class="form-label">Preço de entrada</label><input class="form-input" id="op-e-entry" placeholder="627.10"></div>
+          <div class="form-group"><label class="form-label">Câmbio</label><input class="form-input" id="op-e-currency" placeholder="USD (sem hedge)"></div>
+        </div>
+        <div class="form-row-3">
+          <div class="form-group"><label class="form-label">vs Consenso</label><input class="form-input" id="op-e-consensus" placeholder="Acima — sell-side em $850 avg"></div>
+          <div class="form-group"><label class="form-label">Correlação</label><input class="form-input" id="op-e-correlation" placeholder="Alta com TSM, média com ASML"></div>
+          <div class="form-group"><label class="form-label">Liquidez</label><input class="form-input" id="op-e-liquidity" placeholder="$35B ADV — sem restrição"></div>
+        </div>
+
+        <!-- Change summary -->
+        <div class="op-save-box" id="op-save-box">
+          <label>O que mudou? (obrigatório para salvar)</label>
+          <textarea id="op-e-summary" placeholder="Ex: Elevou target de $900 para $950–1,050 após guidance Q2."></textarea>
+        </div>
+
+        <div class="form-actions" style="margin-top:12px;">
+          <button class="btn-secondary" onclick="showOpMode('view')">cancelar</button>
+          <button class="btn-primary" onclick="saveOnePager()">salvar one-pager</button>
+        </div>
+      </div>
+
+      <!-- ===== HISTORY MODE ===== -->
+      <div id="op-history" style="display:none;">
+        <div id="op-history-list">
+          <div class="loading-center"><div class="spinner"></div></div>
+        </div>
+        <div class="form-actions" style="margin-top:12px;">
+          <button class="btn-secondary btn-sm" onclick="showOpMode('view')">voltar para one-pager</button>
+        </div>
+      </div>
     </div>
 
     <!-- FILES TAB (placeholder) -->
@@ -1027,6 +1267,11 @@ function showTab(tab, el) {
   document.querySelectorAll('.ws-panel').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
+
+  // Load one-pager data when tab is selected
+  if (tab === 'onepager' && currentCoverage) {
+    loadOnePager();
+  }
 }
 
 // ============================================================
@@ -1231,6 +1476,519 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
+// ONE-PAGER — CRUD + VERSIONING + FINANCIALS
+// ============================================================
+let currentOnePager = null;
+let opCachedPrice = null;
+
+async function loadOnePager() {
+  document.getElementById('op-loading').style.display = 'flex';
+  document.getElementById('op-view').style.display = 'none';
+  document.getElementById('op-edit').style.display = 'none';
+  document.getElementById('op-history').style.display = 'none';
+  document.getElementById('op-empty').style.display = 'none';
+  document.getElementById('op-modes').style.display = 'none';
+
+  // Try to get cached price for this ticker
+  opCachedPrice = null;
+  try {
+    const { data: qc } = await sb.from('quote_cache')
+      .select('price')
+      .eq('group_id', currentGroup)
+      .eq('ticker', currentCoverage.ticker)
+      .limit(1)
+      .single();
+    if (qc && qc.price) opCachedPrice = parseFloat(qc.price);
+  } catch(e) {}
+
+  const { data, error } = await sb.from('one_pagers')
+    .select('*')
+    .eq('coverage_id', currentCoverage.id)
+    .limit(1)
+    .single();
+
+  document.getElementById('op-loading').style.display = 'none';
+
+  if (error && error.code !== 'PGRST116') {
+    showToast('Erro ao carregar one-pager: ' + error.message, 'error');
+    return;
+  }
+
+  currentOnePager = data || null;
+
+  if (!currentOnePager) {
+    document.getElementById('op-empty').style.display = 'block';
+    document.getElementById('op-modes').style.display = 'flex';
+  } else {
+    document.getElementById('op-modes').style.display = 'flex';
+    renderOnePagerView();
+  }
+}
+
+function renderOnePagerView() {
+  const op = currentOnePager;
+  if (!op) return;
+
+  // Subtitle
+  const updDate = formatDate(op.updated_at);
+  document.getElementById('op-view-sub').innerHTML =
+    `Última atualização: ${updDate} · <a onclick="showOpMode('history')">ver histórico</a>`;
+
+  // Thesis
+  document.getElementById('op-v-thesis').textContent = op.thesis || '';
+  const pmEl = document.getElementById('op-v-premortem');
+  if (op.premortem) { pmEl.innerHTML = '<strong>Pre-mortem:</strong> ' + esc(op.premortem); pmEl.style.display = ''; }
+  else { pmEl.style.display = 'none'; }
+
+  // Valuation grid
+  const vals = [
+    { label: 'Target de saída', val: op.target_price },
+    { label: 'Margem de segurança', val: op.margin_of_safety },
+    { label: 'Reverse DCF', val: op.reverse_dcf },
+    { label: 'Horizonte', val: op.horizon }
+  ].filter(v => v.val);
+  document.getElementById('op-v-valuation').innerHTML = vals.map(v =>
+    `<div class="op-card"><div class="op-card-label">${v.label}</div><div class="op-card-val">${esc(v.val)}</div></div>`
+  ).join('');
+
+  // Catalysts
+  const cats = op.catalysts || [];
+  const catSec = document.getElementById('op-v-catalysts-sec');
+  if (cats.length) {
+    catSec.style.display = '';
+    document.getElementById('op-v-catalysts').innerHTML = cats.map(c => {
+      const isTriggered = c.status === 'triggered';
+      const isExpired = c.status === 'expired';
+      const dotColor = isTriggered ? '#f59e0b' : isExpired ? '#d1d5db' : '#16a34a';
+      const textStyle = (isTriggered || isExpired) ? 'opacity:0.5;' : '';
+      const dateText = isTriggered ? `<span class="op-cat-date" style="color:#f59e0b;">triggered</span>` :
+                       isExpired ? `<span class="op-cat-date" style="color:#9ca3af;">expired</span>` :
+                       c.date ? `<span class="op-cat-date">${c.date}</span>` : '';
+      return `<div class="op-cat-item"><span class="op-cat-dot" style="background:${dotColor}"></span><span style="${textStyle}">${esc(c.text)}</span>${dateText}</div>`;
+    }).join('');
+  } else { catSec.style.display = 'none'; }
+
+  // Financials
+  const fin = op.financials || {};
+  const finSec = document.getElementById('op-v-fin-sec');
+  if (fin.revenue && fin.revenue.some(v => v > 0)) {
+    finSec.style.display = '';
+    const cols = fin.columns || ['FY24','FY25','FY26E','FY27E'];
+    const rev = fin.revenue || [0,0,0,0];
+    const ebitda = fin.ebitda || [0,0,0,0];
+    const ni = fin.net_income || [0,0,0,0];
+    const sh = fin.shares || [0,0,0,0];
+    const price = opCachedPrice || parseFloat(op.entry_price) || 0;
+
+    let fhtml = '<thead><tr><th></th>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+    fhtml += finRow('Revenue ($B)', rev, false);
+    fhtml += calcRow('↳ rev growth', rev.map((v,i) => i === 0 ? null : rev[i-1] > 0 ? ((v/rev[i-1]-1)*100) : null), '%', 0);
+    fhtml += '<tr class="op-fin-sep"><td colspan="5"></td></tr>';
+    fhtml += finRow('EBITDA ($B)', ebitda, false);
+    fhtml += calcRow('↳ ebitda margin', rev.map((v,i) => v > 0 ? (ebitda[i]/v*100) : null), '%', 1);
+    fhtml += '<tr class="op-fin-sep"><td colspan="5"></td></tr>';
+    fhtml += finRow('Net income ($B)', ni, false);
+    const eps = sh.map((s,i) => s > 0 ? ni[i]/s : null);
+    fhtml += calcRow('↳ EPS', eps, '$', 2);
+    fhtml += calcRow('↳ P/E', eps.map(e => e > 0 && price > 0 ? price/e : null), 'x', 1);
+    fhtml += '<tr class="op-fin-sep"><td colspan="5"></td></tr>';
+    fhtml += finRow('Shares out (B)', sh, false);
+    fhtml += '</tbody>';
+    document.getElementById('op-v-fin').innerHTML = fhtml;
+  } else { finSec.style.display = 'none'; }
+
+  // Risks
+  const risks = op.risks || [];
+  const riskSec = document.getElementById('op-v-risks-sec');
+  if (risks.length) {
+    riskSec.style.display = '';
+    document.getElementById('op-v-risks').innerHTML = risks.map(r =>
+      `<span class="op-risk op-risk-${r.severity}">${esc(r.flag)}</span>`
+    ).join('');
+  } else { riskSec.style.display = 'none'; }
+
+  // Position
+  const posFields = [
+    { label: 'Peso', val: op.current_weight ? op.current_weight + '%' : null },
+    { label: 'Entrada', val: op.entry_price ? '$' + op.entry_price : null },
+    { label: 'Câmbio', val: op.currency },
+    { label: 'vs Consenso', val: op.consensus },
+    { label: 'Correlação', val: op.correlation },
+    { label: 'Liquidez', val: op.liquidity }
+  ].filter(p => p.val);
+  const posSec = document.getElementById('op-v-position-sec');
+  if (posFields.length) {
+    posSec.style.display = '';
+    document.getElementById('op-v-position').innerHTML = posFields.map(p =>
+      `<div class="op-card"><div class="op-card-label">${p.label}</div><div class="op-card-val">${esc(p.val)}</div></div>`
+    ).join('');
+  } else { posSec.style.display = 'none'; }
+
+  document.getElementById('op-view').style.display = 'block';
+}
+
+function finRow(label, vals, bold) {
+  return `<tr class="op-fin-input"><td${bold?' style="font-weight:600"':''}>${label}</td>${vals.map(v => `<td>${v > 0 ? v.toFixed(1) : '—'}</td>`).join('')}</tr>`;
+}
+function calcRow(label, vals, suffix, dec) {
+  return `<tr class="op-fin-calc"><td>${label}</td>${vals.map(v => {
+    if (v === null || !isFinite(v)) return '<td><span class="op-fin-val">—</span></td>';
+    const pre = suffix === '$' ? '$' : '';
+    const suf = suffix === '$' ? '' : suffix;
+    return `<td><span class="op-fin-val">${pre}${v.toFixed(dec)}${suf}</span></td>`;
+  }).join('')}</tr>`;
+}
+
+// --- Edit mode ---
+function populateEditForm() {
+  const op = currentOnePager || {};
+  document.getElementById('op-e-thesis').value = op.thesis || '';
+  document.getElementById('op-e-premortem').value = op.premortem || '';
+  document.getElementById('op-e-target').value = op.target_price || '';
+  document.getElementById('op-e-mos').value = op.margin_of_safety || '';
+  document.getElementById('op-e-rdcf').value = op.reverse_dcf || '';
+  document.getElementById('op-e-horizon').value = op.horizon || '';
+  document.getElementById('op-e-weight').value = op.current_weight || '';
+  document.getElementById('op-e-entry').value = op.entry_price || '';
+  document.getElementById('op-e-currency').value = op.currency || '';
+  document.getElementById('op-e-consensus').value = op.consensus || '';
+  document.getElementById('op-e-correlation').value = op.correlation || '';
+  document.getElementById('op-e-liquidity').value = op.liquidity || '';
+  document.getElementById('op-e-summary').value = '';
+
+  // Show/hide change summary box
+  document.getElementById('op-save-box').style.display = currentOnePager ? '' : 'none';
+
+  // Catalysts
+  const cats = op.catalysts || [];
+  const catContainer = document.getElementById('op-e-catalysts');
+  catContainer.innerHTML = '';
+  if (cats.length) { cats.forEach(c => addCatalystRow(c.text, c.date, c.status)); }
+  else { addCatalystRow(); }
+
+  // Risks
+  const risks = op.risks || [];
+  const riskContainer = document.getElementById('op-e-risks');
+  riskContainer.innerHTML = '';
+  if (risks.length) { risks.forEach(r => addRiskRow(r.flag, r.severity)); }
+  else { addRiskRow(); }
+
+  // Financials
+  const fin = op.financials || {};
+  const cols = fin.columns || ['FY24','FY25','FY26E','FY27E'];
+  for (let i = 0; i < 4; i++) document.getElementById('op-e-col'+i).value = cols[i] || '';
+  const fields = ['rev','ebitda','ni','sh'];
+  const keys = ['revenue','ebitda','net_income','shares'];
+  fields.forEach((f,fi) => {
+    const arr = fin[keys[fi]] || [];
+    for (let i = 0; i < 4; i++) document.getElementById('op-fin-'+f+i).value = arr[i] || '';
+  });
+  document.getElementById('op-e-price-manual').value = '';
+
+  // Price display
+  if (opCachedPrice) {
+    document.getElementById('op-e-price-display').textContent = '$' + opCachedPrice.toFixed(2);
+    document.getElementById('op-e-price-src').textContent = 'via quote_cache';
+  } else if (op.entry_price) {
+    document.getElementById('op-e-price-display').textContent = '$' + parseFloat(op.entry_price).toFixed(2);
+    document.getElementById('op-e-price-src').textContent = 'preço de entrada';
+  } else {
+    document.getElementById('op-e-price-display').textContent = '—';
+    document.getElementById('op-e-price-src').textContent = 'insira manual';
+  }
+
+  recalcFinancials();
+}
+
+function addCatalystRow(text, date, status) {
+  const container = document.getElementById('op-e-catalysts');
+  const div = document.createElement('div');
+  div.className = 'op-edit-cat';
+  div.innerHTML = `
+    <input type="text" value="${esc(text || '')}" placeholder="Catalisador...">
+    <input type="date" value="${date || ''}">
+    <select>
+      <option value="pending"${status==='pending'?' selected':''}>pending</option>
+      <option value="triggered"${status==='triggered'?' selected':''}>triggered</option>
+      <option value="expired"${status==='expired'?' selected':''}>expired</option>
+    </select>
+    <button class="op-remove-btn" onclick="this.parentElement.remove()">×</button>`;
+  container.appendChild(div);
+}
+
+function addRiskRow(flag, severity) {
+  const container = document.getElementById('op-e-risks');
+  const div = document.createElement('div');
+  div.className = 'op-edit-risk';
+  div.innerHTML = `
+    <input type="text" value="${esc(flag || '')}" placeholder="Risco...">
+    <select>
+      <option value="red"${severity==='red'?' selected':''}>vermelho</option>
+      <option value="orange"${severity==='orange'?' selected':''}>laranja</option>
+      <option value="yellow"${severity==='yellow'?' selected':''}>amarelo</option>
+      <option value="green"${severity==='green'?' selected':''}>verde</option>
+    </select>
+    <button class="op-remove-btn" onclick="this.parentElement.remove()">×</button>`;
+  container.appendChild(div);
+}
+
+function recalcFinancials() {
+  const manualP = parseFloat(document.getElementById('op-e-price-manual').value);
+  const price = manualP > 0 ? manualP : (opCachedPrice || parseFloat(document.getElementById('op-e-entry').value) || 0);
+
+  if (manualP > 0) {
+    document.getElementById('op-e-price-display').textContent = '$' + manualP.toFixed(2);
+    document.getElementById('op-e-price-src').textContent = 'manual';
+  }
+
+  const gv = id => parseFloat(document.getElementById(id).value) || 0;
+  const rev = [gv('op-fin-rev0'), gv('op-fin-rev1'), gv('op-fin-rev2'), gv('op-fin-rev3')];
+  const ebitda = [gv('op-fin-ebitda0'), gv('op-fin-ebitda1'), gv('op-fin-ebitda2'), gv('op-fin-ebitda3')];
+  const ni = [gv('op-fin-ni0'), gv('op-fin-ni1'), gv('op-fin-ni2'), gv('op-fin-ni3')];
+  const sh = [gv('op-fin-sh0'), gv('op-fin-sh1'), gv('op-fin-sh2'), gv('op-fin-sh3')];
+
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('op-calc-rg'+i).textContent = i === 0 ? '—' :
+      (rev[i-1] > 0 ? ((rev[i]/rev[i-1]-1)*100).toFixed(0) + '%' : '—');
+    document.getElementById('op-calc-em'+i).textContent = rev[i] > 0 ? (ebitda[i]/rev[i]*100).toFixed(1) + '%' : '—';
+    const eps = sh[i] > 0 ? ni[i]/sh[i] : 0;
+    document.getElementById('op-calc-eps'+i).textContent = eps > 0 ? '$' + eps.toFixed(2) : '—';
+    document.getElementById('op-calc-pe'+i).textContent = eps > 0 && price > 0 ? (price/eps).toFixed(1) + 'x' : '—';
+  }
+}
+
+function showOpMode(mode) {
+  document.getElementById('op-view').style.display = 'none';
+  document.getElementById('op-edit').style.display = 'none';
+  document.getElementById('op-history').style.display = 'none';
+  document.getElementById('op-empty').style.display = 'none';
+  document.querySelectorAll('.op-mode-btn').forEach(b => b.classList.remove('active'));
+
+  if (mode === 'view' && currentOnePager) {
+    renderOnePagerView();
+    document.querySelectorAll('.op-mode-btn')[0].classList.add('active');
+  } else if (mode === 'edit') {
+    populateEditForm();
+    document.getElementById('op-edit').style.display = 'block';
+    document.querySelectorAll('.op-mode-btn')[1].classList.add('active');
+    document.getElementById('op-modes').style.display = 'flex';
+  } else if (mode === 'history') {
+    loadOnePagerVersions();
+    document.getElementById('op-history').style.display = 'block';
+    document.querySelectorAll('.op-mode-btn')[2].classList.add('active');
+  } else {
+    document.getElementById('op-empty').style.display = 'block';
+  }
+}
+
+// --- Save ---
+async function saveOnePager() {
+  const thesis = document.getElementById('op-e-thesis').value.trim();
+  const premortem = document.getElementById('op-e-premortem').value.trim();
+
+  if (!thesis) { showToast('Tese é obrigatória', 'error'); return; }
+  if (!premortem) { showToast('Pre-mortem é obrigatório', 'error'); return; }
+
+  // Check change summary if editing existing
+  const summary = document.getElementById('op-e-summary').value.trim();
+  if (currentOnePager && !summary) { showToast('Descreva o que mudou antes de salvar', 'error'); return; }
+
+  // Gather catalysts
+  const catRows = document.querySelectorAll('#op-e-catalysts .op-edit-cat');
+  const catalysts = [];
+  catRows.forEach(row => {
+    const text = row.querySelector('input[type=text]').value.trim();
+    if (text) {
+      catalysts.push({
+        text,
+        date: row.querySelector('input[type=date]').value || null,
+        status: row.querySelector('select').value
+      });
+    }
+  });
+
+  if (!catalysts.length) { showToast('Pelo menos 1 catalisador é obrigatório', 'error'); return; }
+
+  // Gather risks
+  const riskRows = document.querySelectorAll('#op-e-risks .op-edit-risk');
+  const risks = [];
+  riskRows.forEach(row => {
+    const flag = row.querySelector('input').value.trim();
+    if (flag) risks.push({ flag, severity: row.querySelector('select').value });
+  });
+
+  // Gather financials
+  const gv = id => parseFloat(document.getElementById(id).value) || 0;
+  const financials = {
+    columns: [
+      document.getElementById('op-e-col0').value,
+      document.getElementById('op-e-col1').value,
+      document.getElementById('op-e-col2').value,
+      document.getElementById('op-e-col3').value
+    ],
+    revenue: [gv('op-fin-rev0'), gv('op-fin-rev1'), gv('op-fin-rev2'), gv('op-fin-rev3')],
+    ebitda: [gv('op-fin-ebitda0'), gv('op-fin-ebitda1'), gv('op-fin-ebitda2'), gv('op-fin-ebitda3')],
+    net_income: [gv('op-fin-ni0'), gv('op-fin-ni1'), gv('op-fin-ni2'), gv('op-fin-ni3')],
+    shares: [gv('op-fin-sh0'), gv('op-fin-sh1'), gv('op-fin-sh2'), gv('op-fin-sh3')]
+  };
+
+  const payload = {
+    coverage_id: currentCoverage.id,
+    group_id: currentGroup,
+    thesis,
+    premortem,
+    target_price: document.getElementById('op-e-target').value.trim() || null,
+    margin_of_safety: document.getElementById('op-e-mos').value.trim() || null,
+    reverse_dcf: document.getElementById('op-e-rdcf').value.trim() || null,
+    horizon: document.getElementById('op-e-horizon').value.trim() || null,
+    entry_price: parseFloat(document.getElementById('op-e-entry').value) || null,
+    current_weight: parseFloat(document.getElementById('op-e-weight').value) || null,
+    consensus: document.getElementById('op-e-consensus').value.trim() || null,
+    correlation: document.getElementById('op-e-correlation').value.trim() || null,
+    currency: document.getElementById('op-e-currency').value.trim() || null,
+    liquidity: document.getElementById('op-e-liquidity').value.trim() || null,
+    catalysts,
+    financials,
+    risks,
+    updated_by: currentUser.id
+  };
+
+  try {
+    if (currentOnePager) {
+      // Save current state as version before updating
+      const snapshot = { ...currentOnePager };
+      delete snapshot.id;
+      delete snapshot.created_at;
+
+      await sb.from('one_pager_versions').insert({
+        one_pager_id: currentOnePager.id,
+        coverage_id: currentCoverage.id,
+        group_id: currentGroup,
+        snapshot,
+        change_summary: summary,
+        changed_by: currentUser.id
+      });
+
+      // Update existing
+      const { error } = await sb.from('one_pagers').update(payload).eq('id', currentOnePager.id);
+      if (error) { showToast('Erro ao salvar: ' + error.message, 'error'); return; }
+    } else {
+      // Insert new
+      const { error } = await sb.from('one_pagers').insert(payload);
+      if (error) { showToast('Erro ao criar: ' + error.message, 'error'); return; }
+    }
+
+    // Update coverage timestamp
+    await sb.from('coverages').update({ updated_at: new Date().toISOString() }).eq('id', currentCoverage.id);
+
+    showToast(currentOnePager ? 'One-pager atualizado' : 'One-pager criado', 'success');
+    await loadOnePager();
+    showOpMode('view');
+  } catch(e) {
+    console.error(e);
+    showToast('Erro ao salvar one-pager', 'error');
+  }
+}
+
+// --- Version history ---
+async function loadOnePagerVersions() {
+  const list = document.getElementById('op-history-list');
+  list.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+  const { data, error } = await sb.from('one_pager_versions')
+    .select('*')
+    .eq('coverage_id', currentCoverage.id)
+    .order('changed_at', { ascending: false });
+
+  if (error) { list.innerHTML = '<div class="empty-state"><p>Erro ao carregar histórico</p></div>'; return; }
+
+  const versions = data || [];
+  if (!versions.length) {
+    list.innerHTML = '<div class="empty-state"><p>Nenhuma versão anterior</p></div>';
+    return;
+  }
+
+  list.innerHTML = versions.map((v, idx) => {
+    // Detect changed fields from snapshot vs current
+    const diffTags = generateDiffTags(v.snapshot, currentOnePager);
+    return `
+      <div class="ver-item">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span class="ver-date">${formatDate(v.changed_at)}</span>
+          ${idx === 0 ? '<span class="ver-current">versão anterior mais recente</span>' : ''}
+        </div>
+        <div class="ver-summary">${esc(v.change_summary)}</div>
+        ${diffTags ? `<div style="margin-top:6px;">${diffTags}</div>` : ''}
+        <div style="margin-top:6px;">
+          <button class="ver-btn" onclick="restoreVersion('${v.id}')">restaurar esta versão</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function generateDiffTags(snapshot, current) {
+  if (!snapshot || !current) return '';
+  const tags = [];
+  const fields = [
+    ['thesis', 'tese'], ['premortem', 'pre-mortem'], ['target_price', 'target'],
+    ['current_weight', 'peso'], ['entry_price', 'entrada'], ['horizon', 'horizonte']
+  ];
+  fields.forEach(([key, label]) => {
+    const sv = snapshot[key] || '';
+    const cv = current[key] || '';
+    if (String(sv) !== String(cv)) tags.push(`<span class="diff-tag diff-changed">${label}</span>`);
+  });
+  // Check catalysts count change
+  const sc = (snapshot.catalysts || []).length;
+  const cc = (current.catalysts || []).length;
+  if (sc !== cc) tags.push(`<span class="diff-tag ${cc > sc ? 'diff-added' : 'diff-changed'}">catalisadores</span>`);
+  // Check risks count change
+  const sr = (snapshot.risks || []).length;
+  const cr = (current.risks || []).length;
+  if (sr !== cr) tags.push(`<span class="diff-tag ${cr > sr ? 'diff-added' : 'diff-changed'}">riscos</span>`);
+  return tags.join('');
+}
+
+async function restoreVersion(versionId) {
+  const { data: version } = await sb.from('one_pager_versions')
+    .select('snapshot')
+    .eq('id', versionId)
+    .single();
+
+  if (!version) { showToast('Versão não encontrada', 'error'); return; }
+
+  // Save current state as version first
+  if (currentOnePager) {
+    const snapshot = { ...currentOnePager };
+    delete snapshot.id; delete snapshot.created_at;
+    await sb.from('one_pager_versions').insert({
+      one_pager_id: currentOnePager.id,
+      coverage_id: currentCoverage.id,
+      group_id: currentGroup,
+      snapshot,
+      change_summary: 'Restauração de versão anterior',
+      changed_by: currentUser.id
+    });
+  }
+
+  // Restore
+  const restored = version.snapshot;
+  delete restored.updated_at;
+  restored.updated_by = currentUser.id;
+
+  const { error } = await sb.from('one_pagers').update(restored).eq('id', currentOnePager.id);
+  if (error) { showToast('Erro ao restaurar: ' + error.message, 'error'); return; }
+
+  showToast('Versão restaurada', 'success');
+  await loadOnePager();
+  showOpMode('view');
+}
+
+function exportOnePagerPrint() {
+  window.print();
+}
+
+// ============================================================
 // EXPOSE FUNCTIONS TO HTML (modules are scoped)
 // ============================================================
 window.openCoverageModal = openCoverageModal;
@@ -1249,6 +2007,13 @@ window.setNoteFilter = setNoteFilter;
 window.filterCoverages = filterCoverages;
 window.closeModal = closeModal;
 window.logout = logout;
+window.showOpMode = showOpMode;
+window.saveOnePager = saveOnePager;
+window.addCatalystRow = addCatalystRow;
+window.addRiskRow = addRiskRow;
+window.recalcFinancials = recalcFinancials;
+window.restoreVersion = restoreVersion;
+window.exportOnePagerPrint = exportOnePagerPrint;
 
 // ============================================================
 // START
