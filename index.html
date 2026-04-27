@@ -90,20 +90,37 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .mw-search{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px;border-radius:var(--radius);outline:none;width:220px;transition:border-color .15s}
 .mw-search:focus{border-color:var(--green)}
 .mw-status{font-size:11px;color:var(--text-3);margin-left:auto}
-.mw-group-header{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;padding:10px 6px 6px;background:var(--surface2);border-bottom:1px solid var(--border)}
-.mw-group-header .mw-book-label{color:var(--text);font-size:12px;margin-right:6px}
-.mw-table{width:100%;border-collapse:collapse;font-size:13px}
-.mw-table th{padding:9px 6px;text-align:left;font-size:10px;color:var(--text-2);font-weight:500;white-space:nowrap;letter-spacing:.03em;text-transform:uppercase;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1}
-.mw-table th.r{text-align:right}
-.mw-table td{padding:8px 6px;white-space:nowrap;border-bottom:1px solid var(--border)}
-.mw-table tbody tr:hover{background:var(--bg)}
-.mw-table tbody tr:last-child td{border-bottom:none}
-.mw-ticker{font-weight:600;font-size:13px}
 .mw-refresh{font-family:var(--font);font-size:11px;font-weight:500;padding:7px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;transition:background .15s;white-space:nowrap}
 .mw-refresh:hover:not(:disabled){background:#15803d}
 .mw-refresh:disabled{background:var(--surface2);color:var(--text-3);border:1px solid var(--border);cursor:not-allowed}
-.mw-top-bar{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;margin-bottom:16px;align-items:stretch}
-.mw-scroll{max-height:calc(100vh - 200px);overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface)}
+.mw-top-bar{display:grid;grid-template-columns:1fr 1fr auto auto;gap:12px;margin-bottom:16px;align-items:stretch}
+.mw-port-summary{min-width:180px;max-width:320px}
+.mw-port-line{display:flex;align-items:baseline;gap:0;line-height:1.5}
+.mw-port-line-name{font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.mw-port-line-val{font-size:10px;font-weight:500;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;padding-left:8px;min-width:48px}
+.mw-port-line-vs{font-size:10px;font-weight:500;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;padding-left:6px;min-width:48px}
+.mw-grid{columns:320px 4;column-gap:14px}
+.mw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;break-inside:avoid;margin-bottom:14px}
+.mw-card-header{padding:10px 14px 8px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.mw-card-book{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.mw-card-sector{font-size:10px;font-weight:500;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em}
+.mw-card-body{padding:0}
+.mw-row{display:grid;grid-template-columns:1fr auto auto auto;gap:0;padding:7px 14px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s}
+.mw-row:last-child{border-bottom:none}
+.mw-row:hover{background:var(--bg)}
+.mw-ticker{font-weight:600;font-size:12px;white-space:nowrap}
+.mw-price{font-family:var(--font-mono);font-size:11px;font-variant-numeric:tabular-nums;text-align:right;padding-left:12px;color:var(--text);min-width:65px}
+.mw-var{font-size:11px;font-weight:500;font-variant-numeric:tabular-nums;text-align:right;padding-left:8px;min-width:58px}
+.mw-empty{padding:40px 20px;text-align:center;color:var(--text-3);font-size:13px}
+@media(max-width:1200px){.mw-grid{columns:300px 3}}
+@media(max-width:900px){.mw-grid{columns:280px 2}}
+@media(max-width:600px){.mw-grid{columns:1}
+  .mw-controls{gap:8px}
+  .mw-search{width:100%}
+  .mw-row{padding:6px 10px}
+  .mw-ticker{font-size:11px}
+  .mw-price,.mw-var{font-size:10px}
+}
 .setup-add-ticker{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px}
 .setup-add-ticker .form-grid{grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;align-items:end;gap:8px}
 .setup-add-ticker .form-field input,.setup-add-ticker .form-field select{font-size:12px;padding:6px 10px}
@@ -117,10 +134,6 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .coverage-toggle::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .2s}
 .coverage-toggle.on::after{transform:translateX(12px)}
 @media(max-width:768px){
-  .mw-controls{gap:8px}
-  .mw-search{width:100%}
-  .mw-table td{padding:6px 4px;font-size:12px}
-  .mw-table th{padding:7px 4px;font-size:9px}
   .setup-add-ticker .form-grid{grid-template-columns:1fr 1fr}
 }
 .form-section-title{font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em}
@@ -177,7 +190,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 @keyframes sp{to{transform:rotate(360deg)}}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;font-size:12px;z-index:1000;opacity:0;transform:translateY(6px);transition:all .25s;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
 #toast.show{opacity:1;transform:translateY(0)}#toast.ok{border-color:var(--green);color:var(--green-text)}#toast.err{border-color:var(--red);color:var(--red-text)}
-@media(max-width:1100px){.port-grid.count-2,.port-grid.count-3{grid-template-columns:1fr}.top-bar{grid-template-columns:1fr 1fr}.refresh-card{grid-column:span 2}}
+@media(max-width:1100px){.port-grid.count-2,.port-grid.count-3{grid-template-columns:1fr}.top-bar{grid-template-columns:1fr 1fr}.refresh-card{grid-column:span 2}.mw-top-bar{grid-template-columns:1fr 1fr;gap:10px}.mw-port-summary{grid-column:span 2}.mw-refresh{grid-column:span 2}}
 @media(max-width:768px){
   .group-badge,.role-badge,.nav-time{display:none}
   .nav-btn{padding:6px 8px;font-size:10px}
@@ -307,23 +320,15 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   <div class="mw-top-bar">
     <div class="mkt-card"><div class="mkt-lbl">IBOVESPA</div><div class="mkt-main" id="mw-ibov-pct">—</div><div class="mkt-sub" id="mw-ibov-val">—</div></div>
     <div class="mkt-card"><div class="mkt-lbl">BRL / USD</div><div class="mkt-main" id="mw-usd-pct">—</div><div class="mkt-sub" id="mw-usd-val">—</div></div>
+    <div class="mkt-card mw-port-summary" id="mw-port-summary"><div class="mkt-lbl">Carteiras</div><div class="mw-port-line" style="margin-top:4px;margin-bottom:2px"><span class="mw-port-line-name" style="font-size:9px;color:var(--text-3);font-weight:500">&nbsp;</span><span class="mw-port-line-val" style="font-size:9px;color:var(--text-3);font-weight:500">% DIA</span><span class="mw-port-line-vs" style="font-size:9px;color:var(--text-3);font-weight:500">vs IBOV</span></div><div id="mw-port-lines"><span style="font-size:11px;color:var(--text-3)">—</span></div></div>
     <button class="mw-refresh" id="btn-refresh-mw" onclick="refreshMarketWatch()"><span id="refresh-label-mw">↻ atualizar</span></button>
   </div>
   <div class="mw-controls">
     <input type="text" class="mw-search" id="mw-search" placeholder="Buscar ticker..." oninput="renderMarketWatch()"/>
     <span class="mw-status" id="mw-status"></span>
   </div>
-  <div class="mw-scroll" id="mw-scroll">
-    <table class="mw-table">
-      <thead><tr>
-        <th>Ticker</th>
-        <th>Setor</th>
-        <th class="r">Último</th>
-        <th class="r">% Dia</th>
-        <th class="r">% Ano</th>
-      </tr></thead>
-      <tbody id="mw-body"><tr><td colspan="5" style="padding:32px;color:var(--text-3);text-align:center">Carregando...</td></tr></tbody>
-    </table>
+  <div class="mw-grid" id="mw-grid">
+    <div class="mw-empty">Carregando...</div>
   </div>
   <div class="last-upd" id="mw-last-upd"></div>
 </div>
@@ -1388,7 +1393,7 @@ async function fetchMwQuotes(tickers){
 async function loadMarketWatchData(){
   const covTickers=getCoverageTickers()
   if(!covTickers.length){
-    document.getElementById('mw-body').innerHTML='<tr><td colspan="5" style="padding:32px;color:var(--text-3);text-align:center">Nenhum ativo na cobertura. Ative ativos no Setup (coluna MW).</td></tr>'
+    document.getElementById('mw-grid').innerHTML='<div class="mw-empty">Nenhum ativo na cobertura. Ative ativos no Setup (coluna MW).</div>'
     document.getElementById('mw-status').textContent='0 ativos'
     return
   }
@@ -1431,6 +1436,19 @@ function updateMwTopBar(){
   if(iv&&ibovVal!=null)iv.textContent=ibovVal.toLocaleString('pt-BR',{maximumFractionDigits:0})
   if(ue){ue.textContent=fmtPct(usdVarPct);ue.className='mkt-main '+cls}
   if(uv&&usdBrl)uv.textContent=fmtBRL(usdBrl)
+  // Portfolio summary
+  const el=document.getElementById('mw-port-lines')
+  const names=Object.keys(portfolios)
+  if(!el||!names.length){if(el)el.innerHTML='<span style="font-size:11px;color:var(--text-3)">—</span>';return}
+  el.innerHTML=names.map(name=>{
+    const rows=computeRows(name);const s=computeSummary(rows)
+    const vs=ibovPct!=null?s.varPct-ibovPct:null
+    return`<div class="mw-port-line">
+      <span class="mw-port-line-name">${name.toUpperCase()}</span>
+      <span class="mw-port-line-val ${s.varPct>=0?'pos':'neg'}">${fmtPct(s.varPct)}</span>
+      <span class="mw-port-line-vs ${vs!=null?(vs>=0?'pos':'neg'):'muted'}">${vs!=null?fmtPct(vs):'—'}</span>
+    </div>`
+  }).join('')
 }
 
 function renderMarketWatch(){
@@ -1446,21 +1464,24 @@ function renderMarketWatch(){
     if(!groups[key])groups[key]={book:bk,sector:sc,tickers:[]}
     groups[key].tickers.push(t)
   })
-  // Sort groups: book alphabetical, then sector alphabetical
   const sortedGroups=Object.values(groups).sort((a,b)=>{
     const bc=a.book.localeCompare(b.book);if(bc!==0)return bc
     return a.sector.localeCompare(b.sector)
   })
-  // Sort tickers within each group alphabetically
   sortedGroups.forEach(g=>g.tickers.sort((a,b)=>a.ticker.localeCompare(b.ticker)))
-  const tbody=document.getElementById('mw-body')
+  const grid=document.getElementById('mw-grid')
   if(!filtered.length){
-    tbody.innerHTML='<tr><td colspan="5" style="padding:24px;color:var(--text-3);text-align:center">Nenhum ativo encontrado.</td></tr>'
+    grid.innerHTML='<div class="mw-empty">Nenhum ativo encontrado.</div>'
     return
   }
   let html=''
   for(const group of sortedGroups){
-    html+=`<tr><td colspan="5" class="mw-group-header"><span class="mw-book-label">${group.book}</span> · ${group.sector}</td></tr>`
+    html+=`<div class="mw-card">
+      <div class="mw-card-header">
+        <div class="mw-card-book">${group.book}</div>
+        <div class="mw-card-sector">${group.sector}</div>
+      </div>
+      <div class="mw-card-body">`
     for(const t of group.tickers){
       const mq=mwQuotes[t.ticker]
       const cfg=tickerMap[t.ticker]
@@ -1472,16 +1493,16 @@ function renderMarketWatch(){
       const varAno=yearStart>0?((price-yearStart)/yearStart)*100:0
       const hasPrice=price>0
       const currTag=isUSD?`<span class="curr-tag usd">U$</span>`:`<span class="curr-tag">R$</span>`
-      html+=`<tr>
-        <td>${currTag}<span class="mw-ticker">${t.ticker}</span></td>
-        <td class="meta-cell">${t.sector!=='—'?t.sector:''}</td>
-        <td class="r num">${hasPrice?fmtPrice(price,isUSD):'<span class="err-lbl">—</span>'}</td>
-        <td class="r">${hasPrice&&prevClose>0?`<span class="${varDia>=0?'var-pos':'var-neg'}">${fmtPct(varDia)}</span>`:'<span class="var-zero">—</span>'}</td>
-        <td class="r">${hasPrice&&yearStart>0?`<span class="${varAno>=0?'var-pos':'var-neg'}">${fmtPct(varAno)}</span>`:'<span class="var-zero">—</span>'}</td>
-      </tr>`
+      html+=`<div class="mw-row">
+        <div>${currTag}<span class="mw-ticker">${t.ticker}</span></div>
+        <div class="mw-price">${hasPrice?fmtPrice(price,isUSD):'<span class="err-lbl">—</span>'}</div>
+        <div class="mw-var">${hasPrice&&prevClose>0?`<span class="${varDia>=0?'var-pos':'var-neg'}">${fmtPct(varDia)}</span>`:'<span class="var-zero">—</span>'}</div>
+        <div class="mw-var">${hasPrice&&yearStart>0?`<span class="${varAno>=0?'var-pos':'var-neg'}">${fmtPct(varAno)}</span>`:'<span class="var-zero">—</span>'}</div>
+      </div>`
     }
+    html+=`</div></div>`
   }
-  tbody.innerHTML=html
+  grid.innerHTML=html
 }
 async function loadMembers(){
   const{data}=await sb.from('group_members').select('id,role,user_id').eq('group_id',groupId)
