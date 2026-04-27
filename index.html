@@ -93,7 +93,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .mw-refresh{font-family:var(--font);font-size:11px;font-weight:500;padding:7px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;transition:background .15s;white-space:nowrap}
 .mw-refresh:hover:not(:disabled){background:#15803d}
 .mw-refresh:disabled{background:var(--surface2);color:var(--text-3);border:1px solid var(--border);cursor:not-allowed}
-.mw-top-bar{display:grid;grid-template-columns:auto auto 1fr auto;gap:12px;margin-bottom:16px;align-items:stretch}
+.mw-top-bar{display:grid;grid-template-columns:auto auto auto 1fr;gap:12px;margin-bottom:16px;align-items:stretch}
 .mw-port-summary{min-width:200px}
 .mw-port-line{display:flex;align-items:baseline;gap:0;line-height:1.5}
 .mw-port-line-name{font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
@@ -320,7 +320,7 @@ td.meta-cell{max-width:120px;overflow:hidden;text-overflow:ellipsis}
   <div class="mw-top-bar">
     <div class="mkt-card"><div class="mkt-lbl">IBOVESPA</div><div class="mkt-main" id="mw-ibov-pct">—</div><div class="mkt-sub" id="mw-ibov-val">—</div></div>
     <div class="mkt-card"><div class="mkt-lbl">BRL / USD</div><div class="mkt-main" id="mw-usd-pct">—</div><div class="mkt-sub" id="mw-usd-val">—</div></div>
-    <div class="mkt-card mw-port-summary" id="mw-port-summary"><div class="mw-port-line" style="margin-bottom:2px"><span class="mw-port-line-name" style="font-size:9px;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:.03em">Carteiras</span><span class="mw-port-line-val" style="font-size:9px;color:var(--text-3);font-weight:500">% DIA</span><span class="mw-port-line-vs" style="font-size:9px;color:var(--text-3);font-weight:500">vs IBOV</span></div><div id="mw-port-lines"><span style="font-size:11px;color:var(--text-3)">—</span></div></div>
+    <div class="mkt-card mw-port-summary" id="mw-port-summary"><div class="mw-port-line" style="margin-bottom:2px"><span class="mw-port-line-name" style="font-size:10px;color:var(--text-2);font-weight:500;text-transform:uppercase;letter-spacing:.03em">Carteiras</span><span class="mw-port-line-val" style="font-size:9px;color:var(--text-3);font-weight:500">% DIA</span><span class="mw-port-line-vs" style="font-size:9px;color:var(--text-3);font-weight:500">vs IBOV</span></div><div id="mw-port-lines"><span style="font-size:11px;color:var(--text-3)">—</span></div></div>
     <button class="mw-refresh" id="btn-refresh-mw" onclick="refreshMarketWatch()"><span id="refresh-label-mw">↻ atualizar</span></button>
   </div>
   <div class="mw-controls">
