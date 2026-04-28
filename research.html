@@ -506,6 +506,104 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
 .diff-added { background: #dcfce7; color: #166534; }
 
 /* ============================================================
+   CHECKLIST
+   ============================================================ */
+.cl-run-bar { display: flex; gap: 6px; margin-bottom: 14px; }
+.cl-run-btn {
+  padding: 6px 14px; font-size: 12px; border-radius: 6px;
+  border: 1px solid #e5e7eb; background: #fff; color: #6b7280; cursor: pointer;
+}
+.cl-run-btn.active { border-color: #7c3aed; color: #7c3aed; background: #f5f3ff; font-weight: 500; }
+.cl-progress {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  padding: 10px 14px; background: #f3f4f6; border-radius: 8px;
+}
+.cl-progress-track { flex: 1; height: 6px; border-radius: 3px; background: #e5e7eb; overflow: hidden; }
+.cl-progress-fill { height: 100%; border-radius: 3px; background: #7c3aed; transition: width 0.3s; }
+.cl-progress-text { font-size: 12px; color: #6b7280; min-width: 90px; text-align: right; }
+.cl-block {
+  padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; margin-top: 18px;
+}
+.cl-block:first-of-type { margin-top: 0; }
+.cl-block-1 { background: #eff6ff; }
+.cl-block-2 { background: #fef2f2; }
+.cl-block-3 { background: #fefce8; }
+.cl-block-title { font-size: 12px; font-weight: 500; }
+.cl-block-1 .cl-block-title { color: #1e40af; }
+.cl-block-2 .cl-block-title { color: #991b1b; }
+.cl-block-3 .cl-block-title { color: #854d0e; }
+.cl-block-sub { font-size: 11px; margin-top: 2px; }
+.cl-block-1 .cl-block-sub { color: #3b82f6; }
+.cl-block-2 .cl-block-sub { color: #dc2626; }
+.cl-block-3 .cl-block-sub { color: #ca8a04; }
+.cl-critical { display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 4px; background: #fef2f2; color: #991b1b; margin-left: 4px; }
+.cl-item { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+.cl-item:last-child { border-bottom: none; }
+.cl-item-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+.cl-item-num { font-size: 11px; color: #9ca3af; font-family: 'DM Mono', monospace; min-width: 22px; margin-top: 2px; }
+.cl-item-q { font-size: 13px; color: #1a1a1a; flex: 1; line-height: 1.5; }
+.cl-status-btns { display: flex; gap: 2px; margin-left: auto; flex-shrink: 0; }
+.cl-status-btn {
+  width: 28px; height: 28px; border-radius: 6px; border: 1px solid #e5e7eb;
+  background: #fff; cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center; color: #d1d5db; transition: all 0.1s;
+}
+.cl-status-btn.s-ok { background: #dcfce7; color: #166534; border-color: #86efac; }
+.cl-status-btn.s-warn { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.cl-status-btn.s-bad { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
+.cl-item-answer { margin-left: 32px; }
+.cl-item-answer textarea {
+  width: 100%; min-height: 36px; padding: 6px 10px;
+  border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px;
+  font-family: inherit; resize: vertical; line-height: 1.5;
+}
+.cl-item-answer textarea:focus { border-color: #16a34a; outline: none; }
+.cl-notes-box { margin-top: 16px; }
+.cl-notes-box label { font-size: 12px; font-weight: 500; color: #6b7280; display: block; margin-bottom: 4px; }
+.cl-notes-box textarea { width: 100%; min-height: 50px; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-family: inherit; resize: vertical; }
+.cl-score {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; font-family: 'DM Mono', monospace;
+}
+.cl-score-good { background: #dcfce7; color: #166534; }
+.cl-score-mid { background: #fef3c7; color: #92400e; }
+.cl-score-bad { background: #fef2f2; color: #991b1b; }
+.cl-alert {
+  background: #fef2f2; border-radius: 8px; padding: 10px 14px;
+  margin-bottom: 14px; font-size: 12px; color: #991b1b; line-height: 1.5;
+}
+.cl-summary-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+.cl-summary-item:last-child { border-bottom: none; }
+.cl-s-icon {
+  width: 22px; height: 22px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0; margin-top: 1px;
+}
+.cl-s-ok { background: #dcfce7; color: #166534; }
+.cl-s-warn { background: #fef3c7; color: #92400e; }
+.cl-s-bad { background: #fef2f2; color: #991b1b; }
+.cl-s-none { background: #f3f4f6; color: #9ca3af; }
+.cl-s-q { font-size: 12px; color: #6b7280; }
+.cl-s-a { font-size: 13px; margin-top: 2px; line-height: 1.5; }
+.cl-hist-item { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+.cl-hist-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cl-hist-date { font-size: 11px; color: #9ca3af; font-family: 'DM Mono', monospace; }
+.cl-hist-type { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+.cl-type-entry { background: #f5f3ff; color: #6d28d9; }
+.cl-type-review { background: #eff6ff; color: #1e40af; }
+.cl-type-exit { background: #fefce8; color: #854d0e; }
+.cl-hist-stats { display: flex; gap: 12px; margin-top: 6px; font-size: 12px; color: #6b7280; }
+.cl-hist-actions { margin-top: 6px; }
+.cl-modes { display: flex; gap: 6px; margin-bottom: 16px; }
+.cl-mode-btn {
+  padding: 6px 14px; font-size: 12px; border-radius: 6px;
+  border: 1px solid #e5e7eb; background: #fff; color: #6b7280; cursor: pointer;
+}
+.cl-mode-btn.active { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; font-weight: 500; }
+.cl-draft-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #fef3c7; color: #92400e; }
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 640px) {
@@ -521,6 +619,9 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
   .op-edit-cat { flex-wrap: wrap; }
   .op-edit-cat input[type=date] { width: 100%; }
   .op-edit-cat select { width: 100%; }
+  .cl-run-bar { flex-wrap: wrap; }
+  .cl-item-top { flex-wrap: wrap; }
+  .cl-status-btns { margin-left: 32px; }
 }
 </style>
 </head>
@@ -776,9 +877,53 @@ textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
       <div class="empty-state"><p>Timeline — em breve</p></div>
     </div>
 
-    <!-- CHECKLIST TAB (placeholder) -->
+    <!-- CHECKLIST TAB -->
     <div id="tab-checklist" class="ws-panel">
-      <div class="empty-state"><p>Checklist de 16 itens — em breve</p></div>
+      <div class="cl-modes" id="cl-modes" style="display:none;">
+        <button class="cl-mode-btn active" onclick="showClMode('form')">preencher</button>
+        <button class="cl-mode-btn" onclick="showClMode('summary')">resumo</button>
+        <button class="cl-mode-btn" onclick="showClMode('history')">histórico</button>
+      </div>
+
+      <div id="cl-loading" class="loading-center"><div class="spinner"></div></div>
+
+      <!-- FORM MODE -->
+      <div id="cl-form" style="display:none;">
+        <div class="cl-run-bar">
+          <button class="cl-run-btn active" onclick="setClRunType('entry',this)">entrada</button>
+          <button class="cl-run-btn" onclick="setClRunType('review',this)">revisão periódica</button>
+          <button class="cl-run-btn" onclick="setClRunType('exit',this)">saída</button>
+        </div>
+        <div class="cl-progress">
+          <div class="cl-progress-track"><div class="cl-progress-fill" id="cl-progress-fill" style="width:0%;"></div></div>
+          <span class="cl-progress-text" id="cl-progress-text">0 de 16 respondidos</span>
+        </div>
+        <div id="cl-items-container"></div>
+        <div class="cl-notes-box">
+          <label>Observações gerais</label>
+          <textarea id="cl-notes" placeholder="Notas adicionais sobre o checklist..."></textarea>
+        </div>
+        <div class="form-actions" style="margin-top:14px;">
+          <button class="btn-secondary btn-sm" onclick="saveChecklist(true)">salvar rascunho</button>
+          <button class="btn-primary btn-sm" onclick="saveChecklist(false)">finalizar checklist</button>
+        </div>
+      </div>
+
+      <!-- SUMMARY MODE -->
+      <div id="cl-summary" style="display:none;">
+        <div id="cl-summary-content"></div>
+        <div class="form-actions" style="margin-top:14px;">
+          <button class="btn-secondary btn-sm" onclick="showClMode('form')">novo checklist</button>
+        </div>
+      </div>
+
+      <!-- HISTORY MODE -->
+      <div id="cl-history" style="display:none;">
+        <div id="cl-history-list"></div>
+        <div class="form-actions" style="margin-top:14px;">
+          <button class="btn-primary btn-sm" onclick="showClMode('form')">novo checklist</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1271,6 +1416,10 @@ function showTab(tab, el) {
   // Load one-pager data when tab is selected
   if (tab === 'onepager' && currentCoverage) {
     loadOnePager();
+  }
+  // Load checklist when tab is selected
+  if (tab === 'checklist' && currentCoverage) {
+    loadChecklist();
   }
 }
 
@@ -1989,6 +2138,373 @@ function exportOnePagerPrint() {
 }
 
 // ============================================================
+// CHECKLIST — 16 ITEMS
+// ============================================================
+const CHECKLIST_QUESTIONS = [
+  { block: 1, num: 1, q: 'Qualidade ou recuperação? Sizing/horizonte refletem?' },
+  { block: 1, num: 2, q: 'Target de saída + margem de segurança via reverse DCF' },
+  { block: 1, num: 3, q: 'Pre-mortem: cenário causal que mata a tese' },
+  { block: 1, num: 4, q: 'Revisão de números para cima próximos 2 trimestres?' },
+  { block: 1, num: 5, q: 'Posicionamento vs consenso sell/buy side' },
+  { block: 1, num: 6, q: 'Setor: múltiplos expandindo/contraindo + macro' },
+  { block: 1, num: 7, q: 'Técnico: short interest, overhang, rebalanceamento índices, ETFs' },
+  { block: 2, num: 8, q: 'Eventos de alto risco no curto prazo (resultados, M&A, regulatório, assembleias)', critical: true },
+  { block: 2, num: 9, q: 'Riscos no balanço (caixa, dívida, impairments, mudanças contábeis)', critical: true },
+  { block: 2, num: 10, q: 'Governança + alinhamento management (lock-up, venda, aumento capital, remuneração)', critical: true },
+  { block: 2, num: 11, q: 'Riscos regulatórios/jurídicos/tributários', critical: true },
+  { block: 2, num: 12, q: 'Concentração em clientes/fornecedores/geografias', critical: true },
+  { block: 2, num: 13, q: 'Riscos de disrupção', critical: true },
+  { block: 3, num: 14, q: 'Risco marginal vs diversificação + correlação com posições existentes' },
+  { block: 3, num: 15, q: 'Exposição cambial implícita ok ou precisa hedge?' },
+  { block: 3, num: 16, q: 'Liquidez compatível com sizing e horizonte de saída?' }
+];
+
+let clRunType = 'entry';
+let clDraftId = null;
+let clViewingRun = null;
+
+async function loadChecklist() {
+  document.getElementById('cl-loading').style.display = 'flex';
+  document.getElementById('cl-form').style.display = 'none';
+  document.getElementById('cl-summary').style.display = 'none';
+  document.getElementById('cl-history').style.display = 'none';
+  document.getElementById('cl-modes').style.display = 'none';
+
+  // Check for existing draft
+  const { data: draft } = await sb.from('checklist_runs')
+    .select('*')
+    .eq('coverage_id', currentCoverage.id)
+    .eq('is_draft', true)
+    .limit(1)
+    .maybeSingle();
+
+  document.getElementById('cl-loading').style.display = 'none';
+  document.getElementById('cl-modes').style.display = 'flex';
+
+  clDraftId = null;
+  clViewingRun = null;
+
+  if (draft) {
+    clDraftId = draft.id;
+    clRunType = draft.run_type || 'entry';
+    renderChecklistForm(draft.checklist_data, draft.notes);
+    showClMode('form');
+  } else {
+    renderChecklistForm(null, '');
+    showClMode('form');
+  }
+}
+
+function renderChecklistForm(existingData, existingNotes) {
+  const container = document.getElementById('cl-items-container');
+  const dataMap = {};
+  if (existingData) {
+    (Array.isArray(existingData) ? existingData : []).forEach(d => { dataMap[d.item_number] = d; });
+  }
+
+  let html = '';
+  let currentBlock = 0;
+
+  CHECKLIST_QUESTIONS.forEach(item => {
+    if (item.block !== currentBlock) {
+      currentBlock = item.block;
+      const blockLabels = {
+        1: { title: 'Bloco 1 — Tese / valuation / contexto', sub: 'Itens 1–7 · fundamentos da posição', cls: 'cl-block-1' },
+        2: { title: 'Bloco 2 — Riscos do ativo', sub: 'Itens 8–13 · flag automática se algum item marcado como ✗', cls: 'cl-block-2', critical: true },
+        3: { title: 'Bloco 3 — Riscos de portfólio', sub: 'Itens 14–16 · contexto da posição dentro do book', cls: 'cl-block-3' }
+      };
+      const b = blockLabels[currentBlock];
+      html += `<div class="cl-block ${b.cls}"><div class="cl-block-title">${b.title}${b.critical ? ' <span class="cl-critical">itens críticos</span>' : ''}</div><div class="cl-block-sub">${b.sub}</div></div>`;
+    }
+
+    const d = dataMap[item.num] || {};
+    const status = d.status || '';
+
+    html += `
+      <div class="cl-item" data-num="${item.num}">
+        <div class="cl-item-top">
+          <span class="cl-item-num">${String(item.num).padStart(2,'0')}</span>
+          <span class="cl-item-q">${item.q}</span>
+          <div class="cl-status-btns">
+            <button class="cl-status-btn ${status==='ok'?'s-ok':''}" onclick="setClStatus(${item.num},'ok',this)" title="ok">✓</button>
+            <button class="cl-status-btn ${status==='warn'?'s-warn':''}" onclick="setClStatus(${item.num},'warn',this)" title="atenção">⚠</button>
+            <button class="cl-status-btn ${status==='bad'?'s-bad':''}" onclick="setClStatus(${item.num},'bad',this)" title="problema">✗</button>
+          </div>
+        </div>
+        <div class="cl-item-answer">
+          <textarea placeholder="Resposta..." oninput="updateClProgress()">${esc(d.answer || '')}</textarea>
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+  document.getElementById('cl-notes').value = existingNotes || '';
+
+  // Set run type buttons
+  document.querySelectorAll('.cl-run-btn').forEach(b => b.classList.remove('active'));
+  const typeMap = { entry: 0, review: 1, exit: 2 };
+  document.querySelectorAll('.cl-run-btn')[typeMap[clRunType] || 0].classList.add('active');
+
+  // Show draft badge if resuming
+  if (clDraftId) {
+    const modesDiv = document.getElementById('cl-modes');
+    if (!modesDiv.querySelector('.cl-draft-badge')) {
+      const badge = document.createElement('span');
+      badge.className = 'cl-draft-badge';
+      badge.textContent = 'rascunho salvo';
+      badge.style.alignSelf = 'center';
+      badge.style.marginLeft = '8px';
+      modesDiv.appendChild(badge);
+    }
+  }
+
+  updateClProgress();
+}
+
+function setClStatus(num, status, btn) {
+  const item = btn.closest('.cl-item');
+  const btns = item.querySelectorAll('.cl-status-btn');
+  const wasActive = btn.classList.contains('s-ok') || btn.classList.contains('s-warn') || btn.classList.contains('s-bad');
+
+  btns.forEach(b => { b.classList.remove('s-ok','s-warn','s-bad'); });
+
+  if (!wasActive) {
+    btn.classList.add('s-' + status);
+  }
+  updateClProgress();
+}
+
+function setClRunType(type, btn) {
+  clRunType = type;
+  document.querySelectorAll('.cl-run-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function updateClProgress() {
+  const items = document.querySelectorAll('#cl-items-container .cl-item');
+  let answered = 0;
+  items.forEach(item => {
+    const hasStatus = item.querySelector('.cl-status-btn.s-ok,.cl-status-btn.s-warn,.cl-status-btn.s-bad');
+    const hasText = item.querySelector('textarea').value.trim();
+    if (hasStatus && hasText) answered++;
+  });
+  const pct = Math.round(answered / 16 * 100);
+  document.getElementById('cl-progress-fill').style.width = pct + '%';
+  document.getElementById('cl-progress-text').textContent = `${answered} de 16 respondidos`;
+}
+
+function gatherChecklistData() {
+  const items = document.querySelectorAll('#cl-items-container .cl-item');
+  const data = [];
+  items.forEach(item => {
+    const num = parseInt(item.dataset.num);
+    const q = CHECKLIST_QUESTIONS.find(x => x.num === num);
+    let status = '';
+    if (item.querySelector('.s-ok')) status = 'ok';
+    else if (item.querySelector('.s-warn')) status = 'warn';
+    else if (item.querySelector('.s-bad')) status = 'bad';
+    data.push({
+      item_number: num,
+      question: q.q,
+      answer: item.querySelector('textarea').value.trim(),
+      status,
+      critical: q.critical || false
+    });
+  });
+  return data;
+}
+
+async function saveChecklist(isDraft) {
+  const data = gatherChecklistData();
+
+  if (!isDraft) {
+    const incomplete = data.filter(d => !d.status || !d.answer);
+    if (incomplete.length) {
+      showToast(`${incomplete.length} item(s) ainda sem resposta ou status`, 'error');
+      return;
+    }
+  }
+
+  const payload = {
+    coverage_id: currentCoverage.id,
+    group_id: currentGroup,
+    run_type: clRunType,
+    checklist_data: data,
+    notes: document.getElementById('cl-notes').value.trim() || null,
+    is_draft: isDraft,
+    completed_by: currentUser.id,
+    completed_at: new Date().toISOString()
+  };
+
+  try {
+    let error;
+    if (clDraftId) {
+      ({ error } = await sb.from('checklist_runs').update(payload).eq('id', clDraftId));
+    } else {
+      ({ error } = await sb.from('checklist_runs').insert(payload));
+    }
+
+    if (error) { showToast('Erro ao salvar: ' + error.message, 'error'); return; }
+
+    // Update coverage timestamp
+    await sb.from('coverages').update({ updated_at: new Date().toISOString() }).eq('id', currentCoverage.id);
+
+    showToast(isDraft ? 'Rascunho salvo' : 'Checklist finalizado', 'success');
+
+    if (!isDraft) {
+      clDraftId = null;
+      await loadChecklistHistory();
+      showClMode('history');
+    } else {
+      // Get the draft id if it was a new insert
+      if (!clDraftId) {
+        const { data: latest } = await sb.from('checklist_runs')
+          .select('id')
+          .eq('coverage_id', currentCoverage.id)
+          .eq('is_draft', true)
+          .limit(1)
+          .single();
+        if (latest) clDraftId = latest.id;
+      }
+    }
+  } catch(e) {
+    console.error(e);
+    showToast('Erro ao salvar checklist', 'error');
+  }
+}
+
+function showClMode(mode) {
+  document.getElementById('cl-form').style.display = 'none';
+  document.getElementById('cl-summary').style.display = 'none';
+  document.getElementById('cl-history').style.display = 'none';
+  document.querySelectorAll('.cl-mode-btn').forEach(b => b.classList.remove('active'));
+
+  if (mode === 'form') {
+    document.getElementById('cl-form').style.display = 'block';
+    document.querySelectorAll('.cl-mode-btn')[0].classList.add('active');
+  } else if (mode === 'summary') {
+    if (clViewingRun) {
+      renderChecklistSummary(clViewingRun);
+    }
+    document.getElementById('cl-summary').style.display = 'block';
+    document.querySelectorAll('.cl-mode-btn')[1].classList.add('active');
+  } else if (mode === 'history') {
+    loadChecklistHistory();
+    document.getElementById('cl-history').style.display = 'block';
+    document.querySelectorAll('.cl-mode-btn')[2].classList.add('active');
+  }
+}
+
+function renderChecklistSummary(run) {
+  const data = run.checklist_data || [];
+  const okCount = data.filter(d => d.status === 'ok').length;
+  const warnCount = data.filter(d => d.status === 'warn').length;
+  const badCount = data.filter(d => d.status === 'bad').length;
+  const scoreClass = okCount >= 14 ? 'cl-score-good' : okCount >= 10 ? 'cl-score-mid' : 'cl-score-bad';
+  const typeLabel = { entry: 'entrada', review: 'revisão', exit: 'saída' }[run.run_type] || run.run_type;
+
+  // Check critical items
+  const criticalAlerts = data.filter(d => d.critical && (d.status === 'bad' || d.status === 'warn'));
+
+  let html = `<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+    <span style="font-size:13px;color:#6b7280;">Checklist de ${typeLabel} · ${formatDate(run.completed_at)}</span>
+    <div class="cl-score ${scoreClass}">${okCount}/16</div>
+    <span style="font-size:12px;color:#6b7280;margin-left:auto;">${okCount} ok · ${warnCount} atenção · ${badCount} problema</span>
+  </div>`;
+
+  if (criticalAlerts.length) {
+    html += `<div class="cl-alert"><strong>Atenção:</strong> ${criticalAlerts.length} item(s) crítico(s) com alerta — `;
+    html += criticalAlerts.map(d => `#${d.item_number} (${d.question.split('(')[0].trim().substring(0,40)})`).join(', ');
+    html += `</div>`;
+  }
+
+  let currentBlock = 0;
+  data.forEach(d => {
+    const q = CHECKLIST_QUESTIONS.find(x => x.num === d.item_number);
+    if (q && q.block !== currentBlock) {
+      currentBlock = q.block;
+      const labels = { 1: 'Bloco 1 — Tese / valuation / contexto', 2: 'Bloco 2 — Riscos do ativo', 3: 'Bloco 3 — Riscos de portfólio' };
+      const cls = { 1: 'cl-block-1', 2: 'cl-block-2', 3: 'cl-block-3' };
+      html += `<div class="cl-block ${cls[currentBlock]}"><div class="cl-block-title">${labels[currentBlock]}</div></div>`;
+    }
+
+    const iconClass = d.status === 'ok' ? 'cl-s-ok' : d.status === 'warn' ? 'cl-s-warn' : d.status === 'bad' ? 'cl-s-bad' : 'cl-s-none';
+    const icon = d.status === 'ok' ? '✓' : d.status === 'warn' ? '⚠' : d.status === 'bad' ? '✗' : '—';
+
+    html += `<div class="cl-summary-item">
+      <div class="cl-s-icon ${iconClass}">${icon}</div>
+      <div style="flex:1;">
+        <div class="cl-s-q">${String(d.item_number).padStart(2,'0')} · ${esc(d.question)}</div>
+        ${d.answer ? `<div class="cl-s-a">${esc(d.answer)}</div>` : ''}
+      </div>
+    </div>`;
+  });
+
+  if (run.notes) {
+    html += `<div style="margin-top:14px;padding:10px 12px;background:#f3f4f6;border-radius:8px;font-size:12px;color:#6b7280;">
+      <strong>Observações:</strong> ${esc(run.notes)}
+    </div>`;
+  }
+
+  document.getElementById('cl-summary-content').innerHTML = html;
+}
+
+async function loadChecklistHistory() {
+  const list = document.getElementById('cl-history-list');
+  list.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+  const { data, error } = await sb.from('checklist_runs')
+    .select('*')
+    .eq('coverage_id', currentCoverage.id)
+    .eq('is_draft', false)
+    .order('completed_at', { ascending: false });
+
+  if (error) { list.innerHTML = '<div class="empty-state"><p>Erro ao carregar histórico</p></div>'; return; }
+
+  const runs = data || [];
+  if (!runs.length) {
+    list.innerHTML = '<div class="empty-state"><p>Nenhum checklist finalizado ainda</p><p style="font-size:12px;color:#9ca3af;">Ideal: revisão a cada trimestre ou quando houver mudança material</p></div>';
+    return;
+  }
+
+  list.innerHTML = runs.map(run => {
+    const d = run.checklist_data || [];
+    const okCount = d.filter(x => x.status === 'ok').length;
+    const warnCount = d.filter(x => x.status === 'warn').length;
+    const badCount = d.filter(x => x.status === 'bad').length;
+    const scoreClass = okCount >= 14 ? 'cl-score-good' : okCount >= 10 ? 'cl-score-mid' : 'cl-score-bad';
+    const typeLabel = { entry: 'entrada', review: 'revisão', exit: 'saída' }[run.run_type] || run.run_type;
+    const typeClass = { entry: 'cl-type-entry', review: 'cl-type-review', exit: 'cl-type-exit' }[run.run_type] || '';
+
+    return `<div class="cl-hist-item">
+      <div class="cl-hist-top">
+        <span class="cl-hist-date">${formatDate(run.completed_at)}</span>
+        <span class="cl-hist-type ${typeClass}">${typeLabel}</span>
+        <div class="cl-score ${scoreClass}" style="width:36px;height:36px;font-size:12px;margin-left:auto;">${okCount}/16</div>
+      </div>
+      <div class="cl-hist-stats">
+        <span>${okCount} ok</span> · <span>${warnCount} atenção</span> · <span>${badCount} problema</span>
+      </div>
+      <div class="cl-hist-actions">
+        <button class="ver-btn" onclick="viewChecklistRun('${run.id}')">ver detalhes</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function viewChecklistRun(runId) {
+  const { data } = await sb.from('checklist_runs')
+    .select('*')
+    .eq('id', runId)
+    .single();
+
+  if (!data) { showToast('Checklist não encontrado', 'error'); return; }
+
+  clViewingRun = data;
+  showClMode('summary');
+}
+
+// ============================================================
 // EXPOSE FUNCTIONS TO HTML (modules are scoped)
 // ============================================================
 window.openCoverageModal = openCoverageModal;
@@ -2014,6 +2530,11 @@ window.addRiskRow = addRiskRow;
 window.recalcFinancials = recalcFinancials;
 window.restoreVersion = restoreVersion;
 window.exportOnePagerPrint = exportOnePagerPrint;
+window.showClMode = showClMode;
+window.setClStatus = setClStatus;
+window.setClRunType = setClRunType;
+window.saveChecklist = saveChecklist;
+window.viewChecklistRun = viewChecklistRun;
 
 // ============================================================
 // START
